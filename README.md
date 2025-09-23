@@ -1,6 +1,7 @@
 # viko-kolegija-webApp
 Web Application created for the College VIKO - Vilniaus Kolegija
 
+<<<<<<< HEAD
 Erasmus + Internship
 
 Project idea:
@@ -19,3 +20,6 @@ Functionality:
     Create training, assign trainer, see participants
     Data adjustment
 5. (Optional) Creation of web components, e.g. CourseCardComponent,           ProgressBarComponent to show UI skills
+=======
+This branch is dedicated only for the Flowcharts created for logics.
+>>>>>>> flowcharts
