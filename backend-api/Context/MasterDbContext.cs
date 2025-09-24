@@ -12,28 +12,57 @@ namespace backend_api.Context
         public DbSet<Entities> Entities { get; set; }
         public DbSet<Users> Users { get; set; }
         public DbSet<Roles> Roles { get; set; }
+        public DbSet<Events> Events { get; set; }
+        public DbSet<ParticipantsEvents> ParticipantsEvents { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // ParticipantsEvents → Events  (muitos para um)  | ON DELETE RESTRICT
+            modelBuilder.Entity<ParticipantsEvents>()
+                .HasOne(pe => pe.Event)
+                .WithMany(e => e.Participants)
+                .HasForeignKey(pe => pe.EventId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ParticipantsEvents → Entities (muitos para um) | ON DELETE CASCADE
+            modelBuilder.Entity<ParticipantsEvents>()
+                .HasOne(pe => pe.Entity)
+                .WithMany(en => en.Participants)
+                .HasForeignKey(pe => pe.EntityId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 
+
+
     [Table("Entities")] //Maps the class User for table User in Database
+    [Index(nameof(Email), IsUnique = true)]
     public class Entities
     { //Class Entities
         [Key]
         public int Id { get; set; } //Primary key
-        [Required]
-        public string Name { get; set; } //Name of entity
-        [Required]
+        [Required, MaxLength(100)]
+        public string Name { get; set; } = null!; //Name of entity
+        [Required, MaxLength(150)]
         [EmailAddress]
-        public string Email { get; set; } //Email of entity
+        public string Email { get; set; } = null!; //Email of entity
         public string Image { get; set; } //Image of entity
+        [MaxLength(20)]
         [Phone]
         public string NumberPhone { get; set; } //Number phone of entity
+        [MaxLength(200)]
         public string Address { get; set; } //Address of entity
+        [MaxLength(20)]
         public string Gender { get; set; } //Gender of entity
-        public string Auth { get; set; } //Authorization of entity
-        public int Role_id { get; set; } //Type role of entity
-        [ForeignKey("Role_id")]
+        [Required]
+        public bool Auth { get; set; } = false; //Authorization of entity
+        public int RoleId { get; set; } //Type role of entity
+        [ForeignKey("RoleId")]
         public Roles Roles { get; set; } //Relationship with id of table Roles
+        public ICollection<ParticipantsEvents> Participants { get; set; } = new List<ParticipantsEvents>();
+
     }
 
     [Table("Roles")] //Maps the class User for table User in Database
@@ -41,16 +70,19 @@ namespace backend_api.Context
     { //Class Entities
         [Key]
         public int Id { get; set; } //Primary key
+        [Required]
         public string Type { get; set; } //Type of role
     }
 
     [Table("Users")]
+    [Index(nameof(Username), IsUnique = true)]
     public class Users
     {
         [Key]
         public int Id { get; set; } //Id of User
-        public int Entity_id { get; set; } //Entity_id of User
-        [ForeignKey("Entity_id")]
+        [Required]
+        public int EntityId { get; set; } //Entity_id of User
+        [ForeignKey("EntityId")]
         public Entities Entity { get; set; } //Relationship with id of table Entities
         [Required]
         [MaxLength(50)]
@@ -69,12 +101,33 @@ namespace backend_api.Context
         public string Name { get; set; } //Name of event
         public string Description { get; set; } //Description of event
         public string Topic { get; set; } //Topic type of event
-        public string Create_by_id { get; set; } //Event created by id?
-        [ForeignKey("Create_by_id")]
+        public int CreateById { get; set; } //Event created by id?
+        [ForeignKey("CreateById")]
         public Entities Entities { get; set; } //Relationship with id of table Entities
         public string DateCreate { get; set; } //Event created in date
         public bool Status { get; set; } //Status of event, True = event online / False = event finish
         public int Results { get; set; } //Results of event, grades
-        
+        public ICollection<ParticipantsEvents> Participants { get; set; } = new List<ParticipantsEvents>();
+
+
+    }
+
+    [Table("ParticipantsEvents")] //Maps the class User for table User in Database
+    public class ParticipantsEvents
+    { //Class Entities
+        [Key]
+        public int Id { get; set; } //Primary key
+        public int EventId { get; set; } //Event id?
+        [ForeignKey("EventId")]
+        [InverseProperty("Participants")]
+        public Events Event { get; set; } //Relationship with id of table Events
+        public int EntityId { get; set; } //Entity id?
+        [ForeignKey("EntityId")]
+        [InverseProperty("Participants")]
+        public Entities Entity { get; set; } //Relationship with id of table Entities
+        public bool status { get; set; } //Status of participant in event
+        public string Grade { get; set; } //Grade in 1 event of 1 participant
+        public string CertificateData { get; set; } //Certificate Data in 1 event of 1 participant
+        public string Progress { get; set; } //Progress in 1 event of 1 participant
     }
 }

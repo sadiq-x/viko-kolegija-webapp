@@ -5,6 +5,7 @@ using backend_api.Interceptors;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -16,11 +17,13 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
+//Get the Connection String from local.settings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 
 //Adding the connection string sql
 builder.Services.AddDbContextFactory<MasterDbContext>(options =>
-    options.UseSqlServer("Server=localhost,1433;Database=AppDb;User Id=sa;Password=MyStrongPassword123;Encrypt=True;TrustServerCertificate=True;"));
+    options.UseSqlServer("Server=localhost,1433;Database=AppViko;User Id=sa;Password=MyStrongPassword123;Encrypt=True;TrustServerCertificate=True;"));
 
 //Adding the camelcase json
 builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
