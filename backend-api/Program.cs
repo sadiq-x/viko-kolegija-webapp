@@ -11,6 +11,12 @@ using Microsoft.Extensions.Hosting;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 builder.ConfigureFunctionsWebApplication();
 
 builder.Services
@@ -18,12 +24,12 @@ builder.Services
     .ConfigureFunctionsApplicationInsights();
 
 //Get the Connection String from local.settings.json
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? builder.Configuration["Values:DefaultConnection"];
 
 //Adding the connection string sql
 builder.Services.AddDbContextFactory<MasterDbContext>(options =>
-    options.UseSqlServer("Server=localhost,1433;Database=AppViko;User Id=sa;Password=MyStrongPassword123;Encrypt=True;TrustServerCertificate=True;"));
+    options.UseSqlServer(connectionString));
 
 //Adding the camelcase json
 builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
