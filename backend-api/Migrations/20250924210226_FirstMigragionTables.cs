@@ -5,7 +5,7 @@
 namespace backend_api.Migrations
 {
     /// <inheritdoc />
-    public partial class FirstMigrationDatabase : Migration
+    public partial class FirstMigragionTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -116,13 +116,13 @@ namespace backend_api.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ParticipantsEvents_Events_EventId",
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
