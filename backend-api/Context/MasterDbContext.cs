@@ -19,19 +19,19 @@ namespace backend_api.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // ParticipantsEvents → Events  (muitos para um)  | ON DELETE RESTRICT
-            modelBuilder.Entity<ParticipantsEvents>()
+            // ParticipantsEvents → Events (N:1) / If someone drop the Event id, the FK EventId will be full dropped
+            modelBuilder.Entity<ParticipantsEvents>()   //Fluent API
                 .HasOne(pe => pe.Event)
-                .WithMany(e => e.Participants)
+                .WithMany(e => e.ParticipantsEvents)
                 .HasForeignKey(pe => pe.EventId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);  // ON DELETE CASCADE
 
-            // ParticipantsEvents → Entities (muitos para um) | ON DELETE CASCADE
+            // ParticipantsEvents → Entities (N:1) / If someone drop the Event id, the FK EventId will impossible
             modelBuilder.Entity<ParticipantsEvents>()
                 .HasOne(pe => pe.Entity)
-                .WithMany(en => en.Participants)
+                .WithMany(en => en.ParticipantsEvents)
                 .HasForeignKey(pe => pe.EntityId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);    // ON DELETE RESTRICT
         }
     }
 
@@ -61,11 +61,12 @@ namespace backend_api.Context
         public int RoleId { get; set; } //Type role of entity
         [ForeignKey("RoleId")]
         public Roles Roles { get; set; } //Relationship with id of table Roles
-        public ICollection<ParticipantsEvents> Participants { get; set; } = new List<ParticipantsEvents>();
+        public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
 
     }
 
     [Table("Roles")] //Maps the class User for table User in Database
+    [Index(nameof(Type), IsUnique = true)]
     public class Roles
     { //Class Entities
         [Key]
@@ -107,7 +108,7 @@ namespace backend_api.Context
         public string DateCreate { get; set; } //Event created in date
         public bool Status { get; set; } //Status of event, True = event online / False = event finish
         public int Results { get; set; } //Results of event, grades
-        public ICollection<ParticipantsEvents> Participants { get; set; } = new List<ParticipantsEvents>();
+        public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
 
 
     }
@@ -119,11 +120,9 @@ namespace backend_api.Context
         public int Id { get; set; } //Primary key
         public int EventId { get; set; } //Event id?
         [ForeignKey("EventId")]
-        [InverseProperty("Participants")]
-        public Events Event { get; set; } //Relationship with id of table Events
+        public Events Event { get; set; } = null!; //Relationship with id of table Events
         public int EntityId { get; set; } //Entity id?
         [ForeignKey("EntityId")]
-        [InverseProperty("Participants")]
         public Entities Entity { get; set; } //Relationship with id of table Entities
         public bool status { get; set; } //Status of participant in event
         public string Grade { get; set; } //Grade in 1 event of 1 participant

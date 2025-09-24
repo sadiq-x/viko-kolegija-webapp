@@ -11,8 +11,8 @@ using backend_api.Context;
 namespace backend_api.Migrations
 {
     [DbContext(typeof(MasterDbContext))]
-    [Migration("20250924115419_FirstMigrationDatabase")]
-    partial class FirstMigrationDatabase
+    [Migration("20250924210226_FirstMigragionTables")]
+    partial class FirstMigragionTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,15 +227,15 @@ namespace backend_api.Migrations
             modelBuilder.Entity("backend_api.Context.ParticipantsEvents", b =>
                 {
                     b.HasOne("backend_api.Context.Entities", "Entity")
-                        .WithMany("Participants")
+                        .WithMany("ParticipantsEvents")
                         .HasForeignKey("EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("backend_api.Context.Events", "Event")
-                        .WithMany("Participants")
+                        .WithMany("ParticipantsEvents")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Entity");
@@ -256,12 +256,12 @@ namespace backend_api.Migrations
 
             modelBuilder.Entity("backend_api.Context.Entities", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("ParticipantsEvents");
                 });
 
             modelBuilder.Entity("backend_api.Context.Events", b =>
                 {
-                    b.Navigation("Participants");
+                    b.Navigation("ParticipantsEvents");
                 });
 #pragma warning restore 612, 618
         }
