@@ -1,0 +1,64 @@
+-- =========================================
+-- 1) Table Roles
+-- =========================================
+CREATE TABLE Roles (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Type NVARCHAR(MAX) NOT NULL
+);
+
+-- =========================================
+-- 2) Table Entities
+-- =========================================
+CREATE TABLE Entities (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(150) NOT NULL UNIQUE,
+    Image NVARCHAR(MAX) NULL,
+    NumberPhone NVARCHAR(20) NULL,
+    Address NVARCHAR(200) NULL,
+    Gender NVARCHAR(20) NULL,
+    Auth BIT NOT NULL,
+    RoleId INT NOT NULL,
+    CONSTRAINT FK_Entities_Roles FOREIGN KEY (RoleId) REFERENCES Roles(Id)
+);
+
+-- =========================================
+-- 3) Table Users
+-- =========================================
+CREATE TABLE Users (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EntityId INT NOT NULL,
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(MAX) NOT NULL,
+    CONSTRAINT FK_Users_Entities FOREIGN KEY (EntityId) REFERENCES Entities(Id)
+);
+
+-- =========================================
+-- 4) Table Events
+-- =========================================
+CREATE TABLE Events (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(MAX) NOT NULL,
+    Description NVARCHAR(MAX) NULL,
+    Topic NVARCHAR(MAX) NULL,
+    CreateById INT NOT NULL,
+    DateCreate NVARCHAR(MAX) NULL,
+    Status BIT NOT NULL,
+    Results INT NOT NULL,
+    CONSTRAINT FK_Events_Entities FOREIGN KEY (CreateById) REFERENCES Entities(Id)
+);
+
+-- =========================================
+-- 5) Table ParticipantsEvents
+-- =========================================
+CREATE TABLE ParticipantsEvents (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    EventId INT NOT NULL,
+    EntityId INT NOT NULL,
+    Status BIT NOT NULL,
+    Grade NVARCHAR(MAX) NULL,
+    CertificateData NVARCHAR(MAX) NULL,
+    Progress NVARCHAR(MAX) NULL,
+    CONSTRAINT FK_ParticipantsEvents_Events FOREIGN KEY (EventId) REFERENCES Events(Id),
+    CONSTRAINT FK_ParticipantsEvents_Entities FOREIGN KEY (EntityId) REFERENCES Entities(Id)
+);
