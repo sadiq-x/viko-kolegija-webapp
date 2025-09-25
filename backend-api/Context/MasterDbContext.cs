@@ -35,8 +35,6 @@ namespace backend_api.Context
         }
     }
 
-
-
     [Table("Entities")] //Maps the class User for table User in Database
     [Index(nameof(Email), IsUnique = true)]
     public class Entities
@@ -62,7 +60,6 @@ namespace backend_api.Context
         [ForeignKey("RoleId")]
         public Roles Roles { get; set; } //Relationship with id of table Roles
         public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
-
     }
 
     [Table("Roles")] //Maps the class User for table User in Database
@@ -109,8 +106,6 @@ namespace backend_api.Context
         public bool Status { get; set; } //Status of event, True = event online / False = event finish
         public int Results { get; set; } //Results of event, grades
         public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
-
-
     }
 
     [Table("ParticipantsEvents")] //Maps the class User for table User in Database
