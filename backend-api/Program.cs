@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using backend_api.Middleware;
+using backend_api.Repositories;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -27,6 +29,12 @@ builder.Services
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? builder.Configuration["Values:DefaultConnection"];
 
+//Middleware for Authorization
+builder.UseWhen<HeaderValidationMiddleware>(context => {
+        return context.FunctionDefinition.InputBindings.Values.Any(v => v.Type == "httpTrigger")
+        && context.FunctionDefinition.Name != "auth";
+});
+
 //Adding the connection string sql
 builder.Services.AddDbContextFactory<MasterDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -41,8 +49,9 @@ builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
 
 builder.Services.AddSingleton<RemoveAliasInterceptor>();
 
-//Adding the interface of car repository
-//builder.Services.AddSingleton<ICarRepository, CarRepository>();
+//Adding the interfaces of repositories
+builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User repository 
+//builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User repository
 builder.Services.AddHttpClient();
 
 
