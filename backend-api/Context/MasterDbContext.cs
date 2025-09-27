@@ -46,14 +46,14 @@ namespace backend_api.Context
         [Required, MaxLength(150)]
         [EmailAddress]
         public string Email { get; set; } = null!; //Email of entity
-        public string Image { get; set; } //Image of entity
+        public string? Image { get; set; } //Image of entity
         [MaxLength(20)]
         [Phone]
         public string NumberPhone { get; set; } //Number phone of entity
         [MaxLength(200)]
         public string Address { get; set; } //Address of entity
         [MaxLength(20)]
-        public string Gender { get; set; } //Gender of entity
+        public string? Gender { get; set; } //Gender of entity
         [Required]
         public bool Auth { get; set; } = false; //Authorization of entity
         public int RoleId { get; set; } //Type role of entity
