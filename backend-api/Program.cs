@@ -15,7 +15,6 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
@@ -29,31 +28,33 @@ builder.Services
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? builder.Configuration["Values:DefaultConnection"];
 
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException("Connection string 'DefaultConnection' não configurada.");
+
 //Middleware for Authorization
-builder.UseWhen<HeaderValidationMiddleware>(context => {
-        return context.FunctionDefinition.InputBindings.Values.Any(v => v.Type == "httpTrigger")
-        && context.FunctionDefinition.Name != "auth";
+builder.UseWhen<HeaderValidationMiddleware>(context =>
+{
+    return context.FunctionDefinition.InputBindings.Values.Any(v => v.Type == "httpTrigger")
+    && context.FunctionDefinition.Name != "authLogin" && context.FunctionDefinition.Name != "authRegister";
 });
 
 //Adding the connection string sql
 builder.Services.AddDbContextFactory<MasterDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-//Adding the camelcase json
-builder.Services.Configure<JsonSerializerOptions>(jsonSerializerOptions =>
+builder.Services.Configure<JsonSerializerOptions>(options =>
 {
-    jsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    jsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    jsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+    options.PropertyNameCaseInsensitive = true;
+    options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 
 builder.Services.AddSingleton<RemoveAliasInterceptor>();
 
 //Adding the interfaces of repositories
 builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User repository 
-//builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User repository
 builder.Services.AddHttpClient();
-
 
 builder.Build().Run();
 

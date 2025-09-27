@@ -5,16 +5,15 @@ namespace backend_api.Models
 {
     public sealed class UserLoginRequestModel
     {
-        public int? Id { get; set; }
         [Required]
-        public string? Username { get; set; }
-        [Required, JsonIgnore]
-        public string? PasswordHash { get; set; }
+        public string Username { get; set; } = default!;
+        [Required]
+        public string PasswordHash { get; set; } = default!;
     }
 
     public sealed class UserLoginResponseModel
     {
-        public int Id { get; init; }
-        public string Username { get; init; } = default!;
+        public int? EntityId { get; init; }
+        public string? Username { get; init; } = default!;
     }
 }
