@@ -6,8 +6,8 @@ namespace backend_api.Repositories
 {
     public interface IUserRepository
     {
-        Task<UserLoginResponseModel?> authUserLogin(UserLoginRequestModel t); //Task to check if the login is valid
-        Task<bool> authUserRegister(UserRegisterRequestModel e); //Task to crete a new user
+        Task<UserLoginResponseDTO?> authUserLogin(UserLoginRequestDTO t); //Task to check if the login is valid
+        Task<bool> authUserRegister(UserRegisterRequestDTO e); //Task to crete a new user
     }
 
     public class UserRepository : IUserRepository
@@ -18,9 +18,8 @@ namespace backend_api.Repositories
             _readContextFactory = readContextFactory;
         }
 
-        public async Task<UserLoginResponseModel?> authUserLogin(UserLoginRequestModel t)
+        public async Task<UserLoginResponseDTO?> authUserLogin(UserLoginRequestDTO t)
         {
-            Console.WriteLine($"[LOGIN] Username='{t?.Username}' PasswordHash='{t?.PasswordHash}'");
             try
             {
 
@@ -33,14 +32,12 @@ namespace backend_api.Repositories
                     u => u.EntityId,
                     e => e.Id,
                     (u, e) => new { u, e })
-                .Select(join => new UserLoginResponseModel
+                .Select(join => new UserLoginResponseDTO
                 {
                     EntityId = join.u.EntityId,
                     Username = join.u.Username
                 })
                 .FirstOrDefaultAsync();
-
-              
 
                 if (result is null) return null;
 
@@ -52,20 +49,8 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<bool> authUserRegister(UserRegisterRequestModel t)
+        public async Task<bool> authUserRegister(UserRegisterRequestDTO t)
         {
-            Console.WriteLine("=== Debug UserRegisterRequestModel ===");
-            Console.WriteLine($"Username: {t?.Username}");
-            Console.WriteLine($"PasswordHash: {t?.PasswordHash}");
-            Console.WriteLine($"ConfirmPasswordHash: {t?.ConfirmPasswordHash}");
-            Console.WriteLine($"Name: {t?.Name}");
-            Console.WriteLine($"Email: {t?.Email}");
-            Console.WriteLine($"NumberPhone: {t?.NumberPhone}");
-            Console.WriteLine($"Address: {t?.Address}");
-            Console.WriteLine($"Auth: {t?.Auth}");
-            Console.WriteLine("=====================================");
-
-            //Validation of string required
             if (string.IsNullOrWhiteSpace(t.Email)) return false;
             if (string.IsNullOrWhiteSpace(t.Username)) return false;
             if (string.IsNullOrWhiteSpace(t.Address)) return false;
@@ -89,7 +74,8 @@ namespace backend_api.Repositories
                     Auth = false,
                     RoleId = 5
                 };
-                dbContext.Add(EntitiesDTO);
+
+                dbContext.Entities.Add(EntitiesDTO);
                 var confirmEntities = await dbContext.SaveChangesAsync();
 
                 if (confirmEntities == 0)

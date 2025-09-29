@@ -1,7 +1,7 @@
 using System.Net;
-using System.Text.Json;
 using backend_api.Models;
 using backend_api.Repositories;
+using backend_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -22,13 +22,16 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run1(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/register")] HttpRequestData req)
         {
-            // Usa o helper do runtime que já lê e aplica as opções globais de Json (camelCase incluído)
-            var registerUserDto = await req.ReadFromJsonAsync<UserRegisterRequestModel>();
+            var registerUserDto = await req.ReadFromJsonAsync<UserRegisterRequestDTO>();
 
-            if (registerUserDto is null)
+            if (registerUserDto is null || !registerUserDto.IsValid())
             {
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badResponse.WriteAsJsonAsync(new { message = "Fill the form correctly." });
+                await badResponse.WriteAsJsonAsync(new
+                {
+                    message = "Fill the form correctly.",
+                    error = registerUserDto?.Validate().Select(e => e.ErrorMessage) ?? new List<string>()
+                });
                 return badResponse;
             }
 
@@ -42,7 +45,7 @@ namespace backend_api.Functions
             }
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(new { msg = "Register Success" });
+            await response.WriteAsJsonAsync(new { message = "Register Success" });
             return response;
         }
     }

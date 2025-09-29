@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text.Json;
 using backend_api.Models;
 using backend_api.Repositories;
 using backend_api.Services;
@@ -22,12 +21,16 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run1(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/login")] HttpRequestData req) //Create the Http req and res
         {
-            var loginUserDto = await req.ReadFromJsonAsync<UserLoginRequestModel>();
+            var loginUserDto = await req.ReadFromJsonAsync<UserLoginRequestDTO>();
 
-            if (loginUserDto is null) //Verify if email and password are null, and reject the login
+            if (loginUserDto is null || !loginUserDto.IsValid()) //Verify if email and password are null, and reject the login
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
-                await BadResponse.WriteAsJsonAsync(new { message = "Wrong Credentials." }); //Response send with msg
+                await BadResponse.WriteAsJsonAsync(new
+                {
+                    message = "Wrong Credentials.",
+                    error = loginUserDto?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                }); 
                 return BadResponse;
             }
 
