@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend_api.Models
 {
-    public sealed class UserRegisterRequestModel
+    public sealed class UserRegisterRequestDTO
     {
         [Required]
         public string Username { get; set; } = default!;
@@ -26,7 +26,7 @@ namespace backend_api.Models
         public bool Auth { get; } = false;
     }
 
-    public sealed class EntityRegisterResponseModel
+    public sealed class EntityRegisterResponseDTO
     {
         public int Id { get; init; }
         public string Name { get; init; } = default!;
