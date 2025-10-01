@@ -37,15 +37,15 @@ namespace backend_api.Functions
 
             var registerUser = await _userRepository.authUserRegister(registerUserDto);
 
-            if (!registerUser)
+            if (!registerUser.Success)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-                await notFoundResponse.WriteStringAsync("Username or Email need to be different.");
+                await notFoundResponse.WriteAsJsonAsync(new { message = $"{registerUser.Message}." });
                 return notFoundResponse;
             }
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(new { message = "Register Success" });
+            await response.WriteAsJsonAsync(new { message = "Register Success." });
             return response;
         }
     }
