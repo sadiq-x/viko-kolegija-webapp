@@ -1,1 +1,219 @@
-<p>register works!</p>
+<!-- Página de Registo -->
+<div class="min-h-screen bg-blue-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Logo / Título -->
+        <div class="text-center mb-6">
+            <!-- logo maior -->
+            <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain" />
+        </div>
+
+        <!-- Cabeçalho -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-blue-800">Sign up</h1>
+            <p class="mt-1 text-sm text-blue-700/70">
+                Fill in the data securely. All fields are mandatory.
+            </p>
+        </div>
+
+        <!-- Cartão -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <form class="space-y-4" novalidate>
+
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
+                    <input id="username" name="username" type="text" required class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+                   focus:ring-blue-200 focus:border-blue-400" placeholder="Username" />
+                </div>
+
+                <!-- Nome -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
+                    <input id="name" name="name" type="text" required maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+                   focus:ring-blue-200 focus:border-blue-400" placeholder="Your name" />
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-blue-900">Email</label>
+                    <input id="email" name="email" type="email" required maxlength="150" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+                   focus:ring-blue-200 focus:border-blue-400" placeholder="exemplo@gmail.com" />
+                </div>
+
+                <!-- Telefone -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-blue-900">Phone Number</label>
+
+                    <div class="mt-1 flex gap-2">
+                        <!-- Select com os códigos -->
+                        <select id="countryCode" name="countryCode" class="w-32 rounded-xl border border-blue-200 bg-white px-2 py-2 text-blue-900 
+         focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" required>
+                            <option value="+93">🇦🇫 Afeganistão +93</option>
+                            <option value="+355">🇦🇱 Albânia +355</option>
+                            <option value="+213">🇩🇿 Argélia +213</option>
+                            <option value="+376">🇦🇩 Andorra +376</option>
+                            <option value="+244">🇦🇴 Angola +244</option>
+                            <option value="+54">🇦🇷 Argentina +54</option>
+                            <option value="+61">🇦🇺 Austrália +61</option>
+                            <option value="+43">🇦🇹 Áustria +43</option>
+                            <option value="+32">🇧🇪 Bélgica +32</option>
+                            <option value="+55">🇧🇷 Brasil +55</option>
+                            <option value="+1">🇨🇦 Canadá +1</option>
+                            <option value="+56">🇨🇱 Chile +56</option>
+                            <option value="+86">🇨🇳 China +86</option>
+                            <option value="+57">🇨🇴 Colômbia +57</option>
+                            <option value="+506">🇨🇷 Costa Rica +506</option>
+                            <option value="+53">🇨🇺 Cuba +53</option>
+                            <option value="+420">🇨🇿 Chéquia +420</option>
+                            <option value="+45">🇩🇰 Dinamarca +45</option>
+                            <option value="+20">🇪🇬 Egito +20</option>
+                            <option value="+503">🇸🇻 El Salvador +503</option>
+                            <option value="+34">🇪🇸 Espanha +34</option>
+                            <option value="+372">🇪🇪 Estónia +372</option>
+                            <option value="+251">🇪🇹 Etiópia +251</option>
+                            <option value="+358">🇫🇮 Finlândia +358</option>
+                            <option value="+33">🇫🇷 França +33</option>
+                            <option value="+49">🇩🇪 Alemanha +49</option>
+                            <option value="+30">🇬🇷 Grécia +30</option>
+                            <option value="+852">🇭🇰 Hong Kong +852</option>
+                            <option value="+36">🇭🇺 Hungria +36</option>
+                            <option value="+91">🇮🇳 Índia +91</option>
+                            <option value="+62">🇮🇩 Indonésia +62</option>
+                            <option value="+353">🇮🇪 Irlanda +353</option>
+                            <option value="+972">🇮🇱 Israel +972</option>
+                            <option value="+39">🇮🇹 Itália +39</option>
+                            <option value="+81">🇯🇵 Japão +81</option>
+                            <option value="+254">🇰🇪 Quénia +254</option>
+                            <option value="+371">🇱🇻 Letónia +371</option>
+                            <option value="+370">🇱🇹 Lituânia +370</option>
+                            <option value="+352">🇱🇺 Luxemburgo +352</option>
+                            <option value="+356">🇲🇹 Malta +356</option>
+                            <option value="+212">🇲🇦 Marrocos +212</option>
+                            <option value="+52">🇲🇽 México +52</option>
+                            <option value="+31">🇳🇱 Países Baixos +31</option>
+                            <option value="+64">🇳🇿 Nova Zelândia +64</option>
+                            <option value="+47">🇳🇴 Noruega +47</option>
+                            <option value="+92">🇵🇰 Paquistão +92</option>
+                            <option value="+507">🇵🇦 Panamá +507</option>
+                            <option value="+595">🇵🇾 Paraguai +595</option>
+                            <option value="+51">🇵🇪 Peru +51</option>
+                            <option value="+63">🇵🇭 Filipinas +63</option>
+                            <option value="+48">🇵🇱 Polónia +48</option>
+                            <option value="+351" selected>🇵🇹 Portugal +351</option>
+                            <option value="+40">🇷🇴 Roménia +40</option>
+                            <option value="+7">🇷🇺 Rússia +7</option>
+                            <option value="+966">🇸🇦 Arábia Saudita +966</option>
+                            <option value="+65">🇸🇬 Singapura +65</option>
+                            <option value="+421">🇸🇰 Eslováquia +421</option>
+                            <option value="+386">🇸🇮 Eslovénia +386</option>
+                            <option value="+27">🇿🇦 África do Sul +27</option>
+                            <option value="+82">🇰🇷 Coreia do Sul +82</option>
+                            <option value="+34">🇪🇸 Espanha +34</option>
+                            <option value="+46">🇸🇪 Suécia +46</option>
+                            <option value="+41">🇨🇭 Suíça +41</option>
+                            <option value="+90">🇹🇷 Turquia +90</option>
+                            <option value="+380">🇺🇦 Ucrânia +380</option>
+                            <option value="+971">🇦🇪 Emirados Árabes +971</option>
+                            <option value="+44">🇬🇧 Reino Unido +44</option>
+                            <option value="+1">🇺🇸 Estados Unidos +1</option>
+                            <option value="+598">🇺🇾 Uruguai +598</option>
+                            <option value="+58">🇻🇪 Venezuela +58</option>
+                            <option value="+84">🇻🇳 Vietname +84</option>
+                            <!-- ... lista segue para todos os países -->
+                        </select>
+
+                        <!-- Input só para o número -->
+                        <input id="phone" name="phone" type="tel" required maxlength="20" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+             focus:ring-blue-200 focus:border-blue-400" placeholder="912 345 678" />
+                    </div>
+
+                    <p class="mt-1 text-xs text-blue-700/70">
+                        Choose the country code and enter your mobile phone number.
+                    </p>
+                </div>
+
+                <!-- Morada -->
+                <div>
+                    <label for="address" class="block text-sm font-medium text-blue-900">Address</label>
+                    <input id="address" name="address" type="text" required maxlength="200" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+                   focus:ring-blue-200 focus:border-blue-400" placeholder="Location, street and number." />
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-blue-900">Password</label>
+                    <div class="mt-1 relative">
+                        <input id="password" name="password" type="password" autocomplete="new-password"
+                            placeholder="••••••••" class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900 
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+             focus:ring-blue-200 focus:border-blue-400" aria-describedby="password-help" required />
+                        <!-- Botão mostrar/ocultar -->
+                        <button type="button" aria-label="Mostrar palavra-passe" class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center 
+             rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
+                            onclick="const p=document.getElementById('password'); p.type = p.type==='password' ? 'text':'password';">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7Zm0 12a5 5 0 1 1 5-5 5.006 5.006 0 0 1-5 5Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p id="password-help" class="mt-1 text-xs text-blue-700/70">
+                        Minimum 8 characters, including lowercase, uppercase and digit.
+                    </p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-blue-900">Confirm
+                        Password</label>
+                    <div class="mt-1 relative">
+                        <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password"
+                            placeholder="••••••••" class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900 
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
+             focus:ring-blue-200 focus:border-blue-400" required />
+                        <!-- Botão mostrar/ocultar -->
+                        <button type="button" aria-label="Mostrar palavra-passe" class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center 
+             rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
+                            onclick="const c=document.getElementById('confirmPassword'); c.type = c.type==='password' ? 'text':'password';">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7Zm0 12a5 5 0 1 1 5-5 5.006 5.006 0 0 1-5 5Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dica -->
+                <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+                    Tip: use a unique password and activate two-step authentication for greater security.
+                </div>
+
+                <!-- Botões -->
+                <div class="flex flex-col gap-3 pt-2">
+                    <button type="submit" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg 
+                   hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 
+                   active:translate-y-[1px] transition">
+                        Create account
+                    </button>
+                    <a href="/login" class="w-full rounded-xl bg-white px-4 py-2.5 text-center font-semibold text-blue-700 
+                   border border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4 
+                   focus:ring-blue-200 transition">
+                        I already have an account
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Rodapé -->
+        <p class="mt-6 text-center text-xs text-blue-700/70">
+            By continuing, you accept the Terms and Privacy Policy.
+        </p>
+    </div>
+</div>
