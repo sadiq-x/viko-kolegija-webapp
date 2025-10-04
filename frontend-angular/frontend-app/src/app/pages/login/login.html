@@ -3,34 +3,23 @@
     <div class="w-full max-w-md">
         <!-- Logo / Título -->
         <div class="text-center mb-6">
-            <!-- logo maior -->
             <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain" />
-
             <h1 class="mt-3 text-2xl font-bold text-blue-800">Sign in</h1>
             <p class="mt-1 text-sm text-blue-700/70">Fill in the data securely.</p>
         </div>
 
         <!-- Cartão -->
         <div class="bg-white rounded-2xl shadow-lg p-6">
-            <!-- Alertas (exemplos: mostra apenas quando necessário) -->
-            <!--
-      <div class="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
-        Dica: o teu email é o utilizado no registo.
-      </div>
-      <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-        Credenciais inválidas. Tenta novamente.
-      </div>
-      -->
-
-            <form class="space-y-4" novalidate>
-                <!-- Email -->
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
+                <!-- Username -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-blue-900">Username</label>
-                    <input id="username" name="username" type="text" autocomplete="username" placeholder="Username"
-                        class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400"
-                        aria-describedby="email-help" required />
-                    <p id="email-help" class="mt-1 text-xs text-blue-700/70">
-                        Use the email associated with your account.
+                    <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
+                    <input id="username" type="text" formControlName="username" autocomplete="username"
+                        placeholder="Username" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                   focus:ring-blue-200 focus:border-blue-400" aria-describedby="username-help" required />
+                    <p id="username-help" class="mt-1 text-xs text-blue-700/70">
+                        Use the username associated with your account.
                     </p>
                 </div>
 
@@ -40,12 +29,12 @@
                         <label for="password" class="block text-sm font-medium text-blue-900">Password</label>
                         <a href="#" class="text-xs font-medium text-blue-700 hover:underline">Did you forget?</a>
                     </div>
+
                     <div class="mt-1 relative">
-                        <input id="password" name="password" type="password" autocomplete="current-password"
-                            placeholder="••••••••"
-                            class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900 placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400"
-                            aria-describedby="password-help" required />
-                        <!-- Botão mostrar/ocultar (JS opcional no componente) -->
+                        <input id="password" formControlName="password" autocomplete="new-password" required class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900
+                    placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                    focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" type="password"
+                            aria-describedby="password-help" />
                         <button type="button" aria-label="Mostrar palavra-passe"
                             class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
                             onclick="const c=document.getElementById('password'); c.type = c.type==='password' ? 'text':'password';">
@@ -56,21 +45,26 @@
                             </svg>
                         </button>
                     </div>
+                    <p id="password-help" class="mt-1 text-xs text-blue-700/70">
+                        Keep your password safe.
+                    </p>
                 </div>
 
                 <!-- Opções -->
                 <div class="flex items-center justify-between">
                     <label class="inline-flex items-center gap-2 text-sm text-blue-900">
-                        <input type="checkbox"
+                        <input type="checkbox" formControlName="remember"
                             class="h-4 w-4 rounded-md border-blue-300 text-blue-600 focus:ring-blue-300" />
                         Remember me
                     </label>
                     <a href="#" class="text-sm font-medium text-blue-700 hover:underline">Do you need help?</a>
                 </div>
 
-                <!-- Botão Entrar -->
-                <button type="submit"
-                    class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 active:translate-y-[1px] transition">
+                <!-- Botão Entrar (desativa enquanto formulário inválido) -->
+                <button type="submit" [disabled]="form.invalid" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+                 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                 active:translate-y-[1px] transition
+                 disabled:opacity-50 disabled:cursor-not-allowed">
                     Sign in
                 </button>
 
@@ -86,8 +80,8 @@
 
                 <!-- Ação secundária -->
                 <p class="text-center text-sm text-blue-900">
-                    Don't have an account? 
-                    <a href="#" class="font-semibold text-blue-700 hover:underline">Create account</a>
+                    Don't have an account?
+                    <a routerLink="/register" class="font-semibold text-blue-700 hover:underline">Create account</a>
                 </p>
             </form>
         </div>

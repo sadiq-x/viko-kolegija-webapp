@@ -17,40 +17,40 @@
 
         <!-- Cartão -->
         <div class="bg-white rounded-2xl shadow-lg p-6">
-            <form class="space-y-4" novalidate>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
 
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
-                    <input id="username" name="username" type="text" required class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-                   focus:ring-blue-200 focus:border-blue-400" placeholder="Username" />
+                    <input id="username" type="text" formControlName="username" required class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+             focus:ring-blue-200 focus:border-blue-400" placeholder="Username" />
                 </div>
 
-                <!-- Nome -->
+                <!-- Name -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
-                    <input id="name" name="name" type="text" required maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-                   focus:ring-blue-200 focus:border-blue-400" placeholder="Your name" />
+                    <input id="name" type="text" formControlName="name" required maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+             focus:ring-blue-200 focus:border-blue-400" placeholder="Your name" />
                 </div>
 
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-blue-900">Email</label>
-                    <input id="email" name="email" type="email" required maxlength="150" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-                   focus:ring-blue-200 focus:border-blue-400" placeholder="exemplo@gmail.com" />
+                    <input id="email" type="email" formControlName="email" required maxlength="150" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+             focus:ring-blue-200 focus:border-blue-400" placeholder="exemplo@gmail.com" />
                 </div>
 
-                <!-- Telefone -->
+                <!-- Phone (country code + number) -->
                 <div>
-                    <label for="phone" class="block text-sm font-medium text-blue-900">Phone Number</label>
-
+                    <label class="block text-sm font-medium text-blue-900">Phone Number</label>
                     <div class="mt-1 flex gap-2">
                         <!-- Select com os códigos -->
-                        <select id="countryCode" name="countryCode" class="w-32 rounded-xl border border-blue-200 bg-white px-2 py-2 text-blue-900 
-         focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" required>
+                        <select formControlName="countryCode" class="w-32 rounded-xl border border-blue-200 bg-white px-2 py-2 text-blue-900
+               focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" required>
+                            <option value="+27">🇿🇦 África do Sul +27</option>
                             <option value="+93">🇦🇫 Afeganistão +93</option>
                             <option value="+355">🇦🇱 Albânia +355</option>
                             <option value="+213">🇩🇿 Argélia +213</option>
@@ -80,13 +80,14 @@
                             <option value="+30">🇬🇷 Grécia +30</option>
                             <option value="+852">🇭🇰 Hong Kong +852</option>
                             <option value="+36">🇭🇺 Hungria +36</option>
-                            <option value="+91">🇮🇳 Índia +91</option>
                             <option value="+62">🇮🇩 Indonésia +62</option>
+                            <option value="+91">🇮🇳 Índia +91</option>
                             <option value="+353">🇮🇪 Irlanda +353</option>
                             <option value="+972">🇮🇱 Israel +972</option>
                             <option value="+39">🇮🇹 Itália +39</option>
                             <option value="+81">🇯🇵 Japão +81</option>
                             <option value="+254">🇰🇪 Quénia +254</option>
+                            <option value="+82">🇰🇷 Coreia do Sul +82</option>
                             <option value="+371">🇱🇻 Letónia +371</option>
                             <option value="+370">🇱🇹 Lituânia +370</option>
                             <option value="+352">🇱🇺 Luxemburgo +352</option>
@@ -96,8 +97,8 @@
                             <option value="+31">🇳🇱 Países Baixos +31</option>
                             <option value="+64">🇳🇿 Nova Zelândia +64</option>
                             <option value="+47">🇳🇴 Noruega +47</option>
-                            <option value="+92">🇵🇰 Paquistão +92</option>
                             <option value="+507">🇵🇦 Panamá +507</option>
+                            <option value="+92">🇵🇰 Paquistão +92</option>
                             <option value="+595">🇵🇾 Paraguai +595</option>
                             <option value="+51">🇵🇪 Peru +51</option>
                             <option value="+63">🇵🇭 Filipinas +63</option>
@@ -109,9 +110,6 @@
                             <option value="+65">🇸🇬 Singapura +65</option>
                             <option value="+421">🇸🇰 Eslováquia +421</option>
                             <option value="+386">🇸🇮 Eslovénia +386</option>
-                            <option value="+27">🇿🇦 África do Sul +27</option>
-                            <option value="+82">🇰🇷 Coreia do Sul +82</option>
-                            <option value="+34">🇪🇸 Espanha +34</option>
                             <option value="+46">🇸🇪 Suécia +46</option>
                             <option value="+41">🇨🇭 Suíça +41</option>
                             <option value="+90">🇹🇷 Turquia +90</option>
@@ -122,40 +120,36 @@
                             <option value="+598">🇺🇾 Uruguai +598</option>
                             <option value="+58">🇻🇪 Venezuela +58</option>
                             <option value="+84">🇻🇳 Vietname +84</option>
-                            <!-- ... lista segue para todos os países -->
                         </select>
 
-                        <!-- Input só para o número -->
-                        <input id="phone" name="phone" type="tel" required maxlength="20" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-             focus:ring-blue-200 focus:border-blue-400" placeholder="912 345 678" />
+                        <input id="phone" type="tel" formControlName="phone" required maxlength="20" class="flex-1 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+               placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+               focus:ring-blue-200 focus:border-blue-400" placeholder="912 345 678" />
                     </div>
-
                     <p class="mt-1 text-xs text-blue-700/70">
                         Choose the country code and enter your mobile phone number.
                     </p>
                 </div>
 
-                <!-- Morada -->
+                <!-- Address -->
                 <div>
                     <label for="address" class="block text-sm font-medium text-blue-900">Address</label>
-                    <input id="address" name="address" type="text" required maxlength="200" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-                   placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-                   focus:ring-blue-200 focus:border-blue-400" placeholder="Location, street and number." />
+                    <input id="address" type="text" formControlName="address" required maxlength="200" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+             placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+             focus:ring-blue-200 focus:border-blue-400" placeholder="Location, street and number." />
                 </div>
 
                 <!-- Password -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-blue-900">Password</label>
                     <div class="mt-1 relative">
-                        <input id="password" name="password" type="password" autocomplete="new-password"
-                            placeholder="••••••••" class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900 
-             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-             focus:ring-blue-200 focus:border-blue-400" aria-describedby="password-help" required />
-                        <!-- Botão mostrar/ocultar -->
-                        <button type="button" aria-label="Mostrar palavra-passe" class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center 
-             rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
-                            onclick="const p=document.getElementById('password'); p.type = p.type==='password' ? 'text':'password';">
+                        <input id="password" formControlName="password" autocomplete="new-password" required class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900
+                    placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                    focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" type="password"
+                            aria-describedby="password-help" />
+                        <button type="button" aria-label="Mostrar palavra-passe"
+                            class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
+                            onclick="const c=document.getElementById('password'); c.type = c.type==='password' ? 'text':'password';">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
                                 fill="currentColor">
                                 <path
@@ -173,13 +167,12 @@
                     <label for="confirmPassword" class="block text-sm font-medium text-blue-900">Confirm
                         Password</label>
                     <div class="mt-1 relative">
-                        <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password"
-                            placeholder="••••••••" class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900 
-             placeholder:text-blue-900/40 focus:outline-none focus:ring-4 
-             focus:ring-blue-200 focus:border-blue-400" required />
-                        <!-- Botão mostrar/ocultar -->
-                        <button type="button" aria-label="Mostrar palavra-passe" class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center 
-             rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
+                        <input id="confirmPassword" formControlName="confirmPassword" autocomplete="new-password"
+                            required class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 pr-10 text-blue-900
+                    placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                    focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" type="password"/>
+                        <button type="button" aria-label="Mostrar palavra-passe"
+                            class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
                             onclick="const c=document.getElementById('confirmPassword'); c.type = c.type==='password' ? 'text':'password';">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
                                 fill="currentColor">
@@ -190,21 +183,23 @@
                     </div>
                 </div>
 
-                <!-- Dica -->
+                <!-- Tip -->
                 <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
                     Tip: use a unique password and activate two-step authentication for greater security.
                 </div>
 
-                <!-- Botões -->
+                <!-- Actions -->
                 <div class="flex flex-col gap-3 pt-2">
-                    <button type="submit" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg 
-                   hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 
-                   active:translate-y-[1px] transition">
+                    <button type="submit" [disabled]="submitDisabled" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+                   hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                   active:translate-y-[1px] transition
+                   disabled:opacity-50 disabled:cursor-not-allowed">
                         Create account
                     </button>
-                    <a href="/login" class="w-full rounded-xl bg-white px-4 py-2.5 text-center font-semibold text-blue-700 
-                   border border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4 
-                   focus:ring-blue-200 transition">
+
+                    <a routerLink="/login" class="w-full rounded-xl bg-white px-4 py-2.5 text-center font-semibold text-blue-700
+              border border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4
+              focus:ring-blue-200 transition">
                         I already have an account
                     </a>
                 </div>
