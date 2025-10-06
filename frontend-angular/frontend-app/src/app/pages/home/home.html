@@ -1,0 +1,154 @@
+<!-- Página Home / Landing -->
+<div class="min-h-screen bg-blue-50 text-blue-900 flex flex-col">
+
+  <!-- Navbar -->
+  <header class="bg-white/90 backdrop-blur border-b border-blue-200">
+    <nav class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Left: Logo + Brand -->
+      <div class="flex items-center gap-3">
+        <img src="/logo-viko.png" alt="Viko Logo" class="h-8 w-8 object-contain" />
+        <span class="font-bold text-lg text-blue-800">Viko</span>
+      </div>
+
+      <!-- Right: Actions -->
+      <div class="flex items-center gap-3">
+        <a routerLink="/login"
+           class="rounded-xl border border-blue-300 bg-white px-4 py-2 text-sm font-semibold
+                  text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-4
+                  focus:ring-blue-200 transition">
+          Login
+        </a>
+        <a routerLink="/register"
+           class="rounded-xl bg-blue-600/90 px-4 py-2 text-sm font-semibold text-white shadow
+                  hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                  active:translate-y-[1px] transition">
+          Register
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20 flex-1">
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-blue-800 leading-tight">
+          A plataforma mais simples para gerir a tua conta
+        </h1>
+        <p class="mt-4 text-blue-700/70 text-base sm:text-lg">
+          Segurança primeiro, experiência fluída e ferramentas modernas. Cria a tua conta em segundos
+          e começa a trabalhar com uma interface clara e intuitiva.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a routerLink="/register"
+             class="rounded-xl bg-blue-600/90 px-6 py-3 font-semibold text-white shadow-lg
+                    hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                    active:translate-y-[1px] transition">
+            Começar agora
+          </a>
+          <a routerLink="/login"
+             class="rounded-xl border border-blue-300 bg-white px-6 py-3 font-semibold text-blue-700
+                    hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200 transition">
+            Já tenho conta
+          </a>
+        </div>
+
+        <!-- Badges / Highlights -->
+        <div class="mt-6 flex flex-wrap gap-4 text-sm text-blue-700/70">
+          <div class="inline-flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span> 2FA suportado
+          </div>
+          <div class="inline-flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span> Performance rápida
+          </div>
+          <div class="inline-flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span> UI educativa
+          </div>
+        </div>
+      </div>
+
+      <!-- Ilustração / Placeholder -->
+      <div class="bg-white rounded-2xl border border-blue-200 shadow-sm p-6">
+        <div class="aspect-video w-full rounded-xl border border-blue-200 bg-blue-50
+                    flex items-center justify-center">
+          <span class="text-blue-700/70">Coloca aqui uma imagem/ilustração do produto</span>
+        </div>
+        <ul class="mt-6 grid sm:grid-cols-2 gap-3 text-sm">
+          <li class="rounded-xl border border-blue-200 bg-white p-3">
+            <p class="font-semibold text-blue-800">Registo rápido</p>
+            <p class="text-blue-700/70 mt-1">Fluxo simples e seguro, com validações claras.</p>
+          </li>
+          <li class="rounded-xl border border-blue-200 bg-white p-3">
+            <p class="font-semibold text-blue-800">Login seguro</p>
+            <p class="text-blue-700/70 mt-1">Boas práticas de autenticação e UX.</p>
+          </li>
+          <li class="rounded-xl border border-blue-200 bg-white p-3">
+            <p class="font-semibold text-blue-800">Design consistente</p>
+            <p class="text-blue-700/70 mt-1">Mesma palete entre todas as páginas.</p>
+          </li>
+          <li class="rounded-xl border border-blue-200 bg-white p-3">
+            <p class="font-semibold text-blue-800">Escalável</p>
+            <p class="text-blue-700/70 mt-1">Pronto para crescer com o teu projeto.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secção de Informação -->
+  <section class="bg-white border-t border-blue-200">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 grid lg:grid-cols-3 gap-8">
+      <div>
+        <h2 class="text-xl font-bold text-blue-800">Porquê escolher a Viko?</h2>
+        <p class="mt-2 text-blue-700/70">
+          Focamo-nos em simplicidade e segurança. Criámos um fluxo de onboarding claro, com feedback imediato
+          e validações amigáveis, para que o utilizador saiba sempre o que fazer.
+        </p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-blue-800">Acessibilidade</h3>
+        <p class="mt-2 text-blue-700/70">
+          Componentes com labels, contraste adequado e estados de foco visíveis (`focus:ring-blue-200`).
+        </p>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-blue-800">Performance</h3>
+        <p class="mt-2 text-blue-700/70">
+          Estrutura leve, estilos utilitários Tailwind e Angular standalone components.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
+    <div class="rounded-2xl border border-blue-200 bg-blue-50 p-6 sm:p-8 text-center">
+      <h3 class="text-2xl font-bold text-blue-800">Pronto para começar?</h3>
+      <p class="mt-2 text-blue-700/70">
+        Cria a tua conta agora e explora um fluxo de autenticação limpo e educativo.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3 justify-center">
+        <a routerLink="/register"
+           class="rounded-xl bg-blue-600/90 px-6 py-3 font-semibold text-white shadow-lg
+                  hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                  active:translate-y-[1px] transition">
+          Criar conta
+        </a>
+        <a routerLink="/login"
+           class="rounded-xl border border-blue-300 bg-white px-6 py-3 font-semibold text-blue-700
+                  hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200 transition">
+          Entrar
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-blue-200 bg-white">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <p class="text-sm text-blue-700/70">© {{ currentYear }} Viko. All rights reserved.</p>
+    </div>
+  </footer>
+
+</div>
