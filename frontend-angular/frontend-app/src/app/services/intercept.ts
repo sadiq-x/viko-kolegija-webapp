@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { Auth } from './auth';
+import { AuthService } from './auth';
 import { Router } from '@angular/router';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
-  const authService = inject(Auth);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
   // Retrieve token (could come from auth service, local storage, etc.)
