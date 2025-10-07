@@ -9,7 +9,7 @@ import { Layout } from './pages/private/layout/layout';
 import { Dashboard } from './pages/private/dashboard/dashboard';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '', pathMatch: 'full' },
+    { path: '', redirectTo: 'home', pathMatch: 'full' },
     {
         path: '', component: Layout, canActivate: [Auth],
         children: [
