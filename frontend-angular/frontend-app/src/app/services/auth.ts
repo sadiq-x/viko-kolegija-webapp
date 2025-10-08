@@ -20,7 +20,8 @@ export class AuthService {
       map((response) => {
         if (response?.token && response?.user) {
           let modelUser: ModelUserLogin = response.user;
-          console.log(response.user)
+          console.log(response.user);
+          console.log(modelUser);
           localStorage.setItem('authUser', JSON.stringify(modelUser))
           localStorage.setItem('authToken', response.token);
           alert("Login Successful");

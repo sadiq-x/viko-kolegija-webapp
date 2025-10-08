@@ -1,1 +1,53 @@
-<p>navbar works!</p>
+<header class="bg-white/90 backdrop-blur border-b border-blue-200 sticky top-0 z-50">
+    <nav class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+        <!-- Esquerda: Logo -->
+        <a routerLink="/home" class="flex items-center gap-3" (click)="closeMobile()">
+            <img src="/logo-viko.png" alt="Viko Logo" class="h-8 w-8 object-contain" />
+            <span class="font-bold text-lg text-blue-800">Viko</span>
+        </a>
+
+        <!-- Centro / Desktop links -->
+        <ul class="hidden md:flex items-center gap-6 text-blue-900">
+            <li>
+                <a routerLink="/courses" routerLinkActive="text-blue-700"
+                    class="hover:text-blue-700 transition">Courses</a>
+            </li>
+            <li>
+                <a routerLink="/topics" routerLinkActive="text-blue-700"
+                    class="hover:text-blue-700 transition">Topics</a>
+            </li>
+            <li>
+                <a routerLink="/profile" routerLinkActive="text-blue-700"
+                    class="hover:text-blue-700 transition">Profile</a>
+            </li>
+        </ul>
+
+        <!-- Botão Mobile -->
+        <button type="button" (click)="toggleMobile()" aria-label="Toggle menu" class="md:hidden inline-flex items-center justify-center rounded-lg p-2
+                   text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-4
+                   focus:ring-blue-200">
+            <svg *ngIf="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path d="M4 6h16v2H4V6Zm0 5h16v2H4v-2Zm0 5h16v2H4v-2Z" />
+            </svg>
+            <svg *ngIf="mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                    d="M6.4 5.99 5 7.4 9.6 12 5 16.6 6.4 18l4.6-4.6 4.6 4.6 1.4-1.4L12.4 12l4.6-4.6-1.4-1.4L12 10.6 7.4 5.99z" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Menu Mobile -->
+    <div *ngIf="mobileOpen" class="md:hidden border-t border-blue-200 bg-white">
+        <div class="mx-auto max-w-6xl px-4 py-3 space-y-1">
+            <a routerLink="/courses" (click)="closeMobile()"
+                class="block rounded-lg px-3 py-2 text-blue-900 hover:bg-blue-50">Courses</a>
+            <a routerLink="/topics" (click)="closeMobile()"
+                class="block rounded-lg px-3 py-2 text-blue-900 hover:bg-blue-50">Topics</a>
+            <a routerLink="/profile" (click)="closeMobile()"
+                class="block rounded-lg px-3 py-2 text-blue-900 hover:bg-blue-50">Profile</a>
+        </div>
+    </div>
+</header>
