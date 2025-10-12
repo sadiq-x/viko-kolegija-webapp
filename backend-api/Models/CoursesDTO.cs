@@ -29,9 +29,16 @@ namespace backend_api.Models
     }
 
     //DTO Request for all courses from a specific CreateById
-    public sealed class CoursesListCreateByIdRequestDTO
+    public sealed class CoursesListByCreateByIdRequestDTO
     {
         [Required]
         public string CreateById { get; set; } = default!;
+    }
+
+    //DTO Request for all courses from a specific Date
+    public sealed class CoursesListByDateCreateRequestDTO
+    {
+        [Required]
+        public string DateCreate { get; init; } = default!;
     }
 }
