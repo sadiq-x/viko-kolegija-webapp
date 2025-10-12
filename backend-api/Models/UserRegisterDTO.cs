@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend_api.Models
 {
+    //Dto Request to create a new user
     public sealed class UserRegisterRequestDTO
     {
         [Required]
@@ -26,6 +27,7 @@ namespace backend_api.Models
         public bool Auth { get; } = false;
     }
 
+    //Dto Response to create a new user
     public sealed class EntityRegisterResponseDTO
     {
         public int Id { get; init; }

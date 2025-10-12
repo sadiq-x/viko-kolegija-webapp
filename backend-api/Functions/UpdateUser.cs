@@ -16,7 +16,7 @@ namespace backend_api.Functions
             _userRepository = userRepository;
         }
 
-        [Function("authUpdatePassword")] //Function to do login
+        [Function("authUpdateUser")] //Function to do login
         [Produces("application/json")]
         public async Task<HttpResponseData> Run1(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/update/user")] HttpRequestData req) //Create the Http req and res

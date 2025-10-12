@@ -10,6 +10,7 @@ namespace backend_api.Repositories
         Task<(bool Success, string? Message)> authUserRegister(UserRegisterRequestDTO t); //Task to crete a new user
         Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t); //Task to update user password
         Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t); //Task to update user 
+        Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t); //Task to update user 
     }
 
     public class UserRepository : IUserRepository
@@ -177,5 +178,45 @@ namespace backend_api.Repositories
                 return (false, "User update unsuccessful.");
             }
         }
+
+        public async Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            if (string.IsNullOrWhiteSpace(t.Username)) return null;
+
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+
+                var result = await dbContext.Entities
+                    .AsNoTracking()
+                    .Where(e => e.Id == t.EntityId)
+                    .Join(
+                        dbContext.Users.AsNoTracking().Where(u => u.Username == t.Username),
+                        e => e.Id,        // Entities.Id
+                        u => u.EntityId,  // Users.EntityId
+                        (e, u) => new { e, u }
+                    )
+                    .Select(x => new UserProfileResponseDTO
+                    {
+                        Id = x.e.Id,
+                        Username = x.u.Username,
+                        Name = x.e.Name,
+                        Email = x.e.Email,
+                        NumberPhone = x.e.NumberPhone,
+                        Address = x.e.Address
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (result is null) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw; 
+            }
+        }
+
     }
 }
