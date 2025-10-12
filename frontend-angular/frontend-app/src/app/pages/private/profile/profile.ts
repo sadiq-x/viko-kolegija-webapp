@@ -1,61 +1,99 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, signal } from '@angular/core';
+import { Component, OnInit, effect, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ProfileService } from '../../../services/profile';
+import { ModelUserProfile } from '../../../models/modelUser';
 
 const PHONE_PATTERN = /^[0-9+()\-\s]{6,20}$/;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 @Component({
   selector: 'app-profile',
-  standalone: true,                           // ✅ obrigatório porque usas `imports`
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.scss']               // ✅ plural e array
+  styleUrls: ['./profile.scss']
 })
-export class Profile {
+export class Profile implements OnInit {
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
   imagePreview = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder) {
-    const user = {
-      username: 'john.doe',
-      name: 'John Doe',
-      email: 'john@viko.app',
-      imageUrl: '/avatar-placeholder.png',
-      numberPhone: '+351 912 345 678',
-      address: 'Rua das Flores, 123, Lisboa'
-    };
-
+  constructor(private fb: FormBuilder, private profile: ProfileService) {
+    // Forms vazios (readonly onde aplicável)
     this.profileForm = this.fb.group({
-      username: [{ value: user.username, disabled: true }, [Validators.required]],
-      name:     [{ value: user.name,     disabled: true }, [Validators.required]],
-      email:    [{ value: user.email,    disabled: true }, [Validators.required, Validators.email]],
-      image:    [null],
-      numberPhone: [user.numberPhone, [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
-      address:     [user.address,     [Validators.required, Validators.maxLength(200)]],
+      username: [{ value: '', disabled: true }, [Validators.required]],
+      name: [{ value: '', disabled: true }, [Validators.required]],
+      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      image: [null],
+      numberPhone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
+      address: ['', [Validators.required, Validators.maxLength(200)]],
     });
 
     this.passwordForm = this.fb.group({
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]],
     });
+  }
 
-    effect(() => {
-      const p = this.passwordForm.get('password')?.value ?? '';
-      const c = this.passwordForm.get('confirmPassword')?.value ?? '';
-      const mismatch = !!p && !!c && p !== c;
-      if (mismatch) {
-        this.passwordForm.get('confirmPassword')?.setErrors({ mismatch: true });
-      } else if (this.passwordForm.get('confirmPassword')?.hasError('mismatch')) {
-        const ctrl = this.passwordForm.get('confirmPassword')!;
-        const errors = { ...(ctrl.errors ?? {}) };
-        delete (errors as any).mismatch;
-        ctrl.setErrors(Object.keys(errors).length ? errors : null);
+  ngOnInit(): void {
+    this.profile.getProfile().subscribe({
+      next: (res: ModelUserProfile | false) => {
+        console.log('📥 Res (do serviço):', res);
+
+        if (res === false) {
+          console.warn('⚠️ Serviço devolveu false (sem dados ou erro).');
+          this.fillFormEmpty();
+          return;
+        }
+
+        // 🔀 Mapa tolerante a casing (PascalCase/camelCase)
+        const u: any = res;
+        console.log(u)
+        //Mapped of data with Camel Case and Pascal Case
+        const mapped: ModelUserProfile = {
+          Id: u.Id ?? u.id ?? 0,
+          Username: u.Username ?? u.username ?? '',
+          Name: u.Name ?? u.name ?? '',
+          Email: u.Email ?? u.email ?? '',
+          Image: u.Image ?? u.image ?? null,
+          NumberPhone: u.NumberPhone ?? u.numberPhone ?? '',
+          Address: u.Address ?? u.address ?? '',
+        };
+
+        console.log('✅ Mapeado para o formulário:', mapped);
+        //Form filled with the correct data
+        this.profileForm.patchValue({
+          username: mapped.Username,
+          name: mapped.Name,
+          email: mapped.Email,
+          numberPhone: mapped.NumberPhone,
+          address: mapped.Address,
+        });
+        if (mapped.Image) this.imagePreview.set(mapped.Image);
+
+        this.profileForm.markAsPristine();
+      },
+      error: (err) => {
+        console.error('❌ Erro no subscribe do perfil:', err);
+        this.fillFormEmpty();
       }
     });
   }
 
+  // ======= helpers =======
+  private fillFormEmpty() {
+    this.profileForm.patchValue({
+      username: '',
+      name: '',
+      email: '',
+      numberPhone: '',
+      address: ''
+    });
+    this.imagePreview.set(null);
+    this.profileForm.markAsPristine();
+  }
+
+  // ======= handlers =======
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -78,7 +116,8 @@ export class Profile {
       address: this.profileForm.value.address,
     };
     const imageFile = this.profileForm.value.image as File | null;
-    console.log('PROFILE UPDATE payload:', payload, imageFile);
+
+    console.log('📤 PROFILE UPDATE payload:', payload, imageFile);
   }
 
   savePassword() {
@@ -86,8 +125,18 @@ export class Profile {
       this.passwordForm.markAllAsTouched();
       return;
     }
-    const { password } = this.passwordForm.value;
-    console.log('PASSWORD UPDATE payload:', { password });
+
+    const { password, confirmPassword } = this.passwordForm.value;
+
+    // ✅ Validação explícita antes de enviar
+    if (password !== confirmPassword) {
+      console.error("❌ As passwords não coincidem!");
+      this.passwordForm.get('confirmPassword')?.setErrors({ mismatch: true });
+      return;
+    }
+
+    console.log('📤 PASSWORD UPDATE payload:', { password });
+    // TODO: chamar serviço para update da password
   }
 
   get profileDisabled() { return this.profileForm.invalid || !this.profileForm.dirty; }
