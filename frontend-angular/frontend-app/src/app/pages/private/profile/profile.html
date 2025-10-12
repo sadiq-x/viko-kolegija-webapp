@@ -48,7 +48,7 @@
           <label for="image" class="block text-sm font-medium text-blue-900">Profile image</label>
           <div class="mt-1 flex items-center gap-4">
             <img [src]="imagePreview() || '/avatar-placeholder.png'"
-                 alt="Profile preview"
+                 alt="Image"
                  class="h-16 w-16 rounded-full border border-blue-200 object-cover bg-blue-50" />
             <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)"
                    class="block w-full text-sm text-blue-900 file:mr-4 file:rounded-lg

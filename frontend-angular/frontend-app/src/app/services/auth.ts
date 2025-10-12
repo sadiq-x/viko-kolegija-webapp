@@ -9,7 +9,6 @@ import { ModelUserLogin } from '../models/modelUser';
   providedIn: 'root'
 })
 export class AuthService {
-
   private apiUrlLogin = environment.apiUrl + 'auth/login';
   private apiUrlRegister = environment.apiUrl + 'auth/register';
 
