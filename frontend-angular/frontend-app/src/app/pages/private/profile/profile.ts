@@ -3,6 +3,7 @@ import { Component, OnInit, effect, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '../../../services/profile';
 import { ModelUserProfile } from '../../../models/modelUser';
+import { AuthService } from '../../../services/auth';
 
 const PHONE_PATTERN = /^[0-9+()\-\s]{6,20}$/;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
@@ -18,8 +19,8 @@ export class Profile implements OnInit {
   passwordForm!: FormGroup;
   imagePreview = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder, private profile: ProfileService) {
-    // Forms vazios (readonly onde aplicável)
+  constructor(private fb: FormBuilder, private profile: ProfileService, private auth: AuthService) {
+    //Start the user form empty - if empty the fields going empty
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required]],
       name: [{ value: '', disabled: true }, [Validators.required]],
@@ -28,7 +29,7 @@ export class Profile implements OnInit {
       numberPhone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
     });
-
+    //Start the password form empty - if empty the fields going empty
     this.passwordForm = this.fb.group({
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]],
@@ -38,17 +39,12 @@ export class Profile implements OnInit {
   ngOnInit(): void {
     this.profile.getProfile().subscribe({
       next: (res: ModelUserProfile | false) => {
-        console.log('📥 Res (do serviço):', res);
-
         if (res === false) {
-          console.warn('⚠️ Serviço devolveu false (sem dados ou erro).');
           this.fillFormEmpty();
           return;
         }
 
-        // 🔀 Mapa tolerante a casing (PascalCase/camelCase)
         const u: any = res;
-        console.log(u)
         //Mapped of data with Camel Case and Pascal Case
         const mapped: ModelUserProfile = {
           Id: u.Id ?? u.id ?? 0,
@@ -60,7 +56,6 @@ export class Profile implements OnInit {
           Address: u.Address ?? u.address ?? '',
         };
 
-        console.log('✅ Mapeado para o formulário:', mapped);
         //Form filled with the correct data
         this.profileForm.patchValue({
           username: mapped.Username,
@@ -74,13 +69,12 @@ export class Profile implements OnInit {
         this.profileForm.markAsPristine();
       },
       error: (err) => {
-        console.error('❌ Erro no subscribe do perfil:', err);
         this.fillFormEmpty();
       }
     });
   }
 
-  // ======= helpers =======
+  //Function to make the form empty
   private fillFormEmpty() {
     this.profileForm.patchValue({
       username: '',
@@ -106,9 +100,12 @@ export class Profile implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  //Function to save the new data of user
   saveProfile() {
+    console.log(this.profileForm)
     if (this.profileForm.invalid || !this.profileForm.dirty) {
       this.profileForm.markAllAsTouched();
+
       return;
     }
     const payload = {
@@ -118,8 +115,11 @@ export class Profile implements OnInit {
     const imageFile = this.profileForm.value.image as File | null;
 
     console.log('📤 PROFILE UPDATE payload:', payload, imageFile);
+    // TODO: chamar serviço para update da password
+
   }
 
+  //Function to save the new password of user
   savePassword() {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
@@ -128,17 +128,33 @@ export class Profile implements OnInit {
 
     const { password, confirmPassword } = this.passwordForm.value;
 
-    // ✅ Validação explícita antes de enviar
+    //Validation of password and confirmPassword 
     if (password !== confirmPassword) {
       console.error("❌ As passwords não coincidem!");
       this.passwordForm.get('confirmPassword')?.setErrors({ mismatch: true });
       return;
     }
+    const localStorageItem = localStorage.getItem("authUser");
+    const EntityId = JSON.parse(localStorageItem!);
+    console.log(EntityId.entityId)
+    var payload = {
+      "EntityId": EntityId.entityId,
+      "Username": this.profileForm.get('username')?.value,
+      "PasswordHash": password
+    };
 
-    console.log('📤 PASSWORD UPDATE payload:', { password });
-    // TODO: chamar serviço para update da password
-  }
+    console.log('📤 PASSWORD UPDATE payload:', { payload });
+
+    this.auth.updatePassword(payload).subscribe({
+      next: (res: boolean) => {
+        if (res === false) {
+          this.fillFormEmpty();
+          return;
+        }
+      }})
+        // TODO: chamar serviço para update da password
+      }
 
   get profileDisabled() { return this.profileForm.invalid || !this.profileForm.dirty; }
   get passwordDisabled() { return this.passwordForm.invalid; }
-}
+    }

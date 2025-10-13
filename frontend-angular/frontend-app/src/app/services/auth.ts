@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { ModelUserLogin } from '../models/modelUser';
 
 @Injectable({
@@ -11,10 +11,11 @@ import { ModelUserLogin } from '../models/modelUser';
 export class AuthService {
   private apiUrlLogin = environment.apiUrl + 'auth/login';
   private apiUrlRegister = environment.apiUrl + 'auth/register';
+  private apiUrlUpdatePassword = environment.apiUrl + 'auth/update/password';
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  login(obj: { Username: string, PasswordHash: string }) {
+  login(obj: { Username: string, PasswordHash: string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlLogin, obj).pipe(
       map((response) => {
         if (response?.token && response?.user) {
@@ -36,6 +37,16 @@ export class AuthService {
         return of(false);
       })
     );
+  }
+
+  updatePassword(obj: { EntityId: string, Username: string, PasswordHash: string }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlUpdatePassword, obj).pipe(
+      map((response) => {
+        console.log(response)
+        return true
+      })
+    )
+
   }
 
   logout() {
