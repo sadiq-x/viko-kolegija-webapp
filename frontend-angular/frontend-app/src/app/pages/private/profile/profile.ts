@@ -151,6 +151,7 @@ export class Profile implements OnInit {
           this.fillFormEmpty();
           return;
         }
+      }})
         // TODO: chamar serviço para update da password
       }
 
