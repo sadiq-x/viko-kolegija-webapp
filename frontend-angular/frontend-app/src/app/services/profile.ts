@@ -1,60 +1,42 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, of, Observable } from 'rxjs';
+import { catchError, map, of, Observable, pipe } from 'rxjs';
 import { ModelUserProfile } from '../models/modelUser';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
+  //Backend endpoint
   private apiUrlGetProfile = environment.apiUrl + 'get/profile';
+  private apiUrlUpdateProfile = environment.apiUrl + 'update/profile';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // ✅ declara o tipo de retorno
+  //Function getProfile with return type = ModelUserProfile or False
   getProfile(): Observable<ModelUserProfile | false> {
-    const storedUser = localStorage.getItem('authUser');
-
-    if (!storedUser) {
-      console.warn('⚠️ Nenhum utilizador no localStorage');
-      return of<false>(false);
-    }
-
-    let parsed: any;
-    try {
-      parsed = JSON.parse(storedUser);
-    } catch (error) {
-      console.error('❌ Erro ao fazer parse do localStorage:', error);
-      return of<false>(false);
-    }
-
-    if (!parsed?.entityId || !parsed?.username) {
-      console.error('❌ Dados no localStorage inválidos:', parsed);
-      return of<false>(false);
-    }
-
-    const obj: { EntityId: number; Username: string } = {
-      EntityId: Number(parsed.entityId),
-      Username: String(parsed.username),
-    };
-
-    console.log("📤 Payload enviado ao backend:", obj);
-
-    // ✅ tipa a resposta esperada do backend
-    return this.http.post<any>(this.apiUrlGetProfile, obj).pipe(
+    //Http request get
+    return this.http.get<any>(this.apiUrlGetProfile).pipe(
       map((response) => {
 
         if (response?.user) {
           console.log("✅ Utilizador recebido do backend:", response.user);
-          return response.user;
+          return response.user; //Return the 
         }
 
-        console.warn("⚠️ Nenhum utilizador devolvido pelo backend");
-        return false as const;
+        return of<false>(false);
       }),
       catchError((error) => {
-        console.error('❌ getProfile error:', error);
         return of<false>(false);
       })
     );
+  }
+
+  updateProfile(obj: { NumberPhone: string, Address: string, }) {
+
+    return this.http.post(this.apiUrlUpdateProfile, obj).pipe(
+      map((response) => {
+
+      })
+    )
   }
 }
