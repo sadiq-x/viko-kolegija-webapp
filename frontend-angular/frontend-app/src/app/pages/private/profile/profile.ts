@@ -115,6 +115,8 @@ export class Profile implements OnInit {
     const imageFile = this.profileForm.value.image as File | null;
 
     console.log('📤 PROFILE UPDATE payload:', payload, imageFile);
+    this.profileForm.markAsPristine();
+    this.profileForm.markAsUntouched();
     // TODO: chamar serviço para update da password
 
   }
@@ -143,18 +145,25 @@ export class Profile implements OnInit {
       "PasswordHash": password
     };
 
-    console.log('📤 PASSWORD UPDATE payload:', { payload });
-
     this.auth.updatePassword(payload).subscribe({
       next: (res: boolean) => {
-        if (res === false) {
-          this.fillFormEmpty();
+        console.log(res)
+        if (!res) {
+          console.warn('⚠️ updatePassword devolveu false');
           return;
         }
-      }})
-        // TODO: chamar serviço para update da password
+        alert('Password atualizada com sucesso!');
+
+        this.passwordForm.reset();
+        this.passwordForm.markAsPristine();
+        this.passwordForm.markAsUntouched();
+      },
+      error: (err) => {
+        console.error('❌ Erro no updatePassword:', err);
       }
+    });
+  }
 
   get profileDisabled() { return this.profileForm.invalid || !this.profileForm.dirty; }
   get passwordDisabled() { return this.passwordForm.invalid; }
-    }
+}

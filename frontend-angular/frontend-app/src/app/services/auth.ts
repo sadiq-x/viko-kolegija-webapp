@@ -43,10 +43,12 @@ export class AuthService {
     return this.http.post<any>(this.apiUrlUpdatePassword, obj).pipe(
       map((response) => {
         console.log(response)
-        return true
+        if ( !response || response?.status === false || response?.success === false){
+          return false;
+        }
+        return true;
       })
     )
-
   }
 
   logout() {
