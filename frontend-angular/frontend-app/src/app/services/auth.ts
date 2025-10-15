@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment.development';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
-import { ModelUserLogin } from '../models/modelUser';
+import { ModelUserLoginResponse, ModelUserRegisterRequest } from '../models/model-User';
 
 @Injectable({
   providedIn: 'root'
@@ -19,21 +19,30 @@ export class AuthService {
     return this.http.post<any>(this.apiUrlLogin, obj).pipe(
       map((response) => {
         if (response?.token && response?.user) {
-          let modelUser: ModelUserLogin = response.user;
-          console.log(response.user);
-          console.log(modelUser);
+          let modelUser: ModelUserLoginResponse = response.user;
           localStorage.setItem('authUser', JSON.stringify(modelUser))
           localStorage.setItem('authToken', response.token);
           alert("Login Successful");
           return true;
-        }
+        };
         return false;
       }),
       catchError((error) => {
         if (error.status === 404 || error.status === 400) {
-          console.log(error)
           alert('Wrong Credentials.');
         }
+        return of(false);
+      })
+    );
+  };
+
+  register(obj: ModelUserRegisterRequest): Observable<boolean>{
+    return this.http.post<any>(this.apiUrlRegister,obj).pipe(
+      map((response) => {
+        console.log(response)
+        return response?.success === true;
+      }),
+      catchError((error)=>{
         return of(false);
       })
     );
@@ -42,14 +51,13 @@ export class AuthService {
   updatePassword(obj: { EntityId: string, Username: string, PasswordHash: string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdatePassword, obj).pipe(
       map((response) => {
-        console.log(response)
-        if ( !response || response?.status === false || response?.success === false){
-          return false;
-        }
-        return true;
+        return response?.success === true;
+      }),
+      catchError((error) => {
+        return of(false);
       })
     )
-  }
+  };
 
   logout() {
     localStorage.clear(); //Clear all items from local storage
