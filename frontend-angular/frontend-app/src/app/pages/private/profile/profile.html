@@ -1,7 +1,8 @@
-<!-- Página Profile -->
+<!-- Page Profile -->
 <div class="min-h-screen bg-blue-50 flex items-center justify-center p-4">
   <div class="w-full max-w-2xl">
-    <!-- Título -->
+
+    <!-- Tittle -->
     <div class="text-center mb-6">
       <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-16 h-16 object-contain" />
       <h1 class="mt-3 text-2xl font-bold text-blue-800">My Profile</h1>
@@ -10,48 +11,41 @@
       </p>
     </div>
 
-    <!-- Cartão: Dados de Perfil -->
+    <!-- Design with Form Update User and Button Save change -->
     <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
       <h2 class="text-lg font-semibold text-blue-800">Profile details</h2>
       <p class="text-sm text-blue-700/70 mb-4">Some fields are read-only as they cannot be updated.</p>
 
-      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-4" novalidate>
+      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="space-y-4" novalidate>
+
         <!-- Username (read-only) -->
         <div>
           <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
-          <input id="username" type="text" formControlName="username" [readOnly]="true"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none"
-                 />
+          <input id="username" type="text" formControlName="username" [readOnly]="true" class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
+                        placeholder:text-blue-900/40 focus:outline-none" />
         </div>
 
         <!-- Name (update=no) -->
         <div>
           <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
-          <input id="name" type="text" formControlName="name" [readOnly]="true"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none"
-                 />
+          <input id="name" type="text" formControlName="name" [readOnly]="true" class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
+                        placeholder:text-blue-900/40 focus:outline-none" />
         </div>
 
         <!-- Email (update=no) -->
         <div>
           <label for="email" class="block text-sm font-medium text-blue-900">Email</label>
-          <input id="email" type="email" formControlName="email" [readOnly]="true"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none"
-                 />
+          <input id="email" type="email" formControlName="email" [readOnly]="true" class="mt-1 w-full rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-blue-900
+                        placeholder:text-blue-900/40 focus:outline-none" />
         </div>
 
         <!-- Image (update=true) -->
         <div>
           <label for="image" class="block text-sm font-medium text-blue-900">Profile image</label>
           <div class="mt-1 flex items-center gap-4">
-            <img [src]="imagePreview() || '/avatar-placeholder.png'"
-                 alt="Image"
-                 class="h-16 w-16 rounded-full border border-blue-200 object-cover bg-blue-50" />
-            <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)"
-                   class="block w-full text-sm text-blue-900 file:mr-4 file:rounded-lg
+            <img [src]="imagePreview() || '/default-user-profile.jpg'" alt="Image"
+              class="h-16 w-16 rounded-full border border-blue-200 object-cover bg-blue-50" />
+            <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" class="block w-full text-sm text-blue-900 file:mr-4 file:rounded-lg
                           file:border file:border-blue-200 file:bg-white file:px-3 file:py-2
                           file:text-blue-700 hover:file:bg-blue-50" />
           </div>
@@ -61,29 +55,38 @@
         <!-- NumberPhone (update=true) -->
         <div>
           <label for="numberPhone" class="block text-sm font-medium text-blue-900">Phone number</label>
-          <input id="numberPhone" type="tel" formControlName="numberPhone" maxlength="20"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400"
-                 placeholder="+351 912 345 678" />
-          <p class="mt-1 text-xs text-blue-700/70">Format: numbers, +, spaces, ( ) and -</p>
+
+          <div class="mt-1 flex rounded-xl border border-blue-200 overflow-hidden">
+            <!-- Indicative / Dial code -->
+            <select formControlName="indicative"
+              class="bg-white px-3 py-2 text-blue-900 focus:outline-none border-r border-blue-200">
+              <option *ngFor="let d of dialCodes; trackBy: trackByDial" [value]="d.dial">
+                {{ d.emoji }} {{ d.dial }}
+              </option>
+            </select>
+
+            <!-- Número -->
+            <input id="numberPhone" type="tel" formControlName="numberPhone" maxlength="20" pattern="[0-9]*"
+              inputmode="numeric" class="w-full px-3 py-2 text-blue-900 focus:outline-none placeholder:text-blue-900/40"
+              placeholder="912 345 678" />
+          </div>
+
+          <p class="mt-1 text-xs text-blue-700/70">
+            Selecione o indicativo e introduza apenas o número.
+          </p>
         </div>
 
         <!-- Address (update=true) -->
         <div>
           <label for="address" class="block text-sm font-medium text-blue-900">Address</label>
-          <input id="address" type="text" formControlName="address" maxlength="200"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+          <input id="address" type="text" formControlName="address" maxlength="200" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
                         placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400"
-                 placeholder="Street, number, city" />
+                        focus:ring-blue-200 focus:border-blue-400" placeholder="Street, number, city" />
         </div>
 
-        <!-- Save -->
+        <!-- Button Save change -->
         <div class="pt-2">
-          <button type="submit"
-                  [disabled]="profileDisabled"
-                  class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+          <button type="submit" [disabled]="profileDisabled" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
                          hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
                          active:translate-y-[1px] transition
                          disabled:opacity-50 disabled:cursor-not-allowed">
@@ -93,44 +96,38 @@
       </form>
     </div>
 
-    <!-- Cartão: Alterar Password -->
+    <!-- Design with Form Update Password, Informative text and Button Logout -->
     <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mt-6">
       <h2 class="text-lg font-semibold text-blue-800">Change password</h2>
       <p class="text-sm text-blue-700/70 mb-4">Keep your account safe using a strong password.</p>
 
-      <form [formGroup]="passwordForm" (ngSubmit)="savePassword()" class="space-y-4" novalidate>
+      <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="space-y-4" novalidate>
         <!-- Password -->
         <div>
           <label for="password" class="block text-sm font-medium text-blue-900">Password</label>
-          <input id="password" type="password" formControlName="password"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+          <input id="password" type="password" formControlName="password" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
                         placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400"
-                 placeholder="••••••••" />
+                        focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" />
           <p class="mt-1 text-xs text-blue-700/70">
             Minimum 8 characters, including lowercase, uppercase and digit.
           </p>
         </div>
 
-        <!-- Confirm -->
+        <!-- Confirm Password -->
         <div>
           <label for="confirmPassword" class="block text-sm font-medium text-blue-900">Confirm password</label>
-          <input id="confirmPassword" type="password" formControlName="confirmPassword"
-                 class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
                         placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400"
-                 placeholder="••••••••" />
+                        focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" />
           <p *ngIf="passwordForm.get('confirmPassword')?.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched"
-             class="mt-1 text-xs text-red-600">
+            class="mt-1 text-xs text-red-600">
             Passwords do not match.
           </p>
         </div>
 
-        <!-- Save -->
+        <!-- Button Update Password -->
         <div class="pt-2">
-          <button type="submit"
-                  [disabled]="passwordDisabled"
-                  class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+          <button type="submit" [disabled]="passwordDisabled" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
                          hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
                          active:translate-y-[1px] transition
                          disabled:opacity-50 disabled:cursor-not-allowed">
@@ -140,9 +137,19 @@
       </form>
     </div>
 
-    <!-- Rodapé informativo -->
+    <!-- Informative text -->
     <p class="mt-6 text-center text-xs text-blue-700/70">
       Your data is protected. You can update phone, address and image at any time.
     </p>
+
+    <!-- Button Logout -->
+    <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 mt-6 text-center">
+      <button (click)="logout()" class="w-full rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+                 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200
+                 active:translate-y-[1px] transition
+                 disabled:opacity-50 disabled:cursor-not-allowed">
+        Logout
+      </button>
+    </div>
   </div>
 </div>
