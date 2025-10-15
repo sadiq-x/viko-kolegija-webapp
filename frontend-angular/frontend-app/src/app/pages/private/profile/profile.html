@@ -58,7 +58,7 @@
 
           <div class="mt-1 flex rounded-xl border border-blue-200 overflow-hidden">
             <!-- Indicative / Dial code -->
-            <select formControlName="indicative"
+            <select formControlName="countryCode"
               class="bg-white px-3 py-2 text-blue-900 focus:outline-none border-r border-blue-200">
               <option *ngFor="let d of dialCodes; trackBy: trackByDial" [value]="d.dial">
                 {{ d.emoji }} {{ d.dial }}

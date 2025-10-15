@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, of, Observable, pipe } from 'rxjs';
-import { ModelUserProfile } from '../models/model-User';
+import { ModelUserProfileResponse } from '../models/model-User';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
@@ -13,7 +13,7 @@ export class ProfileService {
   constructor(private http: HttpClient) { }
 
   //Function getProfile with return type = ModelUserProfile or False
-  getProfile(): Observable<ModelUserProfile | false> {
+  getProfile(): Observable<ModelUserProfileResponse | false> {
     //Http request get
     return this.http.get<any>(this.apiUrlGetProfile).pipe(
       map((response) => {

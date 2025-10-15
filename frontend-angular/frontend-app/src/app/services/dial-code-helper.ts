@@ -11,7 +11,7 @@ const DIAL_DIGITS = [...DIAL_CODES]
  * em { indicative: "+351", number: "912345678" }.
  */
 export function splitDialAndNumber(input: string, fallbackDial: string = '') {
-  if (!input) return { indicative: fallbackDial, number: '' };
+  if (!input) return { countryCode: fallbackDial, number: '' };
 
   // Normaliza: mantém só dígitos, remove prefixos internacionais (00/011/0011/810…)
   let digitsOnly = String(input).replace(/\D/g, '');
@@ -21,12 +21,12 @@ export function splitDialAndNumber(input: string, fallbackDial: string = '') {
   for (const p of DIAL_DIGITS) {
     if (digitsOnly.startsWith(p.digits)) {
       return {
-        indicative: p.dial,                          // ex.: "+351"
+        countryCode: p.dial,                          // ex.: "+351"
         number: digitsOnly.slice(p.digits.length)    // ex.: "912345678"
       };
     }
   }
 
   // Se nada casar, usa fallback e considera tudo como número
-  return { indicative: fallbackDial, number: digitsOnly };
+  return { countryCode: fallbackDial, number: digitsOnly };
 }

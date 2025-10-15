@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, effect, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProfileService } from '../../../services/profile';
-import { ModelUserProfile } from '../../../models/model-User';
+import { ModelUserProfileResponse } from '../../../models/model-User';
 import { AuthService } from '../../../services/auth';
 import { DIAL_CODES } from '../../../data/dial-codes';
 import { ModelDialCode } from '../../../models/model-dial-codes';
@@ -33,7 +33,7 @@ export class Profile implements OnInit {
       name: [{ value: '', disabled: true }, [Validators.required]],
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       image: [null],
-      indicative: ['+370', Validators.required],
+      countryCode: ['+370', Validators.required],
       numberPhone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
     });
@@ -54,7 +54,7 @@ export class Profile implements OnInit {
       username: '',
       name: '',
       email: '',
-      indicative: '+370',
+      countryCode: '+370',
       numberPhone: '',
       address: ''
     });
@@ -72,7 +72,7 @@ export class Profile implements OnInit {
     const reader = new FileReader();
     reader.onload = () => {
       const base64WithPrefix = reader.result as string;    //Full image code prefix+base64 ex: "data:image/jpeg;base64,AAAA..."
-      const base64Only = base64WithPrefix.split(',')[1];   //Just the bytes string base64
+      //const base64Only = base64WithPrefix.split(',')[1];   //Just the bytes string base64
 
       //Update the preview of image
       this.imagePreview.set(base64WithPrefix);
@@ -120,14 +120,14 @@ export class Profile implements OnInit {
   //Function to load user profile
   private loadProfile() {
     this.profile.getProfile().subscribe({
-      next: (res: ModelUserProfile | false) => {
+      next: (res: ModelUserProfileResponse | false) => {
         if (res === false) {
           this.fillFormEmpty();
           return;
         }
 
         const u: any = res;
-        const mapped: ModelUserProfile = {
+        const mapped: ModelUserProfileResponse = {
           Id: u.Id ?? u.id ?? 0,
           Username: u.Username ?? u.username ?? '',
           Name: u.Name ?? u.name ?? '',
@@ -138,14 +138,14 @@ export class Profile implements OnInit {
         };
 
         // 👇 separa indicativo e número (fallback para +351, ajusta se preferires outro)
-        const { indicative, number } = splitDialAndNumber(mapped.NumberPhone);
+        const { countryCode, number } = splitDialAndNumber(mapped.NumberPhone);
 
         // Preenche o form
         this.profileForm.patchValue({
           username: mapped.Username,
           name: mapped.Name,
           email: mapped.Email,
-          indicative,            // novo controlo no form
+          countryCode,            // novo controlo no form
           numberPhone: number,   // só os dígitos do número
           address: mapped.Address,
         });
@@ -213,8 +213,8 @@ export class Profile implements OnInit {
   };
   //Get full number phone with dial code and number phone
   getFullPhone(): string {
-    const { indicative, numberPhone } = this.profileForm.getRawValue();
-    return `${indicative}${numberPhone.replace(/\s+/g, '')}`;
+    const { countryCode, numberPhone } = this.profileForm.getRawValue();
+    return `${countryCode}${numberPhone.replace(/\s+/g, '')}`;
   };
 
   get profileDisabled() { return this.profileForm.invalid || !this.profileForm.dirty; }

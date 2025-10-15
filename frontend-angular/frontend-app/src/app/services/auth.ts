@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment.development';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
-import { ModelUserLogin } from '../models/model-User';
+import { ModelUserLoginResponse, ModelUserRegisterRequest } from '../models/model-User';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class AuthService {
     return this.http.post<any>(this.apiUrlLogin, obj).pipe(
       map((response) => {
         if (response?.token && response?.user) {
-          let modelUser: ModelUserLogin = response.user;
+          let modelUser: ModelUserLoginResponse = response.user;
           localStorage.setItem('authUser', JSON.stringify(modelUser))
           localStorage.setItem('authToken', response.token);
           alert("Login Successful");
@@ -35,6 +35,18 @@ export class AuthService {
       })
     );
   };
+
+  register(obj: ModelUserRegisterRequest): Observable<boolean>{
+    return this.http.post<any>(this.apiUrlRegister,obj).pipe(
+      map((response) => {
+        console.log(response)
+        return response?.success === true;
+      }),
+      catchError((error)=>{
+        return of(false);
+      })
+    );
+  }
 
   updatePassword(obj: { EntityId: string, Username: string, PasswordHash: string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdatePassword, obj).pipe(
