@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/authService';
 
 @Component({
   selector: 'app-login',
@@ -30,18 +30,14 @@ export class Login {
       return;
     }
     const payload = this.form.value; // { username, password, remember }
-    console.log('Login payload:', payload);
 
     var credentials = {
       "Username": this.form.value.username,
       "PasswordHash": this.form.value.password
     };
-    console.log(credentials);
 
     this.authService.login(credentials).subscribe({
       next: (status: boolean) => {
-        this.router.navigate(['/dashboard'])
-        console.log(status)
       }, error: (e) => {
         console.log(e)
       }

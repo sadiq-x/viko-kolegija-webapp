@@ -4,8 +4,8 @@ import { RouterLink } from '@angular/router';
 import { DIAL_CODES } from '../../data/dial-codes';
 import { ModelDialCode } from '../../models/model-dial-codes';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth';
-import { ModelUserRegisterRequest } from '../../models/model-User';
+import { AuthService } from '../../services/authService';
+import { ModelUserRegisterRequest } from '../../models/modelUser';
 
 //Annotation for phone and password
 const PHONE_PATTERN = /^[0-9+()\-\s]{6,20}$/;
