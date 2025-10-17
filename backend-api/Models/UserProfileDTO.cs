@@ -6,9 +6,9 @@ namespace backend_api.Models
     public sealed class UserProfileRequestDTO
     {
         [Required]
-        public int EntityId { get; set; } = default!;
+        public int? EntityId { get; set; } = default!;
         [Required]
-        public string Username { get; set; } = default!;
+        public string? Username { get; set; } = default!;
     }
 
     //Dto Response to get a specific Profile User

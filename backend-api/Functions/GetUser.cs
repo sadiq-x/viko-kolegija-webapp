@@ -20,16 +20,31 @@ namespace backend_api.Functions
 
         [Function("authGetUser")]
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run1(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "get/profile")] HttpRequestData req)
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/profile")] HttpRequestData req, FunctionContext executionContext)
         {
-            var userProfileDto = await req.ReadFromJsonAsync<UserProfileRequestDTO>();
+            executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
+            var token = userObj as string; //Transform token object into string
 
-            if (userProfileDto is null || !userProfileDto.IsValid())
+            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
             {
-                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
-                await BadRequest.WriteAsJsonAsync(new { message = "Fields incorrect." });
-                return BadRequest;
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive" }); //Response send with msg
+                return BadResponse;
+            }
+
+            var (userId, userName) = JwtAuth.Decoder(token); //Information of decoded token
+            var userProfileDto = new UserProfileRequestDTO //use the userModel for fill the data from token
+            {
+                EntityId = userId,
+                Username = userName
+            };
+
+            if (userProfileDto == null || string.IsNullOrEmpty(userProfileDto.Username) || userProfileDto.EntityId == null) //Verify if entity model don't are false and token don't are empty
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new { message = "Username and EntityId don't find in JWT token" }); //Response send with msg
+                return BadResponse;
             }
 
             var user = await _userRepository.authGetUser(userProfileDto); //Checking request body with database

@@ -18,7 +18,7 @@ namespace backend_api.Functions
 
         [Function("authLogin")] //Function to do login
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run1(
+        public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/login")] HttpRequestData req) //Create the Http req and res
         {
             var loginUserDto = await req.ReadFromJsonAsync<UserLoginRequestDTO>();

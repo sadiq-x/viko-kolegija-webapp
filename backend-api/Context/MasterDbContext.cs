@@ -14,24 +14,39 @@ namespace backend_api.Context
         public DbSet<Roles> Roles { get; set; }
         public DbSet<Events> Events { get; set; }
         public DbSet<ParticipantsEvents> ParticipantsEvents { get; set; }
+        public DbSet<Topics> Topics { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ParticipantsEvents → Events (N:1) / If someone drop the Event id, the FK EventId will be full dropped
+            // ParticipantsEvents → Events (N:1) / If someone drop the Event, the FK EventId will be full dropped
             modelBuilder.Entity<ParticipantsEvents>()   //Fluent API
                 .HasOne(pe => pe.Event)
                 .WithMany(e => e.ParticipantsEvents)
                 .HasForeignKey(pe => pe.EventId)
-                .OnDelete(DeleteBehavior.Cascade);  // ON DELETE CASCADE
+                .OnDelete(DeleteBehavior.Cascade); // ON DELETE CASCADE
 
             // ParticipantsEvents → Entities (N:1) / If someone drop the Event id, the FK EventId will impossible
             modelBuilder.Entity<ParticipantsEvents>()
                 .HasOne(pe => pe.Entity)
                 .WithMany(en => en.ParticipantsEvents)
                 .HasForeignKey(pe => pe.EntityId)
-                .OnDelete(DeleteBehavior.Restrict);    // ON DELETE RESTRICT
+                .OnDelete(DeleteBehavior.Restrict); // ON DELETE RESTRICT
+
+            // Events → Topics (N:1) / If someone drop the Event id, the FK EventId will impossible
+            modelBuilder.Entity<Events>()
+                .HasOne(pe => pe.Topics)
+                .WithMany(en => en.Events)
+                .HasForeignKey(pe => pe.TopicsId)
+                .OnDelete(DeleteBehavior.Restrict); // ON DELETE RESTRICT
+            // Events → Entities (N:1)
+            modelBuilder.Entity<Events>()
+                .HasOne(e => e.Entities)
+                .WithMany(ent => ent.Events) 
+                .HasForeignKey(e => e.CreateById)
+                .OnDelete(DeleteBehavior.Restrict); // ON DELETE RESTRICT
         }
     }
 
@@ -53,13 +68,16 @@ namespace backend_api.Context
         [MaxLength(200)]
         public string Address { get; set; } //Address of entity
         [MaxLength(20)]
+        public string? Birthday { get; set; } //Gender of entity
+        [MaxLength(20)]
+        public string? Nationality { get; set; } //Gender of entity
+        [MaxLength(20)]
         public string? Gender { get; set; } //Gender of entity
-        [Required]
-        public bool Auth { get; set; } = false; //Authorization of entity
         public int RoleId { get; set; } //Type role of entity
         [ForeignKey("RoleId")]
         public Roles Roles { get; set; } //Relationship with id of table Roles
         public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
+        public ICollection<Events> Events { get; set; } = new List<Events>();
     }
 
     [Table("Roles")] //Maps the class User for table User in Database
@@ -79,7 +97,7 @@ namespace backend_api.Context
         [Key]
         public int Id { get; set; } //Id of User
         [Required]
-        public int EntityId { get; set; } //Entity_id of User
+        public int EntityId { get; set; }  //Entity_id of User
         [ForeignKey("EntityId")]
         public Entities Entity { get; set; } //Relationship with id of table Entities
         [Required]
@@ -98,7 +116,9 @@ namespace backend_api.Context
         [Required]
         public string Name { get; set; } //Name of event
         public string Description { get; set; } //Description of event
-        public string Topic { get; set; } //Topic type of event
+        public int TopicsId { get; set; } //Type Topic of event
+        [ForeignKey("TopicsId")]
+        public Topics Topics { get; set; } //Relationship with id of table Roles
         public int CreateById { get; set; } //Event created by id?
         [ForeignKey("CreateById")]
         public Entities Entities { get; set; } //Relationship with id of table Entities
@@ -123,5 +143,18 @@ namespace backend_api.Context
         public string Grade { get; set; } //Grade in 1 event of 1 participant
         public string CertificateData { get; set; } //Certificate Data in 1 event of 1 participant
         public string Progress { get; set; } //Progress in 1 event of 1 participant
+    }
+
+    [Table("Topics")] //Maps the class User for table User in Database
+    [Index(nameof(Type), IsUnique = true)]
+    public class Topics
+    { //Class Entities
+        [Key]
+        public int Id { get; set; } //Primary key
+        [Required]
+        public string Type { get; set; } = null!; //Type of Topic
+        [Required]
+        public string Description { get; set; } = null!; //Description of Topic
+        public ICollection<Events> Events { get; set; } = new List<Events>();
     }
 }

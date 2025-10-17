@@ -17,5 +17,6 @@ namespace backend_api.Models
     {
         public int EntityId { get; init; } = default!;
         public string Username { get; init; } = default!;
+        public string RoleType { get; init; } = default!;
     }
 }
