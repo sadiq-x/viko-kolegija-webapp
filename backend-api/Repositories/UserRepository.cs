@@ -10,6 +10,7 @@ namespace backend_api.Repositories
         Task<(bool Success, string? Message)> authUserRegister(UserRegisterRequestDTO t); //Task to crete a new user
         Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t); //Task to update user password
         Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t); //Task to update user 
+        Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t); //Task to update user 
     }
 
     public class UserRepository : IUserRepository
@@ -33,10 +34,15 @@ namespace backend_api.Repositories
                     u => u.EntityId,
                     e => e.Id,
                     (u, e) => new { u, e })
+                .Join(dbContext.Roles,
+                    ue => ue.e.RoleId,   // FK em Entity
+                    r => r.Id,           // PK em Roles
+                    (ue, r) => new { ue.u, ue.e, r })
                 .Select(join => new UserLoginResponseDTO
                 {
                     EntityId = join.u.EntityId,
-                    Username = join.u.Username
+                    Username = join.u.Username,
+                    RoleType = join.r.Type
                 })
                 .FirstOrDefaultAsync();
 
@@ -58,6 +64,7 @@ namespace backend_api.Repositories
             if (string.IsNullOrWhiteSpace(t.Email)) return (false, "Email field empty.");
             if (string.IsNullOrWhiteSpace(t.NumberPhone)) return (false, "Number phone field empty.");
             if (string.IsNullOrWhiteSpace(t.Address)) return (false, "Address field empty.");
+            if (string.IsNullOrWhiteSpace(t.Gender)) return (false, "Gender field empty.");
 
             try
             {
@@ -72,10 +79,13 @@ namespace backend_api.Repositories
                     Name = t.Name.Trim(),
                     Email = t.Email.Trim().ToLowerInvariant(),
                     NumberPhone = t.NumberPhone.Trim(),
-                    Address = t.Address.ToString().Trim(), //Need to be tested
-                    Auth = false,
+                    Address = t.Address.ToString().Trim(),
+                    Gender = t.Gender.Trim(),
                     RoleId = 5 //Set the Unauthorized
                 };
+
+                if (!string.IsNullOrWhiteSpace(t.Image))
+                    EntitiesDTO.Image = t.Image;
 
                 dbContext.Entities.Add(EntitiesDTO);
                 var confirmEntities = await dbContext.SaveChangesAsync();
@@ -110,7 +120,7 @@ namespace backend_api.Repositories
 
         public async Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t)
         {
-            if (t.Id <= 0) return (false, "Id field empty.");
+            if (t.EntityId <= 0) return (false, "EntityId field empty.");
             if (string.IsNullOrWhiteSpace(t.Username)) return (false, "Username field empty.");
             if (string.IsNullOrWhiteSpace(t.PasswordHash)) return (false, "Password field empty.");
 
@@ -119,7 +129,7 @@ namespace backend_api.Repositories
                 using var dbContext = _readContextFactory.CreateDbContext();
 
                 var user = await dbContext.Users
-                .SingleOrDefaultAsync(u => u.Id == t.Id && u.Username == t.Username);
+                .SingleOrDefaultAsync(u => u.EntityId == t.EntityId && u.Username == t.Username);
 
                 if (user is null)
                     return (false, "User not found.");
@@ -137,9 +147,8 @@ namespace backend_api.Repositories
 
         public async Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t)
         {
-            if (t.Id <= 0) return (false, "Id field empty.");
+            if (t.EntityId <= 0) return (false, "Id field empty.");
             if (string.IsNullOrWhiteSpace(t.Username)) return (false, "Username field empty.");
-            if (string.IsNullOrWhiteSpace(t.Name)) return (false, "Name field empty.");
             if (string.IsNullOrWhiteSpace(t.Email)) return (false, "Email field empty.");
             if (string.IsNullOrWhiteSpace(t.NumberPhone)) return (false, "Number phone field empty.");
             if (string.IsNullOrWhiteSpace(t.Address)) return (false, "Address field empty.");
@@ -149,19 +158,16 @@ namespace backend_api.Repositories
                 using var dbContext = _readContextFactory.CreateDbContext();
 
                 var user = await dbContext.Users
-                .SingleOrDefaultAsync(u => u.Id == t.Id && u.Username == t.Username);
+                .SingleOrDefaultAsync(u => u.EntityId == t.EntityId && u.Username == t.Username);
 
                 if (user is null)
                     return (false, "User not found.");
 
                 var entity = await dbContext.Entities
-                .SingleOrDefaultAsync(e => e.Id == user.EntityId);
+                .SingleOrDefaultAsync(e => e.Id == user.EntityId && e.Email == t.Email);
 
                 if (entity is null)
                     return (false, "Entity not found.");
-
-                entity.Name = t.Name.Trim();
-                entity.Email = t.Email.Trim().ToLowerInvariant();
 
                 if (!string.IsNullOrWhiteSpace(t.Image))
                     entity.Image = t.Image;
@@ -175,6 +181,46 @@ namespace backend_api.Repositories
             catch (Exception)
             {
                 return (false, "User update unsuccessful.");
+            }
+        }
+
+        public async Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            if (string.IsNullOrWhiteSpace(t.Username)) return null;
+
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+
+                var result = await dbContext.Entities
+                    .AsNoTracking()
+                    .Where(e => e.Id == t.EntityId)
+                    .Join(
+                        dbContext.Users.AsNoTracking().Where(u => u.Username == t.Username),
+                        e => e.Id,        // Entities.Id
+                        u => u.EntityId,  // Users.EntityId
+                        (e, u) => new { e, u }
+                    )
+                    .Select(x => new UserProfileResponseDTO
+                    {
+                        Id = x.e.Id,
+                        Username = x.u.Username,
+                        Name = x.e.Name,
+                        Email = x.e.Email,
+                        Image = x.e.Image,
+                        NumberPhone = x.e.NumberPhone,
+                        Address = x.e.Address
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (result is null) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }

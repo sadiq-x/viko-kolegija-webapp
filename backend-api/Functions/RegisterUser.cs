@@ -19,7 +19,7 @@ namespace backend_api.Functions
 
         [Function("authRegister")] //Function to do login
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run1(
+        public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/register")] HttpRequestData req)
         {
             var registerUserDto = await req.ReadFromJsonAsync<UserRegisterRequestDTO>();
@@ -29,6 +29,7 @@ namespace backend_api.Functions
                 var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badResponse.WriteAsJsonAsync(new
                 {
+                    Success = false,
                     message = "Fill the form correctly.",
                     error = registerUserDto?.Validate().Select(e => e.ErrorMessage) ?? new List<string>()
                 });
@@ -40,12 +41,12 @@ namespace backend_api.Functions
             if (!registerUser.Success)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-                await notFoundResponse.WriteAsJsonAsync(new { message = $"{registerUser.Message}." });
+                await notFoundResponse.WriteAsJsonAsync(new { registerUser.Success, registerUser.Message });
                 return notFoundResponse;
             }
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(new { message = "Register Success." });
+            await response.WriteAsJsonAsync(new { registerUser.Success, registerUser.Message });
             return response;
         }
     }

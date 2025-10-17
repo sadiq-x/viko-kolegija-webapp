@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace backend_api.Models
 {
+    //Dto Request to create a new user
     public sealed class UserRegisterRequestDTO
     {
         [Required]
@@ -18,20 +19,14 @@ namespace backend_api.Models
         public string Name { get; set; } = default!;
         [Required, EmailAddress, MaxLength(150)]
         public string Email { get; set; } = default!;
+        public string? Image { get; set; }
         [Required, Phone, MaxLength(20)]
         public string NumberPhone { get; set; } = default!;
         [Required, MaxLength(200)]
         public string Address { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Gender { get; set; }
         [JsonIgnore, BindNever]
         public bool Auth { get; } = false;
-    }
-
-    public sealed class EntityRegisterResponseDTO
-    {
-        public int Id { get; init; }
-        public string Name { get; init; } = default!;
-        public string Email { get; init; } = default!;
-        public string NumberPhone { get; init; } = default!;
-        public string Address { get; init; } = default!;
     }
 }

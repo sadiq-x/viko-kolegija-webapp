@@ -16,7 +16,7 @@ namespace backend_api.Services
             var claims = new[] //Set the body of jwt, calls claim
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim("UserId", id.ToString()),
+                new Claim("EntityId", id.ToString()),
                 // You can add more claims based on your requirements
             };
 
@@ -62,10 +62,15 @@ namespace backend_api.Services
 
         public static (int? userId, string? username) Decoder(string token) //Function to decode the information inside token, will decode the token for a username and a id
         {
+            if (token is null)
+            {
+                return (null, null);
+            }
+            
             var handler = new JwtSecurityTokenHandler(); //Set the handler jwtSecurity
             var jwtToken = handler.ReadToken(token) as JwtSecurityToken; //Read the token 
 
-            var userIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "UserId"); //Claim the UserId from token
+            var userIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "EntityId"); //Claim the UserId from token
 
             string? usernameClaim = jwtToken?.Claims
             .FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "name")?.Value; //Claim the Username from token
