@@ -1,6 +1,7 @@
 export interface ModelUserLoginResponse {
     EntityId: number,
-    Username: string
+    Username: string,
+    RoleType: string
 };
 
 export interface ModelUserRegisterRequest {
