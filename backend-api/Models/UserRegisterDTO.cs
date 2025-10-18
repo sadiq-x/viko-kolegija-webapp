@@ -25,8 +25,11 @@ namespace backend_api.Models
         [Required, MaxLength(200)]
         public string Address { get; set; } = default!;
         [MaxLength(20)]
-        public string? Gender { get; set; }
-        [JsonIgnore, BindNever]
-        public bool Auth { get; } = false;
+        public string? Birthday { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Nationality { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Gender { get; set; } = default!;
+
     }
 }

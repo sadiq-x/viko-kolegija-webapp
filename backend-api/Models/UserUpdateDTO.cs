@@ -15,5 +15,11 @@ namespace backend_api.Models
         public string NumberPhone { get; set; } = default!;
         [Required, MaxLength(200)]
         public string Address { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Birthday { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Nationality { get; set; } = default!;
+        [MaxLength(20)]
+        public string? Gender { get; set; } = default!;
     }
 }

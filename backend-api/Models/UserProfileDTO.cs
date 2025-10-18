@@ -21,5 +21,8 @@ namespace backend_api.Models
         public string? Image { get; init; }
         public string NumberPhone { get; init; } = default!;
         public string Address { get; init; } = default!;
+        public string? Birthday { get; init; } = default!;
+        public string? Nationality { get; init; } = default!;
+        public string? Gender { get; init; } = default!;
     }
 }
