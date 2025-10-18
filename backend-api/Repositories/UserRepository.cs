@@ -64,6 +64,8 @@ namespace backend_api.Repositories
             if (string.IsNullOrWhiteSpace(t.Email)) return (false, "Email field empty.");
             if (string.IsNullOrWhiteSpace(t.NumberPhone)) return (false, "Number phone field empty.");
             if (string.IsNullOrWhiteSpace(t.Address)) return (false, "Address field empty.");
+            if (string.IsNullOrWhiteSpace(t.Birthday)) return (false, "Gender field empty.");
+            if (string.IsNullOrWhiteSpace(t.Nationality)) return (false, "Gender field empty.");
             if (string.IsNullOrWhiteSpace(t.Gender)) return (false, "Gender field empty.");
 
             try
@@ -80,7 +82,9 @@ namespace backend_api.Repositories
                     Email = t.Email.Trim().ToLowerInvariant(),
                     NumberPhone = t.NumberPhone.Trim(),
                     Address = t.Address.ToString().Trim(),
-                    Gender = t.Gender.Trim(),
+                    Birthday = t.Birthday.Trim(),
+                    Nationality = t.Nationality.Trim(),
+                    Gender = t.Gender.Trim(),   
                     RoleId = 5 //Set the Unauthorized
                 };
 
@@ -152,6 +156,9 @@ namespace backend_api.Repositories
             if (string.IsNullOrWhiteSpace(t.Email)) return (false, "Email field empty.");
             if (string.IsNullOrWhiteSpace(t.NumberPhone)) return (false, "Number phone field empty.");
             if (string.IsNullOrWhiteSpace(t.Address)) return (false, "Address field empty.");
+            if (string.IsNullOrWhiteSpace(t.Birthday)) return (false, "Address field empty.");
+            if (string.IsNullOrWhiteSpace(t.Nationality)) return (false, "Address field empty.");
+            if (string.IsNullOrWhiteSpace(t.Gender)) return (false, "Address field empty.");
 
             try
             {
@@ -174,6 +181,9 @@ namespace backend_api.Repositories
 
                 entity.NumberPhone = t.NumberPhone.Trim();
                 entity.Address = t.Address.Trim();
+                entity.Birthday = t.Birthday.Trim();
+                entity.Nationality = t.Nationality.Trim();
+                entity.Gender = t.Gender.Trim();
 
                 await dbContext.SaveChangesAsync();
                 return (true, "User update successfully.");
@@ -210,7 +220,10 @@ namespace backend_api.Repositories
                         Email = x.e.Email,
                         Image = x.e.Image,
                         NumberPhone = x.e.NumberPhone,
-                        Address = x.e.Address
+                        Address = x.e.Address,
+                        Birthday = x.e.Birthday,
+                        Nationality = x.e.Nationality,
+                        Gender = x.e.Gender
                     })
                     .FirstOrDefaultAsync();
 
