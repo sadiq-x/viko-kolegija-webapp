@@ -36,6 +36,9 @@ export class Profile implements OnInit {
       countryCode: ['+370', Validators.required],
       numberPhone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
+      birthday: ['', [Validators.required]],   
+      nationality: ['', [Validators.required, Validators.maxLength(20)]],
+      gender: ['', [Validators.required, Validators.maxLength(20)]],
     });
     //Start the password form empty - if empty the fields going empty
     this.passwordForm = this.fb.group({
@@ -56,7 +59,10 @@ export class Profile implements OnInit {
       email: '',
       countryCode: '+370',
       numberPhone: '',
-      address: ''
+      address: '',
+      birthday: '',
+      nationality: '',
+      gender: ''
     });
     this.imagePreview.set(null);
     this.profileForm.markAsPristine();
@@ -99,6 +105,9 @@ export class Profile implements OnInit {
       "Image": this.profileForm.value.image,
       "NumberPhone": this.getFullPhone(),
       "Address": this.profileForm.value.address,
+      "Birthday": this.profileForm.value.birthday,
+      "Nationality": this.profileForm.value.nationality,
+      "Gender": this.profileForm.value.gender,
 
     };
     console.log(this.profileForm.value)
@@ -125,7 +134,7 @@ export class Profile implements OnInit {
           this.fillFormEmpty();
           return;
         }
-
+        console.log(res)
         const u: any = res;
         const mapped: ModelUserProfileResponse = {
           Id: u.Id ?? u.id ?? 0,
@@ -133,8 +142,11 @@ export class Profile implements OnInit {
           Name: u.Name ?? u.name ?? '',
           Email: u.Email ?? u.email ?? '',
           Image: u.Image ?? u.image ?? null,
-          NumberPhone: u.NumberPhone ?? u.numberPhone ?? '', // vem tipo "351912345678"
+          NumberPhone: u.NumberPhone ?? u.numberPhone ?? '', 
           Address: u.Address ?? u.address ?? '',
+          Birthday: u.Birthday ?? u.birthday ?? '',
+          Nationality: u.Nationality ?? u.nationality ?? '',
+          Gender: u.Gender ?? u.gender ?? '',
         };
 
         // 👇 separa indicativo e número (fallback para +351, ajusta se preferires outro)
@@ -145,9 +157,12 @@ export class Profile implements OnInit {
           username: mapped.Username,
           name: mapped.Name,
           email: mapped.Email,
-          countryCode,            // novo controlo no form
-          numberPhone: number,   // só os dígitos do número
+          countryCode,            
+          numberPhone: number,   
           address: mapped.Address,
+          birthday: mapped.Birthday,
+          nationality: mapped.Nationality,
+          gender: mapped.Gender,
         });
 
         if (mapped.Image) this.imagePreview.set(mapped.Image);
