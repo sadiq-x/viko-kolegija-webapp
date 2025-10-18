@@ -43,6 +43,8 @@ export class Register {
       phone: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(PHONE_PATTERN)]],
       address: ['', [Validators.required, Validators.maxLength(200)]],
       image: [null],
+      birthday: ['', [Validators.required]],   
+      nationality: ['', [Validators.required, Validators.maxLength(20)]],
       gender: ['', [Validators.required, Validators.maxLength(20)]],
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]],
@@ -75,6 +77,8 @@ export class Register {
       "Email": v.email,
       "NumberPhone": this.getFullPhone(),
       "Address": v.address,
+      "Birthday": v.birthday,   
+      "Nationality":v.nationality,
       "Gender": v.gender,
       "Image": v.image
     };

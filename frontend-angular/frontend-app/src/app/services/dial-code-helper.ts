@@ -23,8 +23,8 @@ export function splitDialAndNumber(input: string, fallbackDial: string = '') {
       return {
         countryCode: p.dial,                          // ex.: "+351"
         number: digitsOnly.slice(p.digits.length)    // ex.: "912345678"
-      };
-    }
+        };
+      }
   }
 
   // Se nada casar, usa fallback e considera tudo como número

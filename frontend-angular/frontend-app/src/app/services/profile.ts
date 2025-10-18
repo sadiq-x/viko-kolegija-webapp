@@ -25,7 +25,7 @@ export class ProfileService {
     );
   }
 
-  updateProfile(obj: { EntityId: number, Username: string, Email: string, Image: string, NumberPhone: string, Address: string, }): Observable<boolean> {
+  updateProfile(obj: { EntityId: number, Username: string, Email: string, Image: string, NumberPhone: string, Address: string, Birthday: string, Nationality: string, Gender:string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateProfile, obj).pipe(
       map((response) => {
         return response?.success === true;

@@ -13,6 +13,8 @@ export interface ModelUserRegisterRequest {
     Image?: string | null,
     NumberPhone: string,
     Address: string,
+    Birthday: string,
+    Nationality: string,
     Gender: string 
 };
 
@@ -23,5 +25,8 @@ export interface ModelUserProfileResponse {
     Email: string,
     Image?: string | null,
     NumberPhone: string,
-    Address: string 
+    Address: string,
+    Birthday: string,
+    Nationality: string,
+    Gender: string
 };

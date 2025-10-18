@@ -55,7 +55,8 @@
                             </option>
                         </select>
                         <!-- Number Phone -->
-                        <input id="phone" type="tel" formControlName="phone" required maxlength="20" pattern="[0-9]*" class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
+                        <input id="phone" type="tel" formControlName="phone" required maxlength="20" pattern="[0-9]*"
+                            class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
          text-blue-900 placeholder:text-blue-900/40
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="912 345 678" />
                     </div>
@@ -87,6 +88,24 @@
                   file:text-blue-700 hover:file:bg-blue-50" />
                     </div>
                     <p class="mt-1 text-xs text-blue-700/70">JPG/PNG até 2MB.</p>
+                </div>
+
+                <!-- Birthday -->
+                <div>
+                    <label for="birthday" class="block text-sm font-medium text-blue-900">Birthday</label>
+                    <input id="birthday" type="date" formControlName="birthday" required class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
+                text-blue-900 placeholder:text-blue-900/40
+                focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" />
+                </div>
+
+                <!-- Nationality -->
+                <div>
+                    <label for="nationality" class="block text-sm font-medium text-blue-900">Nationality</label>
+                    <input id="nationality" type="text" formControlName="nationality" required maxlength="20" class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
+                text-blue-900 placeholder:text-blue-900/40
+                focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400"
+                        placeholder="e.g., Portuguese" />
+                    <p class="mt-1 text-xs text-blue-700/70">Maximum 20 characters.</p>
                 </div>
 
                 <!-- Gender -->
