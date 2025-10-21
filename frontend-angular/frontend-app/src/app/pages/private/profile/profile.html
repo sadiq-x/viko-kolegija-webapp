@@ -67,7 +67,7 @@
 
             <!-- Número -->
             <input id="numberPhone" type="tel" formControlName="numberPhone" required maxlength="20" pattern="[0-9]*"
-              inputmode="numeric" class="w-full px-3 py-2 text-blue-900 focus:outline-none placeholder:text-blue-900/40"
+              inputmode="numeric" (input)="allowOnlyNumbers($event)" class="w-full px-3 py-2 text-blue-900 focus:outline-none placeholder:text-blue-900/40"
               placeholder="912 345 678" />
           </div>
 
