@@ -54,6 +54,7 @@ builder.Services.AddSingleton<RemoveAliasInterceptor>();
 
 //Adding the interfaces of repositories
 builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User repository 
+builder.Services.AddSingleton<ITopicsRepository, TopicsRepository>(); //Topics repository 
 builder.Services.AddHttpClient();
 
 builder.Build().Run();
