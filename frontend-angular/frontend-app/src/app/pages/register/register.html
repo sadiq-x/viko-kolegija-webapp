@@ -55,7 +55,7 @@
                             </option>
                         </select>
                         <!-- Number Phone -->
-                        <input id="phone" type="tel" formControlName="phone" required maxlength="20" pattern="[0-9]*"
+                        <input id="phone" type="tel" formControlName="phone" required maxlength="20" pattern="[0-9]*" (input)="allowOnlyNumbers($event)"
                             class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
          text-blue-900 placeholder:text-blue-900/40
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="912 345 678" />

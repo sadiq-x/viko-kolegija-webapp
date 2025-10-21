@@ -12,6 +12,6 @@ export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   //If the route does not declare 'roles', it does not restrict; otherwise, it validates
   if (!allowed || authService.hasRole(allowed)) return true;
 
-  router.navigate(['/dashboard']);
+  router.navigate(['/unauthorized']);
   return false;
 };

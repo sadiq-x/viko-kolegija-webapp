@@ -16,17 +16,19 @@ const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   selector: 'app-profile',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.scss']
+  styleUrls: ['./profile.scss'],
 })
 export class Profile implements OnInit {
+
   profileForm!: FormGroup; //Form of profile
   passwordForm!: FormGroup; //Form of password update
-  imagePreview = signal<string | null>(null);
+  imagePreview = signal<string | null>(null); //Variables of image preview
 
+  //Dial code helpers
   dialCodes: ModelDialCode[] = DIAL_CODES;
   trackByDial = (_: number, d: ModelDialCode) => d.dial;
 
-  constructor(private fb: FormBuilder, private profile: ProfileService, private auth: AuthService) {
+  constructor(private fb: FormBuilder, private profileService: ProfileService, private authService: AuthService) {
     //Start the user form empty - if empty the fields going empty
     this.profileForm = this.fb.group({
       username: [{ value: '', disabled: true }, [Validators.required]],
@@ -34,9 +36,12 @@ export class Profile implements OnInit {
       email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       image: [null],
       countryCode: ['+370', Validators.required],
-      numberPhone: ['', [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)]],
+      numberPhone: [
+        '',
+        [Validators.required, Validators.pattern(PHONE_PATTERN), Validators.maxLength(20)],
+      ],
       address: ['', [Validators.required, Validators.maxLength(200)]],
-      birthday: ['', [Validators.required]],   
+      birthday: ['', [Validators.required]],
       nationality: ['', [Validators.required, Validators.maxLength(20)]],
       gender: ['', [Validators.required, Validators.maxLength(20)]],
     });
@@ -45,7 +50,7 @@ export class Profile implements OnInit {
       password: ['', [Validators.required, Validators.pattern(PASSWORD_PATTERN)]],
       confirmPassword: ['', [Validators.required]],
     });
-  };
+  }
 
   ngOnInit(): void {
     this.loadProfile();
@@ -62,7 +67,7 @@ export class Profile implements OnInit {
       address: '',
       birthday: '',
       nationality: '',
-      gender: ''
+      gender: '',
     });
     this.imagePreview.set(null);
     this.profileForm.markAsPristine();
@@ -77,7 +82,7 @@ export class Profile implements OnInit {
 
     const reader = new FileReader();
     reader.onload = () => {
-      const base64WithPrefix = reader.result as string;    //Full image code prefix+base64 ex: "data:image/jpeg;base64,AAAA..."
+      const base64WithPrefix = reader.result as string; //Full image code prefix+base64 ex: "data:image/jpeg;base64,AAAA..."
       //const base64Only = base64WithPrefix.split(',')[1];   //Just the bytes string base64
 
       //Update the preview of image
@@ -87,35 +92,34 @@ export class Profile implements OnInit {
       this.profileForm.patchValue({ image: base64WithPrefix });
     };
     reader.readAsDataURL(file);
-  };
+  }
   //Function to save the new data of user
   updateProfile() {
     if (this.profileForm.invalid || !this.profileForm.dirty) {
       this.profileForm.markAllAsTouched();
 
       return;
-    };
+    }
 
-    const localStorageItem = localStorage.getItem("authUser");
+    const localStorageItem = localStorage.getItem('authUser');
     const localStorageItemParsed = JSON.parse(localStorageItem!);
     const payload = {
-      "EntityId": localStorageItemParsed.entityId,
-      "Username": this.profileForm.get('username')?.value,
-      "Email": this.profileForm.get('email')?.value,
-      "Image": this.profileForm.value.image,
-      "NumberPhone": this.getFullPhone(),
-      "Address": this.profileForm.value.address,
-      "Birthday": this.profileForm.value.birthday,
-      "Nationality": this.profileForm.value.nationality,
-      "Gender": this.profileForm.value.gender,
-
+      EntityId: localStorageItemParsed.entityId,
+      Username: this.profileForm.get('username')?.value,
+      Email: this.profileForm.get('email')?.value,
+      Image: this.profileForm.value.image,
+      NumberPhone: this.getFullPhone(),
+      Address: this.profileForm.value.address,
+      Birthday: this.profileForm.value.birthday,
+      Nationality: this.profileForm.value.nationality,
+      Gender: this.profileForm.value.gender,
     };
-    console.log(this.profileForm.value)
+    console.log(this.profileForm.value);
     console.log('📤 PROFILE UPDATE payload:', payload);
 
-    this.profile.updateProfile(payload).subscribe({
+    this.profileService.updateProfile(payload).subscribe({
       next: (res) => {
-        console.log(res)
+        console.log(res);
         if (res) {
           alert('Profile updated successful.');
 
@@ -123,18 +127,18 @@ export class Profile implements OnInit {
           this.profileForm.markAsUntouched();
           this.loadProfile();
         }
-      }
-    })
-  };
+      },
+    });
+  }
   //Function to load user profile
   private loadProfile() {
-    this.profile.getProfile().subscribe({
+    this.profileService.getProfile().subscribe({
       next: (res: ModelUserProfileResponse | false) => {
         if (res === false) {
           this.fillFormEmpty();
           return;
         }
-        console.log(res)
+        console.log(res);
         const u: any = res;
         const mapped: ModelUserProfileResponse = {
           Id: u.Id ?? u.id ?? 0,
@@ -142,7 +146,7 @@ export class Profile implements OnInit {
           Name: u.Name ?? u.name ?? '',
           Email: u.Email ?? u.email ?? '',
           Image: u.Image ?? u.image ?? null,
-          NumberPhone: u.NumberPhone ?? u.numberPhone ?? '', 
+          NumberPhone: u.NumberPhone ?? u.numberPhone ?? '',
           Address: u.Address ?? u.address ?? '',
           Birthday: u.Birthday ?? u.birthday ?? '',
           Nationality: u.Nationality ?? u.nationality ?? '',
@@ -157,8 +161,8 @@ export class Profile implements OnInit {
           username: mapped.Username,
           name: mapped.Name,
           email: mapped.Email,
-          countryCode,            
-          numberPhone: number,   
+          countryCode,
+          numberPhone: number,
           address: mapped.Address,
           birthday: mapped.Birthday,
           nationality: mapped.Nationality,
@@ -171,7 +175,7 @@ export class Profile implements OnInit {
       },
       error: (_) => {
         this.fillFormEmpty();
-      }
+      },
     });
   };
   //Function to save the new password of user
@@ -183,23 +187,23 @@ export class Profile implements OnInit {
 
     const { password, confirmPassword } = this.passwordForm.value;
 
-    //Validation of password and confirmPassword 
+    //Validation of password and confirmPassword
     if (password !== confirmPassword) {
       this.passwordForm.get('confirmPassword')?.setErrors({ mismatch: true });
       return;
-    };
+    }
 
     //Get the localStorage to pick EntityId and Username
-    const localStorageItem = localStorage.getItem("authUser");
+    const localStorageItem = localStorage.getItem('authUser');
     const EntityId = JSON.parse(localStorageItem!);
     var payload = {
-      "EntityId": EntityId.entityId,
-      "Username": this.profileForm.get('username')?.value,
-      "PasswordHash": password
+      EntityId: EntityId.entityId,
+      Username: this.profileForm.get('username')?.value,
+      PasswordHash: password,
     };
 
     //Http request subscribe
-    this.auth.updatePassword(payload).subscribe({
+    this.authService.updatePassword(payload).subscribe({
       next: (res: boolean) => {
         if (!res) {
           alert('Password impossible to updated.');
@@ -211,27 +215,40 @@ export class Profile implements OnInit {
         this.passwordForm.markAsPristine();
         this.passwordForm.markAsUntouched();
       },
-      error: (err) => {
-      }
+      error: (err) => {},
     });
   };
   //Function to logout user
   logout() {
-    this.auth.logout();
+    this.authService.logout();
     this.profileForm.reset();
     this.passwordForm.reset();
 
     this.profileForm.markAsPristine();
     this.passwordForm.markAsPristine();
 
-    alert("You have been logged out successfully.");
+    alert('You have been logged out successfully.');
   };
   //Get full number phone with dial code and number phone
   getFullPhone(): string {
     const { countryCode, numberPhone } = this.profileForm.getRawValue();
     return `${countryCode}${numberPhone.replace(/\s+/g, '')}`;
   };
+  //Verify if the input number phone is only numbers
+  allowOnlyNumbers(event: Event) {
+    const input = event.target as HTMLInputElement;
 
-  get profileDisabled() { return this.profileForm.invalid || !this.profileForm.dirty; }
-  get passwordDisabled() { return this.passwordForm.invalid; }
+    //Remove everything with character or symbol
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    //Update the form with clean value
+    this.profileForm.patchValue({ numberPhone: input.value });
+  };
+  //Properties to disable the buttons
+  get profileDisabled() {
+    return this.profileForm.invalid || !this.profileForm.dirty;
+  };
+  get passwordDisabled() {
+    return this.passwordForm.invalid;
+  };
 }

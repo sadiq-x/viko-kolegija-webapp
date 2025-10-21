@@ -31,8 +31,8 @@ export class AuthService {
           switch (role) {
             case Roles.Admin: this.router.navigate(['/admin']); break;
             case Roles.Teacher: this.router.navigate(['/teacher']); break;
-            case Roles.Unauthorized: this.router.navigate(['/dashboard']); break;
-            default: this.router.navigate(['/dashboard']);
+            case Roles.Unauthorized: this.router.navigate(['/unauthorized']); break;
+            case Roles.User: this.router.navigate(['/dashboard']); break;
           }
           return true;
         };
