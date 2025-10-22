@@ -16,9 +16,11 @@ export class TopicsService {
   getTopics(): Observable<ModelTopicsResponse[] | false>{
     return this.http.get<any>(this.apiUrlGetTopics).pipe(
       map((response) => {
-        if (response?.success) {
+        if (response?.success && Array.isArray(response.topics)) {
           return response.topics;
         };
+
+        //return false as const;
         return of<false>(false);
       })
     )

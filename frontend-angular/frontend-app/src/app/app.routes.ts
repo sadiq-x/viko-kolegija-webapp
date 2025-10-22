@@ -14,6 +14,7 @@ import { Roles } from './models/modelRoles';
 import { Unauthorized } from './pages/private/unauthorized/unauthorized';
 import { Topics } from './pages/private/topics/topics';
 import { Courseslist } from './pages/private/courseslist/courseslist';
+import { TeacherEvents } from './pages/private/teacher-events/teacher-events';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -29,7 +30,7 @@ export const routes: Routes = [
         path: 'dashboard',
         component: Dashboard,
         canActivate: [RoleGuard],
-        data: { roles: [Roles.Admin, Roles.Teacher, Roles.User] }, //This define who can access
+        data: { roles: [Roles.Admin, Roles.User] }, //This define who can access
       },
       {
         path: 'profile',
@@ -55,6 +56,12 @@ export const routes: Routes = [
         component: Teacher,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Teacher] }, //This define who can access
+      },
+      {
+        path: 'teacher/event/:id',
+        component: TeacherEvents,
+        canActivate: [RoleGuard],
+        data: {roles: [Roles.Teacher]}
       },
       {
         path: 'admin',

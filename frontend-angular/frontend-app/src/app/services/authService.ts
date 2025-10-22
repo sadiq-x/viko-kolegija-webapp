@@ -25,7 +25,7 @@ export class AuthService {
           localStorage.setItem('authUser', JSON.stringify(modelUser))
           localStorage.setItem('role', response.user.roleType)
           localStorage.setItem('authToken', response.token);
-          alert("Login Successful");
+          alert("Login Successful"+role);
 
           //Directs the client for the page according to the Role type
           switch (role) {

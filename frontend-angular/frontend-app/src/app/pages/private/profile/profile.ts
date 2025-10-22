@@ -114,8 +114,6 @@ export class Profile implements OnInit {
       Nationality: this.profileForm.value.nationality,
       Gender: this.profileForm.value.gender,
     };
-    console.log(this.profileForm.value);
-    console.log('📤 PROFILE UPDATE payload:', payload);
 
     this.profileService.updateProfile(payload).subscribe({
       next: (res) => {
@@ -138,7 +136,7 @@ export class Profile implements OnInit {
           this.fillFormEmpty();
           return;
         }
-        console.log(res);
+
         const u: any = res;
         const mapped: ModelUserProfileResponse = {
           Id: u.Id ?? u.id ?? 0,
