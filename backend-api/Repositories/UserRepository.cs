@@ -165,7 +165,7 @@ namespace backend_api.Repositories
                 using var dbContext = _readContextFactory.CreateDbContext();
 
                 var user = await dbContext.Users
-                .SingleOrDefaultAsync(u => u.EntityId == t.EntityId && u.Username == t.Username);
+                    .SingleOrDefaultAsync(u => u.EntityId == t.EntityId && u.Username == t.Username);
 
                 if (user is null)
                     return (false, "User not found.");
