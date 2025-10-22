@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, signal, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs/operators';
 import { ModelTopicsResponse } from '../../../models/modelTopics';
 import { TopicsService } from '../../../services/topics';
-var f;
+
 @Component({
   selector: 'app-topics',
   imports: [CommonModule, FormsModule],
@@ -12,47 +11,45 @@ var f;
   styleUrls: ['./topics.scss'],
 })
 export class Topics {
-  /** Lista que vem do backend */
+  //Array list get from backend
   topics: ModelTopicsResponse[] = [];
 
-  trackByIndex = (index: number) => index;
-
-  /** Estado de carregamento */
+  //Loading status
   loading = false;
 
   /** (opcional) Evento quando o utilizador escolhe um tópico */
   selectTopic = new EventEmitter<ModelTopicsResponse>();
-  
+
   //Search variable - signal
   query = signal<string>('');
 
-  /** Skeletons para loading */
+  // Skeletons for loading array, it's a blur loading items, just used only for Ui 
   loadingSkeletons = Array.from({ length: 6 });
-  // TODO: Rever o codigo topo do topics
-  //Filtered List (Type + Description) 
+
+  //Filtered List (Type + Description)
   filtered = computed<ModelTopicsResponse[]>(() => {
-    const q = this.query().trim().toLowerCase();
-    if (!q) return this.topics ?? [];
+    const norm = (s: string) =>
+      s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase(); //Remove the accentuation and use the lowerCase character
+    const q = norm(this.query().trim()); //Get the string/character search, and remove empty spaces in the start/end
+    if (!q) return this.topics ?? []; //If the variable q don't have any character, return full list of Topics
     return (this.topics ?? []).filter(
-      (t) =>
-        (t.Type ?? '').toLowerCase().includes(q) || (t.Description ?? '').toLowerCase().includes(q)
+      //Filter the list Topics
+      (t) => norm(t.Type ?? '').includes(q) || norm(t.Description ?? '').includes(q) //Else if have character, search in Type or Description the specific string
     );
   });
-  
-  f = computed(()=>{});
 
   constructor(private topicService: TopicsService) {}
 
   ngOnInit() {
     this.loadTopics();
-  };
+  }
 
   loadTopics() {
     this.loading = true; //Turn on before the request
     this.topicService.getTopics().subscribe({
       next: (res: ModelTopicsResponse[] | false) => {
         //Verify if the res are false or not
-        if (res == false || !Array.isArray(res)){
+        if (res == false || !Array.isArray(res)) {
           this.topics = []; //Set the loading false
           this.loading = false;
           return;
@@ -66,8 +63,6 @@ export class Topics {
           Type: x.Type ?? x.type,
           Description: x.Description ?? x.description,
         }));
-        // (debug)
-        // console.log('topics:', this.topics);
       },
       error: () => {
         this.topics = [];
@@ -75,11 +70,11 @@ export class Topics {
       },
     });
   }
-
+  //Function trackBy, help in the DOM rendering
   trackById: TrackByFunction<ModelTopicsResponse> = (_: number, item) => item.Id;
-
+  //Function onSelect the Topic
   onSelect(t: ModelTopicsResponse) {
     console.log('Selected topic:', t);
-    this.selectTopic.emit(t);
+    //this.selectTopic.emit(t);
   }
 }

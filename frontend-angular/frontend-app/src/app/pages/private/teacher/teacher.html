@@ -1,1 +1,93 @@
-<p>teacher works!</p>
+<!-- Página Teacher -->
+<div class="min-h-screen bg-blue-50 p-4">
+  <div class="mx-auto max-w-6xl grid lg:grid-cols-2 gap-6">
+    <!-- Criar Curso -->
+    <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+      <h1 class="text-xl font-bold text-blue-800">Create Course / Event</h1>
+      <p class="text-sm text-blue-700/70 mb-4">Fill the fields to publish a new course.</p>
+
+      <form [formGroup]="form" (ngSubmit)="onCreateCourse()" class="space-y-4" novalidate>
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
+          <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                        focus:ring-blue-200 focus:border-blue-400" placeholder="Course title" />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-blue-900">Description</label>
+          <textarea id="description" formControlName="description" rows="5" maxlength="2000" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                           placeholder:text-blue-900/40 focus:outline-none focus:ring-4
+                           focus:ring-blue-200 focus:border-blue-400"
+            placeholder="Explain what students will learn..."></textarea>
+        </div>
+
+        <!-- Topic -->
+        <div>
+          <label for="topicId" class="block text-sm font-medium text-blue-900">Topic</label>
+          <select id="topicId" formControlName="topicId" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                         focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400">
+            <option [ngValue]="null" disabled>Choose a topic</option>
+            <option *ngFor="let t of topics()" [ngValue]="t.Id">{{ t.Type }}</option>
+          </select>
+          <p class="mt-1 text-xs text-blue-700/70" *ngIf="loading()">Loading topics…</p>
+        </div>
+
+        <!-- Hidden / default metadata (só info para o utilizador) -->
+        <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+          <ul class="list-disc ml-5 space-y-1">
+            <li><strong>Status:</strong> true by default</li>
+            <li><strong>Date create:</strong> set automatically on submit</li>
+            <li><strong>Result:</strong> 0 by default</li>
+          </ul>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" [disabled]="submitDisabled" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+                       hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                       active:translate-y-[1px] transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Create course
+        </button>
+      </form>
+    </div>
+
+    <!-- Meus Cursos -->
+    <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+      <h2 class="text-xl font-bold text-blue-800">My Courses / Events</h2>
+      <p class="text-sm text-blue-700/70 mb-4">Courses you’ve created will appear here.</p>
+
+      <div *ngIf="myCourses().length === 0; else listTpl"
+        class="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700/70">
+        No courses yet.
+      </div>
+
+      <ng-template #listTpl>
+        <ul class="space-y-3">
+          <li *ngFor="let c of myCourses()">
+            <a class="block rounded-xl border border-blue-200 p-3 hover:bg-blue-50 transition cursor-pointer"
+              [routerLink]="['/teacher/event', c.Id]" [state]="{ course: c }">
+              <div class="flex items-center justify-between">
+                <p class="font-semibold text-blue-800">{{ c.Name }}</p>
+                <span class="text-xs" [ngClass]="c.Status ? 'text-green-700' : 'text-red-600'">
+                  {{ c.Status ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+
+              <p class="text-sm text-blue-700/70 mt-1 line-clamp-2">
+                {{ c.Description }}
+              </p>
+
+              <div class="text-xs text-blue-700/70 mt-2 flex flex-wrap gap-3">
+                <span *ngIf="c.TopicName"><strong>Topic:</strong> {{ c.TopicName }}</span>
+                <span><strong>Created:</strong> {{ c.DateCreate | date:'medium' }}</span>
+                <span *ngIf="c.Results"><strong>Result:</strong> {{ c.Results }}</span>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </ng-template>
+    </div>
+  </div>
+</div>
