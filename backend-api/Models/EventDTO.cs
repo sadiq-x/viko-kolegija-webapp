@@ -5,12 +5,18 @@ namespace backend_api.Models
     //Dto Request to create a Event
     public sealed class EventCreateRequestDTO
     {
-        public string Name { get; init; } = default!;
-        public string Description { get; init; } = default!;
-        public string Topic { get; init; } = default!;
-        public int CreateById { get; init; } = default!;
-        public string DateCreate { get; init; } = default!;
-        public bool Status { get; init; } = default!;
+        [Required]
+        public string Name { get; set; } = default!;
+        [Required]
+        public string Description { get; set; } = default!;
+        [Required]
+        public int TopicsId { get; set; } = default!;
+        [Required]
+        public int CreateById { get; set; } = default!;
+        [Required]
+        public string DateCreate { get; set; } = default!;
+        public bool Status { get; set; } = true;
+        public int Results { get; set; } = 0;
     }
 
     //Dto Response for all Event without any filter
@@ -19,10 +25,11 @@ namespace backend_api.Models
         public int Id { get; init; } = default!;
         public string Name { get; init; } = default!;
         public string Description { get; init; } = default!;
-        public string Topic { get; init; } = default!;
+        public string TopicName { get; init; } = default!;
         public int CreateById { get; init; } = default!;
         public string DateCreate { get; init; } = default!;
         public bool Status { get; init; } = default!;
+        public int Results { get; init; } = default!;
     }
 
     //DTO Request for all Event from a specific Topics
@@ -36,14 +43,14 @@ namespace backend_api.Models
     public sealed class EventListByStatusRequestDTO
     {
         [Required]
-        public string Topic { get; set; } = default!;
+        public string Status { get; set; } = default!;
     }
 
     //DTO Request for all Event from a specific CreateById
-    public sealed class EventListByCreateByIdRequestDTO
+    public sealed class EventListByIdRequestDTO
     {
         [Required]
-        public string CreateById { get; set; } = default!;
+        public int CreateById { get; set; } = default!;
     }
 
     //DTO Request for all Event from a specific Date
