@@ -33,14 +33,14 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var (userId, userName) = JwtAuth.Decoder(token); //Information of decoded token
+            var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); //Information of decoded token
             var userProfileDto = new UserProfileRequestDTO //use the userModel for fill the data from token
             {
                 EntityId = userId,
                 Username = userName
             };
 
-            if (userProfileDto == null || string.IsNullOrEmpty(userProfileDto.Username) || userProfileDto.EntityId == null) //Verify if entity model don't are false and token don't are empty
+            if (userProfileDto == null || string.IsNullOrEmpty(userProfileDto.Username) || userProfileDto.EntityId == null || userProfileDto.EntityId <= 0) //Verify if entity model don't are false and token don't are empty
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
                 await BadResponse.WriteAsJsonAsync(new { message = "Username and EntityId don't find in JWT token" }); //Response send with msg
@@ -51,7 +51,7 @@ namespace backend_api.Functions
             if (user is null)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await notFoundResponse.WriteAsJsonAsync(new { message = "User not found." }); //Reponse a message if the error exist
+                await notFoundResponse.WriteAsJsonAsync(new { message = "User not found." }); //Response a message if the error exist
                 return notFoundResponse;
             }
 
