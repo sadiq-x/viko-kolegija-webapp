@@ -30,7 +30,7 @@ export const routes: Routes = [
         path: 'dashboard',
         component: Dashboard,
         canActivate: [RoleGuard],
-        data: { roles: [Roles.Admin, Roles.User] }, //This define who can access
+        data: { roles: [Roles.User] }, //This define who can access
       },
       {
         path: 'profile',
@@ -55,13 +55,14 @@ export const routes: Routes = [
         path: 'teacher',
         component: Teacher,
         canActivate: [RoleGuard],
-        data: { roles: [Roles.Teacher] }, //This define who can access
+        data: { roles: [Roles.Teacher] },
+        children: [], //This define who can access
       },
       {
         path: 'teacher/event/:id',
         component: TeacherEvents,
         canActivate: [RoleGuard],
-        data: {roles: [Roles.Teacher]}
+        data: { roles: [Roles.Teacher] },
       },
       {
         path: 'admin',

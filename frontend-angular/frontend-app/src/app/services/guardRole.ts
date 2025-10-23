@@ -1,33 +1,43 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+import { of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { AuthService } from './authService';
 import { Roles } from '../models/modelRoles';
 
 export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
-  const authService = inject(AuthService);
+  const auth = inject(AuthService);
   const router = inject(Router);
 
-  const allowed = route.data['roles'] as Roles[] | undefined; //Get the property data inside the Route
+  const allowed = route.data['roles'] as Roles[] | undefined;
 
-  //If the route does not declare 'roles', it does not restrict; otherwise, it validates
-  if (!allowed || authService.hasRole(allowed)) return true;
+  return auth.verifyRole().pipe(
+    switchMap((isAuth) => {
+      //TODO Need to check this
+      
+      // não autenticado / sem permissão base
+      if (auth.getRole() != isAuth) {
+        console.log("false")
+        auth.clearLocalStorage()
+        return of(router.createUrlTree(['/login']));
+      }
 
-  //Switcher of direction of Role page
-  switch (authService.getRole()) {
-    case Roles.Admin:
-      router.navigate(['/admin']);
-      break;
-    case Roles.Teacher:
-      router.navigate(['/teacher']);
-      break;
-    case Roles.Unauthorized:
-      router.navigate(['/unauthorized']);
-      break;
-    case Roles.User:
-      router.navigate(['/dashboard']);
-      break;
-  }
+      // rota sem restrição de roles
+      if (!allowed || auth.hasRole(allowed)) {
+        console.log("true")
+        return of(true);
+      }
+      // role não permitido: calcular redireção por role atual
+      const role = auth.getRole();
+      const target =
+        role === Roles.Admin        ? ['/admin'] :
+        role === Roles.Teacher      ? ['/teacher'] :
+        role === Roles.User         ? ['/dashboard'] :
+        role === Roles.Unauthorized ? ['/unauthorized'] :
+                                      ['/login'];
 
-  //router.navigate(['/unauthorized']);
-  return false;
+      return of(router.createUrlTree(target));
+    }),
+    catchError(() => of(router.createUrlTree(['/login'])))
+  );
 };

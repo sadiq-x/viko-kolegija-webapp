@@ -7,35 +7,44 @@ import { ModelUserLoginResponse, ModelUserRegisterRequest } from '../models/mode
 import { Roles } from '../models/modelRoles';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrlLogin = environment.apiUrl + 'auth/login';
   private apiUrlRegister = environment.apiUrl + 'auth/register';
   private apiUrlUpdatePassword = environment.apiUrl + 'auth/update/password';
+  private apiUrlAuthorizationRole = environment.apiUrl + 'auth/roles';
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) {}
 
-  login(obj: { Username: string, PasswordHash: string }): Observable<boolean> {
+  login(obj: { Username: string; PasswordHash: string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlLogin, obj).pipe(
       map((response) => {
         if (response?.token && response?.user) {
-          const role = response.user.roleType
+          const role = response.user.roleType;
           let modelUser: ModelUserLoginResponse = response.user;
-          localStorage.setItem('authUser', JSON.stringify(modelUser))
-          localStorage.setItem('role', response.user.roleType)
+          localStorage.setItem('authUser', JSON.stringify(modelUser));
+          localStorage.setItem('role', response.user.roleType);
           localStorage.setItem('authToken', response.token);
-          alert("Login Successful"+role);
+          alert('Login Successful' + role);
 
           //Directs the client for the page according to the Role type
           switch (role) {
-            case Roles.Admin: this.router.navigate(['/admin']); break;
-            case Roles.Teacher: this.router.navigate(['/teacher']); break;
-            case Roles.Unauthorized: this.router.navigate(['/unauthorized']); break;
-            case Roles.User: this.router.navigate(['/dashboard']); break;
+            case Roles.Admin:
+              this.router.navigate(['/admin']);
+              break;
+            case Roles.Teacher:
+              this.router.navigate(['/teacher']);
+              break;
+            case Roles.Unauthorized:
+              this.router.navigate(['/unauthorized']);
+              break;
+            case Roles.User:
+              this.router.navigate(['/dashboard']);
+              break;
           }
           return true;
-        };
+        }
         return false;
       }),
       catchError((error) => {
@@ -45,12 +54,11 @@ export class AuthService {
         return of(false);
       })
     );
-  };
+  }
 
   register(obj: ModelUserRegisterRequest): Observable<boolean> {
     return this.http.post<any>(this.apiUrlRegister, obj).pipe(
       map((response) => {
-        console.log(response)
         return response?.success === true;
       }),
       catchError((error) => {
@@ -59,7 +67,11 @@ export class AuthService {
     );
   }
 
-  updatePassword(obj: { EntityId: string, Username: string, PasswordHash: string }): Observable<boolean> {
+  updatePassword(obj: {
+    EntityId: string;
+    Username: string;
+    PasswordHash: string;
+  }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdatePassword, obj).pipe(
       map((response) => {
         return response?.success === true;
@@ -67,26 +79,44 @@ export class AuthService {
       catchError((error) => {
         return of(false);
       })
-    )
-  };
+    );
+  }
 
   //Logout the user, will remove the Token and Role
   logout() {
     localStorage.clear(); //Clear all items from local storage
     this.router.navigate(['/login']); //Navigate to path Login
   }
+  //Clear everything in local storage
+  clearLocalStorage() {
+    localStorage.clear();
+  }
 
-  //For the Intercept Service 
+  //For the Intercept Service
   //Get the Token from local storage
   getAuthToken() {
     return localStorage.getItem('authToken') || null; //Get the Token if have, else return null
-  };
-
-  //For the Login/Role Guard Service 
-  //Get the Role from local storage 
+  }
+  //TODO: Escrever o que faz
+  verifyRole(): Observable<string | boolean> {
+    return this.http.get<any>(this.apiUrlAuthorizationRole).pipe(
+      map((response) => {
+        if (response.success) {
+          return response.roleVerify.type;
+        }
+        return !!response.success;
+      })
+    );
+  }
+  //Get the Role from local storage
   getRole() {
     const role = localStorage.getItem('role');
-    if (role === Roles.Admin || role === Roles.Teacher || role === Roles.Unauthorized || role === Roles.User) {
+    if (
+      role === Roles.Admin ||
+      role === Roles.Teacher ||
+      role === Roles.Unauthorized ||
+      role === Roles.User
+    ) {
       return role as Roles;
     }
     return null;
@@ -98,7 +128,7 @@ export class AuthService {
   }
   //Confirm if the token is in local storage
   isAuthenticated() {
-    const token = this.getAuthToken()
+    const token = this.getAuthToken();
     return !!token;
     /**
     Or
