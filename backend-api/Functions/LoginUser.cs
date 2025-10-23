@@ -35,7 +35,7 @@ namespace backend_api.Functions
             }
 
             var user = await _userRepository.authUserLogin(loginUserDto); //Checking request body with database
-            if (user is null)
+            if (user is null || string.IsNullOrEmpty(user.Username) || user.EntityId <= 0 || string.IsNullOrEmpty(user.RoleType))
             {
                 // Parse the request body to extract username and password
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
@@ -43,7 +43,7 @@ namespace backend_api.Functions
                 return notFoundResponse;
             }
 
-            string token = JwtAuth.GenerateToken(user.Username, user.EntityId); //Create token with username and id
+            string token = JwtAuth.GenerateToken(user.Username, user.EntityId, user.RoleType); //Create token with username and id
             var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
             await response.WriteAsJsonAsync(new { user, token });
             return response; //Return the response, with username and token Jwt Authorization 
