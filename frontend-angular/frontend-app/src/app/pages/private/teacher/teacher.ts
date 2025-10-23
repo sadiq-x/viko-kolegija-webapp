@@ -9,7 +9,7 @@ import { ModelTopicsResponse } from '../../../models/modelTopics';
 import { TeacherService } from '../../../services/teacher';
 import { CommonModule } from '@angular/common';
 import { TopicsService } from '../../../services/topics';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-teacher',
