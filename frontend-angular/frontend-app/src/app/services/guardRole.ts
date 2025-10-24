@@ -13,21 +13,17 @@ export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
 
   return auth.verifyRole().pipe(
     switchMap((isAuth) => {
-      //TODO Need to check this
-      
-      // não autenticado / sem permissão base
+      //Confirm the local storage role with roles get in backend
       if (auth.getRole() != isAuth) {
-        console.log("false")
         auth.clearLocalStorage()
         return of(router.createUrlTree(['/login']));
       }
-
-      // rota sem restrição de roles
+      //Verify if the allow is empty, or the current role exist in enum roles
       if (!allowed || auth.hasRole(allowed)) {
         console.log("true")
         return of(true);
       }
-      // role não permitido: calcular redireção por role atual
+      //If the roles not exist, define the correct path do direct
       const role = auth.getRole();
       const target =
         role === Roles.Admin        ? ['/admin'] :
