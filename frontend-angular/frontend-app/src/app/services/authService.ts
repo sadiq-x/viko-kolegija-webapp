@@ -17,6 +17,7 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  //Request the backend to do user login
   login(obj: { Username: string; PasswordHash: string }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlLogin, obj).pipe(
       map((response) => {
@@ -55,7 +56,7 @@ export class AuthService {
       })
     );
   }
-
+  //Request the backend to do user register
   register(obj: ModelUserRegisterRequest): Observable<boolean> {
     return this.http.post<any>(this.apiUrlRegister, obj).pipe(
       map((response) => {
@@ -66,7 +67,7 @@ export class AuthService {
       })
     );
   }
-
+  //Request the backend to update password
   updatePassword(obj: {
     EntityId: string;
     Username: string;
@@ -81,7 +82,6 @@ export class AuthService {
       })
     );
   }
-
   //Logout the user, will remove the Token and Role
   logout() {
     localStorage.clear(); //Clear all items from local storage
@@ -91,14 +91,14 @@ export class AuthService {
   clearLocalStorage() {
     localStorage.clear();
   }
-
   //For the Intercept Service
   //Get the Token from local storage
   getAuthToken() {
     return localStorage.getItem('authToken') || null; //Get the Token if have, else return null
   }
-  //TODO: Escrever o que faz
-  verifyRole(): Observable<string | boolean> {
+  //Request backend to get verify of entityId, username and role type, will return true if the user are authorized to access the page who wants
+  verifyRole(): Observable<string | false> {
+    //Return the role or false
     return this.http.get<any>(this.apiUrlAuthorizationRole).pipe(
       map((response) => {
         if (response.success) {
