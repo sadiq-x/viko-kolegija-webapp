@@ -107,7 +107,6 @@ namespace backend_api.Repositories
                     CreateById = t.CreateById,
                     DateCreate = t.DateCreate,
                     Status = t.Status,
-                    Results = t.Results
                 };
 
                 //Create the event in database

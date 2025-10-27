@@ -57,6 +57,8 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>(); //User reposit
 builder.Services.AddSingleton<IRolesRepository, RolesRepository>(); //Roles repository 
 builder.Services.AddSingleton<ITopicsRepository, TopicsRepository>(); //Topics repository 
 builder.Services.AddSingleton<IEventsRepository, EventsRepository>(); //Events repository
+builder.Services.AddSingleton<IParticipantsEventsRepository, ParticipantsEventsRepository>(); //Participants Events repository
+
 builder.Services.AddHttpClient();
 
 builder.Build().Run();
