@@ -14,7 +14,6 @@ export interface EventListResponse {
   CreateById: number;
   DateCreate: string;     
   Status: boolean;
-  Results: string;
 }
 
 export interface EventListByIdRequest {

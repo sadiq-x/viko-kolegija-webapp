@@ -13,8 +13,9 @@ import { RoleGuard } from './services/guardRole';
 import { Roles } from './models/modelRoles';
 import { Unauthorized } from './pages/private/unauthorized/unauthorized';
 import { Topics } from './pages/private/topics/topics';
-import { Courseslist } from './pages/private/courseslist/courseslist';
+import { CoursesList } from './pages/private/courseslist/courseslist';
 import { TeacherEvents } from './pages/private/teacher-events/teacher-events';
+import { CoursesType } from './pages/private/coursestype/coursestype';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -40,7 +41,13 @@ export const routes: Routes = [
       },
       {
         path: 'courses',
-        component: Courseslist,
+        component: CoursesList,
+        canActivate: [RoleGuard],
+        data: { roles: [Roles.Admin, Roles.Teacher, Roles.User] }, //This define who can access
+      },
+      {
+        path: 'courses/type/:type',
+        component: CoursesType,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Admin, Roles.Teacher, Roles.User] }, //This define who can access
       },

@@ -166,7 +166,6 @@ export class Profile implements OnInit {
           nationality: mapped.Nationality,
           gender: mapped.Gender,
         });
-
         if (mapped.Image) this.imagePreview.set(mapped.Image);
 
         this.profileForm.markAsPristine();

@@ -38,9 +38,8 @@
         <!-- Hidden / default metadata (só info para o utilizador) -->
         <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
           <ul class="list-disc ml-5 space-y-1">
-            <li><strong>Status:</strong> true by default</li>
+            <li><strong>Status:</strong> true by default.</li>
             <li><strong>Date create:</strong> set automatically on submit</li>
-            <li><strong>Result:</strong> 0 by default</li>
           </ul>
         </div>
 
@@ -82,7 +81,6 @@
               <div class="text-xs text-blue-700/70 mt-2 flex flex-wrap gap-3">
                 <span *ngIf="c.TopicName"><strong>Topic:</strong> {{ c.TopicName }}</span>
                 <span><strong>Created:</strong> {{ c.DateCreate | date:'medium' }}</span>
-                <span *ngIf="c.Results"><strong>Result:</strong> {{ c.Results }}</span>
               </div>
             </a>
           </li>
