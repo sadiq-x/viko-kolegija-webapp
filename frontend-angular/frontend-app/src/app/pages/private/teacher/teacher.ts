@@ -35,14 +35,9 @@ export class Teacher implements OnInit {
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(2000)]],
       topicId: [null, [Validators.required]],
-      // os seguintes são preenchidos no submit:
-      // createBy, dateCreate, status, result
     });
   }
-  // TODO: REVER CODIGO
-  goToCourse(c: any) {
-  this.router.navigate(['/teacher/event', c.Id], { state: { course: c } });
-}
+
 
   ngOnInit(): void {
     this.loadTopics();
@@ -96,12 +91,10 @@ export class Teacher implements OnInit {
               CreateById: x.CreateById ?? x.createById,
               DateCreate: x.DateCreate ?? x.dateCreate,
               Status: x.Status ?? x.status,
-              Results: x.Results ?? x.results
+              Results: x.Results ?? x.results,
             }))
           );
         }
-
-
       },
       error: () => this.myCourses.set([]),
       complete: () => this.loading.set(false),

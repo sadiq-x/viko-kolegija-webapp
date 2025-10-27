@@ -31,7 +31,7 @@
 
     <!-- Lista -->
     <div *ngIf="filtered().length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <article *ngFor="let t of filtered(); trackBy: trackById" (click)="onSelect(t)"
+      <article *ngFor="let t of filtered(); trackBy: trackById" (click)="onSelect(t)" [routerLink]="['/courses/type', t.Type]" [state]="{ course: t }"
         class="group cursor-pointer rounded-xl border border-gray-200 p-4 bg-white hover:shadow-md transition"
         tabindex="0" (keydown.enter)="onSelect(t)" role="button" aria-label="Abrir tópico {{ t.Type }}">
         <header class="mb-2 flex items-center justify-between">

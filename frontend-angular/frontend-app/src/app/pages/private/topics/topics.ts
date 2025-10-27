@@ -3,10 +3,11 @@ import { Component, computed, EventEmitter, signal, TrackByFunction } from '@ang
 import { FormsModule } from '@angular/forms';
 import { ModelTopicsResponse } from '../../../models/modelTopics';
 import { TopicsService } from '../../../services/topics';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-topics',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './topics.html',
   styleUrls: ['./topics.scss'],
 })
@@ -37,6 +38,7 @@ export class Topics {
       (t) => norm(t.Type ?? '').includes(q) || norm(t.Description ?? '').includes(q) //Else if have character, search in Type or Description the specific string
     );
   });
+  router: any;
 
   constructor(private topicService: TopicsService) {}
 
@@ -74,7 +76,11 @@ export class Topics {
   trackById: TrackByFunction<ModelTopicsResponse> = (_: number, item) => item.Id;
   //Function onSelect the Topic
   onSelect(t: ModelTopicsResponse) {
-    console.log('Selected topic:', t);
-    //this.selectTopic.emit(t);
+     if (!t?.Type) return;
+    // navegação para /courses/type/:type (o Angular codifica espaços/acentos automaticamente)
+    this.router.navigate([`/courses/typet/:${t.Type}`]);
+    // Se preferires garantir codificação manual:
+    // this.router.navigateByUrl(`/courses/type/${encodeURIComponent(t.Type)}`);
   }
-}
+  }
+

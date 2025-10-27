@@ -9,6 +9,7 @@ export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
+  //Get the roles allowed to access specific routes
   const allowed = route.data['roles'] as Roles[] | undefined;
 
   return auth.verifyRole().pipe(
@@ -20,7 +21,6 @@ export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
       }
       //Verify if the allow is empty, or the current role exist in enum roles
       if (!allowed || auth.hasRole(allowed)) {
-        console.log("true")
         return of(true);
       }
       //If the roles not exist, define the correct path do direct
