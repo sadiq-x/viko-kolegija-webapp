@@ -124,7 +124,6 @@ namespace backend_api.Context
         public Entities Entities { get; set; } //Relationship with id of table Entities
         public string DateCreate { get; set; } //Event created in date
         public bool Status { get; set; } //Status of event, True = event online / False = event finish
-        public int Results { get; set; } //Results of event, grades
         public ICollection<ParticipantsEvents> ParticipantsEvents { get; set; } = new List<ParticipantsEvents>();
     }
 
@@ -139,10 +138,9 @@ namespace backend_api.Context
         public int EntityId { get; set; } //Entity id?
         [ForeignKey("EntityId")]
         public Entities Entity { get; set; } //Relationship with id of table Entities
-        public bool status { get; set; } //Status of participant in event
-        public string Grade { get; set; } //Grade in 1 event of 1 participant
-        public string CertificateData { get; set; } //Certificate Data in 1 event of 1 participant
-        public string Progress { get; set; } //Progress in 1 event of 1 participant
+        public bool Status { get; set; }//Status of participant in event, true represent inscription on event, false represent withdrawal 
+        public string? Grade { get; set; } //Grade in 1 event of 1 participant
+        public string? Comments { get; set; } //Certificate Data in 1 event of 1 participant
     }
 
     [Table("Topics")] //Maps the class User for table User in Database

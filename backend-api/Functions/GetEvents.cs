@@ -30,7 +30,7 @@ namespace backend_api.Functions
                 {
                     Success = false,
                     message = "Events not found."
-                }); //Reponse a message if the error exist
+                }); //Response a message if the error exist
                 return notFoundResponse;
             }
 

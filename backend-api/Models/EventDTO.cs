@@ -16,7 +16,6 @@ namespace backend_api.Models
         [Required]
         public string DateCreate { get; set; } = default!;
         public bool Status { get; set; } = true;
-        public int Results { get; set; } = 0;
     }
 
     //Dto Response for all Event without any filter
@@ -29,7 +28,6 @@ namespace backend_api.Models
         public int CreateById { get; init; } = default!;
         public string DateCreate { get; init; } = default!;
         public bool Status { get; init; } = default!;
-        public int Results { get; init; } = default!;
     }
 
     //DTO Request for all Event from a specific Topics
