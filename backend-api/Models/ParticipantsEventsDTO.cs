@@ -19,4 +19,16 @@ namespace backend_api.Models
         public string? Grade { get; init; } = default!;
         public string? Comments { get; init; } = default!;
     }
+    //Dto Request to insert grade on individual student
+    public sealed class ParticipantsEventGradeRequestDTO        
+    {
+        [Required]
+        public int Id { get; init; } = default!;
+        [Required]
+        public int EventId { get; init; } = default!;
+        [Required]
+        public string Grade { get; set; } = default!;
+        [MaxLength(200)]
+        public string? Comments { get; set; } 
+    }
 }
