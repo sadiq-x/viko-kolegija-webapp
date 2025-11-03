@@ -79,9 +79,7 @@ export class Teacher implements OnInit {
 
     this.teacherService.getEventById(teacherId).subscribe({
       next: (res) => {
-        console.log(res);
-
-        if (Array.isArray(res)) {
+        if (Array.isArray(res) && !!res) {
           this.myCourses.set(
             res.map((x: any) => ({
               Id: x.Id ?? x.id,

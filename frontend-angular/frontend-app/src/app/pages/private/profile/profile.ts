@@ -124,14 +124,17 @@ export class Profile implements OnInit {
           this.profileForm.markAsPristine();
           this.profileForm.markAsUntouched();
           this.loadProfile();
+          return;
         }
+        alert('Profile not updated successful.');
+        return;
       },
     });
   }
   //Function to load user profile
   private loadProfile() {
     this.profileService.getProfile().subscribe({
-      next: (res: ModelUserProfileResponse | false) => {
+      next: (res) => {
         if (res === false) {
           this.fillFormEmpty();
           return;
@@ -201,7 +204,7 @@ export class Profile implements OnInit {
 
     //Http request subscribe
     this.authService.updatePassword(payload).subscribe({
-      next: (res: boolean) => {
+      next: (res) => {
         if (!res) {
           alert('Password impossible to updated.');
           return;

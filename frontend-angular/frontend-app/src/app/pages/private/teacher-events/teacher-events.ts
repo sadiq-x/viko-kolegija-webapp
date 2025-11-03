@@ -24,6 +24,8 @@ export class TeacherEvents {
   editingId = signal<number | null>(null);
   editParticipants: FormGroup;
 
+  eventId: number = 0;
+
   // TODO: REVER CODIGO
   constructor(
     private route: ActivatedRoute,
@@ -31,7 +33,15 @@ export class TeacherEvents {
     private fb: FormBuilder
   ) {
     this.editParticipants = fb.group({
-      grade: ['', [Validators.maxLength(50)]],
+      grade: [
+        '',
+        [
+          Validators.required,
+          Validators.min(0),
+          Validators.max(20),
+          Validators.pattern(/^\d+(\.\d{1,2})?$/), // só números (e decimais opcionais)
+        ],
+      ],
       comments: ['', [Validators.maxLength(200)]],
     });
   }
@@ -54,10 +64,10 @@ export class TeacherEvents {
   //Get the participants from backend, from specific eventId
   getParticipants() {
     this.loadingParticipants.set(true);
-    const eventId = Number(this.route.snapshot.paramMap.get('id'));
-    this.teacherService.getParticipantsIndividualEvent(eventId).subscribe({
+    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
+    this.teacherService.getParticipantsIndividualEvent(this.eventId).subscribe({
       next: (res) => {
-        if (Array.isArray(res) && res !== false) {
+        if (Array.isArray(res) && !!res) {
           this.loadingParticipants.set(false);
           this.participants.set(
             res.map((x: any) => ({
@@ -70,6 +80,7 @@ export class TeacherEvents {
               Comments: x.comments ?? x.Comments,
             }))
           );
+
           return;
         }
         this.participants.set([]);
@@ -80,20 +91,37 @@ export class TeacherEvents {
   //TODO: To review code, and add update grades and Comments
   //!TESTINGG
   saveEdit(p: any) {
-    console.log(this.editParticipants.value)
+    const obj = {
+      Id: this.editingId()!,
+      EventId: this.eventId,
+      Grade: this.editParticipants.value.grade.toString(),
+      Comments: this.editParticipants.value.comments,
+    };
+    this.teacherService.insertParticipantGrade(obj).subscribe({
+      next: (res) => {
+        if (res) {
+          this.cancelEdit();
+          setTimeout(() => {
+            this.getParticipants();
+          }, 1000);
+          console.log(this.editParticipants.value)
+          return;
+        }
+      },
+    });
   }
   cancelEdit() {
     this.editingId.set(null);
     this.editParticipants.reset();
-  }
+  };
   startEdit(p: { Id: number; Grade?: string; Comments?: string }) {
     this.editingId.set(p.Id);
-    console.log(this.editingId())
-    console.log(this.participants())
     this.editParticipants.setValue({
       grade: p.Grade ?? '',
       comments: p.Comments ?? '',
     });
     this.editParticipants.markAsPristine();
   }
+
+  closeEvent() {}
 }

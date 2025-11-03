@@ -13,7 +13,7 @@ export class TopicsService {
 
   constructor(private http: HttpClient){}
 
-  getTopics(): Observable<ModelTopicsResponse[] | false>{
+  getTopics(): Observable<ModelTopicsResponse | false>{
     return this.http.get<any>(this.apiUrlGetTopics).pipe(
       map((response) => {
         if (response?.success && Array.isArray(response.topics)) {

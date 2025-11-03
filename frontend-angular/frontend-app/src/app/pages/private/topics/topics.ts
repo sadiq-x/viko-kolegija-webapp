@@ -24,13 +24,16 @@ export class Topics {
   //Search variable - signal
   query = signal<string>('');
 
-  // Skeletons for loading array, it's a blur loading items, just used only for Ui 
+  // Skeletons for loading array, it's a blur loading items, just used only for Ui
   loadingSkeletons = Array.from({ length: 6 });
 
   //Filtered List (Type + Description)
   filtered = computed<ModelTopicsResponse[]>(() => {
     const norm = (s: string) =>
-      s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase(); //Remove the accentuation and use the lowerCase character
+      s
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .toLowerCase(); //Remove the accentuation and use the lowerCase character
     const q = norm(this.query().trim()); //Get the string/character search, and remove empty spaces in the start/end
     if (!q) return this.topics ?? []; //If the variable q don't have any character, return full list of Topics
     return (this.topics ?? []).filter(
@@ -49,7 +52,7 @@ export class Topics {
   loadTopics() {
     this.loading = true; //Turn on before the request
     this.topicService.getTopics().subscribe({
-      next: (res: ModelTopicsResponse[] | false) => {
+      next: (res) => {
         //Verify if the res are false or not
         if (res == false || !Array.isArray(res)) {
           this.topics = []; //Set the loading false
@@ -74,13 +77,4 @@ export class Topics {
   }
   //Function trackBy, help in the DOM rendering
   trackById: TrackByFunction<ModelTopicsResponse> = (_: number, item) => item.Id;
-  //Function onSelect the Topic
-  onSelect(t: ModelTopicsResponse) {
-     if (!t?.Type) return;
-    // navegação para /courses/type/:type (o Angular codifica espaços/acentos automaticamente)
-    this.router.navigate([`/courses/typet/:${t.Type}`]);
-    // Se preferires garantir codificação manual:
-    // this.router.navigateByUrl(`/courses/type/${encodeURIComponent(t.Type)}`);
-  }
-  }
-
+}
