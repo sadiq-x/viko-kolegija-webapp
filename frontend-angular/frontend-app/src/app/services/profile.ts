@@ -20,7 +20,7 @@ export class ProfileService {
         if (response?.user) {
           return response.user;
         }
-        return of<false>(false);
+        return false as const;
       })
     );
   }

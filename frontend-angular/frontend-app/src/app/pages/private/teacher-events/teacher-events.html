@@ -82,6 +82,21 @@
           </ng-template>
         </div>
       </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <!-- Button to edit event -->
+        <button type="button"
+          class="rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200">
+          Edit event
+        </button>
+
+        <!-- Button to close event -->
+        <button type="button"
+          class="rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
+          (click)="closeEvent()">
+          Close event
+        </button>
+      </div>
     </div>
 
     <!-- Participants -->
@@ -138,7 +153,8 @@
           <div class="flex items-center justify-between">
             <h3 class="text-base text-blue-900">
               {{ p.Email || '—' }}
-            </h3></div>
+            </h3>
+          </div>
 
           <!-- Valores atuais (quando não está a editar) -->
           <div *ngIf="editingId() !== p.Id" class="mt-1 text-sm">
@@ -159,21 +175,31 @@
           </div>
 
           <!-- Form inline (quando a editar este participante) -->
-          <form *ngIf="editingId() === p.Id" [formGroup]="editParticipants" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <form *ngIf="editingId() === p.Id" [formGroup]="editParticipants"
+            class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-medium text-blue-900">Grade</label>
-              <input type="text" formControlName="grade" maxlength="50"
-                class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                      placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="Ex: A+, 19/20, Completed" />
-              <p class="mt-1 text-xs text-blue-700/70">Máx. 50 caracteres.</p>
+
+              <input type="number" formControlName="grade" min="0" max="20" step="0.1" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+           placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400"
+                placeholder="Grade of student." />
+
+              <!-- Mensagem de ajuda -->
+              <p class="mt-1 text-xs text-blue-700/70">Insert a value between 0 and 20.</p>
+
+              <!-- Mensagem de erro -->
+              <p *ngIf="editParticipants.get('grade')?.invalid && editParticipants.get('grade')?.touched"
+                class="text-xs text-red-600 mt-1">
+                The value must be between 0 and 20.
+              </p>
             </div>
 
             <div>
               <label class="block text-xs font-medium text-blue-900">Comments</label>
               <input type="text" formControlName="comments" maxlength="200"
                 class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                      placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="URL/ID/Hash do certificado" />
-              <p class="mt-1 text-xs text-blue-700/70">Máx. 200 caracteres.</p>
+                      placeholder:text-blue-900/40 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="Comments about the student progress." />
+              <p class="mt-1 text-xs text-blue-700/70">Máx. 200 characters.</p>
             </div>
           </form>
 

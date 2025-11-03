@@ -12,7 +12,8 @@ import { errorContext } from 'rxjs/internal/util/errorContext';
 export class TeacherService {
   private apiUrlCreateEvent = environment.apiUrl + 'create/events';
   private apiUrlGetEvent = environment.apiUrl + 'get/byId/topics';
-  private apiUrlParticipants = environment.apiUrl + 'get/participants/';
+  private apiUrlGetParticipants = environment.apiUrl + 'get/participants/';
+  private apiUrlInsertGradeParticipant = environment.apiUrl + 'insert/participant/grade';
 
   constructor(private http: HttpClient) {}
   //Create event in database
@@ -45,14 +46,24 @@ export class TeacherService {
   }
   //Get the participants of a specific event
   getParticipantsIndividualEvent(eventId: number): Observable<ModelListParticipants | false> {
-    return this.http.get<any>(`${this.apiUrlParticipants}${eventId}`).pipe(
+    return this.http.get<any>(`${this.apiUrlGetParticipants}${eventId}`).pipe(
       map((response) => {
-        if (response.success) {
+        if (response?.success && response.participantsEvent) {
           return response.participantsEvent;
-        }else if(!response.success){
+        } else if (!response.success) {
           return false as const;
         }
       })
     );
+  }
+  //Insert grade and if exist comments of a student
+  insertParticipantGrade(obj: { Id: number; EventId: number; Grade: string; Comments?: string }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlInsertGradeParticipant, obj).pipe(
+      map((response) => {
+        if(response?.success){
+          return true as const
+        }
+        return false as const
+    }));
   }
 }

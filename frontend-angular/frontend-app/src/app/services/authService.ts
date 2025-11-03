@@ -44,9 +44,9 @@ export class AuthService {
               this.router.navigate(['/dashboard']);
               break;
           }
-          return true;
+          return true as const;
         }
-        return false;
+        return false as const;
       }),
       catchError((error) => {
         if (error.status === 404 || error.status === 400) {
