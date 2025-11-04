@@ -8,6 +8,7 @@ namespace backend_api.Repositories
     {
         Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId(ParticipantsListFromEventIdRequestDTO t);
         Task<(bool Success, string? Message)> insertGradeParticipantsEvent(ParticipantsEventGradeRequestDTO t);
+        Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t);
     }
 
     public class ParticipantsEventsRepository : IParticipantsEventsRepository
@@ -92,6 +93,37 @@ namespace backend_api.Repositories
                 await dbContext.SaveChangesAsync();
 
                 return (true, "Grade updated successfully.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t)
+        {
+            if (t.Id <= 0) return (false, "Id field empty.");
+            if (t.EventId <= 0) return (false, "EventId field empty.");
+            if (t.EntityId <= 0) return (false, "EntityId field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var participantEvent = await dbContext.ParticipantsEvents
+                    .SingleOrDefaultAsync(pe =>
+                        pe.Id == t.Id &&
+                        pe.EventId == t.EventId &&
+                        pe.EntityId == t.EntityId);
+
+                if (participantEvent is null)
+                {
+                    return (false, "Participant for this event not found.");
+                }
+
+                participantEvent.Status = false;
+
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Status updated successfully.");
             }
             catch (Exception)
             {

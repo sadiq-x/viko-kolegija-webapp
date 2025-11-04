@@ -20,7 +20,7 @@ namespace backend_api.Models
         public string? Comments { get; init; } = default!;
     }
     //Dto Request to insert grade on individual student
-    public sealed class ParticipantsEventGradeRequestDTO        
+    public sealed class ParticipantsEventGradeRequestDTO
     {
         [Required]
         public int Id { get; init; } = default!;
@@ -29,6 +29,16 @@ namespace backend_api.Models
         [Required]
         public string Grade { get; set; } = default!;
         [MaxLength(200)]
-        public string? Comments { get; set; } 
+        public string? Comments { get; set; }
+    }
+    //Dto Request to update status of individual student
+    public sealed class ParticipantsEventUpdateStatusRequestDTO        
+    {
+        [Required]
+        public int Id { get; init; } = default!;
+        [Required]
+        public int EventId { get; init; } = default!;
+        [Required]
+        public int EntityId { get; set; } = default!;
     }
 }

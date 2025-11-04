@@ -9,6 +9,7 @@ namespace backend_api.Repositories
         Task<List<EventListResponseDTO>?> getAllEvents();
         Task<List<EventListResponseDTO>?> getEventsById(EventListByIdRequestDTO t);
         Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t);
+        Task<(bool Success, string? Message)> deleteEvent(EventCloseRequestDTO t);
     }
 
     public class EventsRepository : IEventsRepository
@@ -118,6 +119,34 @@ namespace backend_api.Repositories
             catch
             {
                 return (false, "Event created unsuccessfully."); ;
+            }
+        }
+
+        public async Task<(bool Success, string? Message)> deleteEvent(EventCloseRequestDTO t)
+        {
+            //Input validations
+            if (t.Id <= 0) return (false, "Id field empty."); ;
+            if (t.CreateById <= 0) return (false, "CreateById field empty."); ;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var eventClose = await dbContext.Events
+                    .SingleOrDefaultAsync(x => x.Id == t.Id && x.CreateById == t.CreateById);
+
+                if (eventClose is null)
+                {
+                    return (false, "Event not found."); ;
+                }
+
+                eventClose.Status = false;
+                
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Event close successfully."); ;
+            }
+            catch
+            {
+                return (false, "Event close unsuccessfully."); ;
             }
         }
     }
