@@ -57,4 +57,12 @@ namespace backend_api.Models
         [Required]
         public string DateCreate { get; init; } = default!;
     }
+    //DTO Request for close a event with a specific id
+    public sealed class EventCloseRequestDTO
+    {
+        [Required]
+        public int Id { get; set; } = default!;
+        [Required]
+        public int CreateById { get; set; } = default!;
+    }
 }
