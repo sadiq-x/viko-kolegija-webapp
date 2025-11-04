@@ -88,40 +88,102 @@ export class TeacherEvents {
       },
     });
   }
-  //TODO: To review code, and add update grades and Comments
-  //!TESTINGG
-  saveEdit(p: any) {
+
+  //Button to save the grade and comments of individual student in backend
+  btnSaveEdit() {
     const obj = {
       Id: this.editingId()!,
       EventId: this.eventId,
       Grade: this.editParticipants.value.grade.toString(),
       Comments: this.editParticipants.value.comments,
     };
+    //Request to backend
     this.teacherService.insertParticipantGrade(obj).subscribe({
       next: (res) => {
         if (res) {
-          this.cancelEdit();
+          alert('Participant grade update');
+          this.btnCancelEdit();
           setTimeout(() => {
             this.getParticipants();
           }, 1000);
-          console.log(this.editParticipants.value)
+          this.editParticipants.markAsPristine();
           return;
         }
       },
     });
   }
-  cancelEdit() {
+  //Button to cancel editing of grade and comments
+  btnCancelEdit() {
     this.editingId.set(null);
     this.editParticipants.reset();
-  };
-  startEdit(p: { Id: number; Grade?: string; Comments?: string }) {
+  }
+  //Button to edit grade and comments of individual student
+  btnStartEdit(p: { Id: number; Grade?: string; Comments?: string }) {
     this.editingId.set(p.Id);
     this.editParticipants.setValue({
       grade: p.Grade ?? '',
       comments: p.Comments ?? '',
     });
-    this.editParticipants.markAsPristine();
   }
+  //Button to inactive student from a event
+  btnInactive(p: any) {
+    console.log(p);
+    const obj = {
+      Id: p.Id,
+      EventId: this.eventId,
+      EntityId: p.EntityId,
+    };
+    console.log(obj);
+    this.teacherService.updateParticipantStatus(obj).subscribe({
+      next: (res) => {
+        if (res) {
+          alert('Participant status inactive');
+          setTimeout(() => {
+            this.getParticipants();
+          }, 1000);
+          return;
+        }
+        return;
+      },
+    });
+  }
+  //Button to close event
+  btnCloseEvent() {
+    const participantStatus = this.participants()
+      .filter((p) => p.Status == true)
+      .map((p) => p.Status);
 
-  closeEvent() {}
+    if (!this.getCurrentTeacherId()) {
+      return;
+    }
+
+    const obj = {
+      Id: this.eventId,
+      CreateById: this.getCurrentTeacherId()!,
+    };
+
+    if (participantStatus.length === 0) {
+      this.teacherService.deleteEventById(obj).subscribe({
+        next: (res) => {
+          if(res){
+            this.course.Status = false
+            return;
+          }
+        },
+      });
+    } else {
+      alert('All students need to be classified and placed inactive');
+    }
+  }
+  //Get the current id of teacher
+  private getCurrentTeacherId(): number | null {
+    const raw = localStorage.getItem('authUser');
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw);
+      return Number(parsed.entityId) || null;
+    } catch {
+      return null;
+    }
+  }
 }

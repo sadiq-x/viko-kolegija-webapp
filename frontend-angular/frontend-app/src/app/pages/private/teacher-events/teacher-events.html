@@ -85,15 +85,15 @@
 
       <div class="mt-6 flex flex-wrap gap-3">
         <!-- Button to edit event -->
-        <button type="button"
+        <!-- <button type="button"
           class="rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200">
           Edit event
-        </button>
+        </button> -->
 
         <!-- Button to close event -->
         <button type="button"
           class="rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
-          (click)="closeEvent()">
+          (click)="btnCloseEvent()">
           Close event
         </button>
       </div>
@@ -127,23 +127,30 @@
               {{ p.Name || '—' }}
             </h3>
 
-            <!-- Botão Edit / Cancel -->
-            <ng-container *ngIf="editingId() !== p.Id; else editingActions">
-              <button type="button" class="rounded-lg bg-blue-600/90 px-3 py-1.5 text-white text-sm font-semibold shadow
-                       hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="startEdit(p)">
-                Edit
-              </button>
-            </ng-container>
+            <!-- Button Edit / Cancel -->
+            <ng-container *ngIf="editingId() !== p.Id && p.Status; else editingActions">
+              <div class="flex flex-col gap-2">
+                <button type="button" class="rounded-lg bg-blue-600/90 px-3 py-1.5 text-white text-sm font-semibold shadow
+             hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="btnStartEdit(p)">
+                  Edit
+                </button>
 
+                <button *ngIf="p.Status" type="button" class="rounded-lg bg-red-600/90 px-3 py-1.5 text-white border border-blue-200 text-sm font-semibold
+                         hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="btnInactive(p)">
+                  Inactive
+                </button>
+              </div>
+            </ng-container>
+            <!-- Button Save / Cancel -->
             <ng-template #editingActions>
-              <div class="flex gap-2">
+              <div class="flex gap-2" *ngIf="p.Status">
                 <button type="button" class="rounded-lg bg-green-600/90 px-3 py-1.5 text-white text-sm font-semibold shadow
                          hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-200 disabled:opacity-50"
-                  [disabled]="editParticipants.invalid || editParticipants.pristine" (click)="saveEdit(p)">
+                  [disabled]="editParticipants.invalid || editParticipants.pristine" (click)="btnSaveEdit()">
                   Save
                 </button>
                 <button type="button" class="rounded-lg bg-white px-3 py-1.5 text-blue-700 border border-blue-200 text-sm font-semibold
-                         hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="cancelEdit()">
+                         hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="btnCancelEdit()">
                   Cancel
                 </button>
               </div>
