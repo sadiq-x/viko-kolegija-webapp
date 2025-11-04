@@ -67,7 +67,6 @@ export class Teacher implements OnInit {
 
   private loadMyCourses() {
     this.loading.set(true);
-    console.log(this.getCurrentTeacherId());
 
     if (!this.getCurrentTeacherId()) {
       return;
@@ -98,7 +97,7 @@ export class Teacher implements OnInit {
       complete: () => this.loading.set(false),
     });
   }
-
+  //Get the current id of teacher
   private getCurrentTeacherId(): number | null {
     const raw = localStorage.getItem('authUser');
     if (!raw) return null;
