@@ -48,7 +48,7 @@ namespace backend_api.Models
     public sealed class EventListByIdRequestDTO
     {
         [Required]
-        public int CreateById { get; set; } = default!;
+        public int? CreateById { get; set; } = default!;
     }
 
     //DTO Request for all Event from a specific Date
