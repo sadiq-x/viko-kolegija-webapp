@@ -10,7 +10,7 @@ import { ModelListParticipants } from '../models/modelParticipant';
 })
 export class TeacherService {
   private apiUrlCreateEvent = environment.apiUrl + 'create/events';
-  private apiUrlGetEvent = environment.apiUrl + 'get/byId/topics';
+  private apiUrlGetEventById = environment.apiUrl + 'get/events/byId';
   private apiUrlGetParticipants = environment.apiUrl + 'get/participants/';
   private apiUrlInsertGradeParticipant = environment.apiUrl + 'insert/participant/grade';
   private apiUrlUpdateStatusParticipant = environment.apiUrl + 'update/participant/status';
@@ -35,8 +35,8 @@ export class TeacherService {
     );
   }
   //Get a event with a specific id
-  getEventById(obj: { CreateById: number }): Observable<EventListResponse | false> {
-    return this.http.post<any>(this.apiUrlGetEvent, obj).pipe(
+  getEventById(): Observable<EventListResponse | false> {
+    return this.http.get<any>(this.apiUrlGetEventById).pipe(
       map((response) => {
         if (response?.success && response?.events) {
           return response.events;

@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
-  EventListByIdRequest,
   EventListResponse,
   ModelEventsRequest,
 } from '../../../models/modelEvents';
@@ -72,11 +71,7 @@ export class Teacher implements OnInit {
       return;
     }
 
-    const teacherId: EventListByIdRequest = {
-      CreateById: this.getCurrentTeacherId()!,
-    };
-
-    this.teacherService.getEventById(teacherId).subscribe({
+    this.teacherService.getEventById().subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
           this.myCourses.set(

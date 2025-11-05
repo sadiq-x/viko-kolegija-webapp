@@ -39,7 +39,7 @@ export class TeacherEvents {
           Validators.required,
           Validators.min(0),
           Validators.max(20),
-          Validators.pattern(/^\d+(\.\d{1,2})?$/), // só números (e decimais opcionais)
+          Validators.pattern(/^\d+(\.\d{1,2})?$/), //only numbers and decimals
         ],
       ],
       comments: ['', [Validators.maxLength(200)]],
