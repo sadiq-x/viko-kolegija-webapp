@@ -1,17 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-
-
-type Course = {
-  Id: number;
-  Name: string;
-  Description: string;
-  Status: boolean;
-  DateCreate: string | Date;
-  TopicName?: string;
-  Type: string;       // <- usamos para filtrar pelo :type
-};
+import { Component, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { EventService } from '../../../services/events';
+import { EventListResponse } from '../../../models/modelEvents';
 
 @Component({
   selector: 'app-coursestype',
@@ -20,81 +11,53 @@ type Course = {
   styleUrl: './coursestype.scss',
 })
 export class CoursesType {
-  // parâmetro vindo da rota /courses/type/:type
-  type = '';
+  type: string = '';
+  loading: boolean = true;
 
-  // estado de loading
-  loading = true;
+  courses = signal<EventListResponse[]>([]);
 
-  // lista já filtrada para o HTML
-  courses: Course[] = [];
-
-  // (mock) base de cursos só para demo sem HTTP
-  private allCourses = [
-    {
-      Id: 1,
-      Name: 'Angular Fundamentals',
-      Description: 'Componentes, formulários reativos e routing.',
-      Status: true,
-      DateCreate: new Date('2025-08-12'),
-      TopicName: 'Tecnologia',
-      Type: 'Tecnologia',
-    },
-    {
-      Id: 2,
-      Name: 'Treino Funcional',
-      Description: 'Força, mobilidade e prevenção de lesões.',
-      Status: true,
-      DateCreate: new Date('2025-07-01'),
-      TopicName: 'Desporto',
-      Type: 'Desporto',
-    },
-    {
-      Id: 3,
-      Name: 'TypeScript Avançado',
-      Description: 'Tipos genéricos, utility types e padrões.',
-      Status: false,
-      DateCreate: new Date('2025-06-10'),
-      TopicName: 'Tecnologia',
-      Type: 'Tecnologia',
-    },
-  ];
-
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private eventService: EventService) {}
 
   ngOnInit(): void {
-    this.getCourseFromTopicsPage()
-    // reage a alterações do parâmetro :type (navegação dentro da mesma página)
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      this.type = (params.get('type') ?? '').trim();
-      this.loadByType(this.type);
-    });
+    this.getCourseFromTopicsPage();
   }
-
-  private loadByType(type: string): void {
-    this.loading = true;
-
-    // simula latência de rede só para mostrar o loader do HTML
-    setTimeout(() => {
-      const norm = (s: string) =>
-        s
-          .normalize('NFD')
-          .replace(/\p{Diacritic}/gu, '')
-          .toLowerCase();
-
-      const t = norm(type);
-
-      this.courses = this.allCourses.filter((c) => norm(c.Type) === t);
-      this.loading = false;
-    }, 300);
-  }
-
+  //Function to get event by Topic selected
   getCourseFromTopicsPage() {
-    const passed = history.state?.['course']; // funciona após navegação normal
-    if (passed) {
-      console.log(passed);
+    const passed = history.state?.['course']; //Get the type from state received from topics page
+    this.type = (this.route.snapshot.paramMap.get('type') ?? '').trim(); //Get the Type from url params
 
+    if (passed.Type === this.type) {
+      this.loading = true;
+      const obj = {
+        Topic: this.type || passed.Type,
+      };
+
+      this.eventService.getEventByTopic(obj).subscribe({
+        next: (res) => {
+          if (Array.isArray(res)) {
+            this.courses.set(
+              res.map((p: any) => ({
+                Id: p.Id ?? p.id,
+                Name: p.Name ?? p.name,
+                Description: p.Description ?? p.description,
+                TopicName: p.TopicName ?? p.topicName,
+                CreateById: p.CreateById ?? p.createById,
+                DateCreate: p.DateCreate ?? p.dateCreate,
+                Status: p.Status ?? p.status,
+              }))
+            );
+            this.loading = false;
+          } else {
+            this.courses.set([]);
+            this.loading = false;
+          }
+        },
+      });
       return;
+    } else {
+      this.courses.set([]);
+      this.loading = false;
     }
   }
+  //
 }

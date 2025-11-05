@@ -16,6 +16,7 @@ import { Topics } from './pages/private/topics/topics';
 import { CoursesList } from './pages/private/courseslist/courseslist';
 import { TeacherEvents } from './pages/private/teacher-events/teacher-events';
 import { CoursesType } from './pages/private/coursestype/coursestype';
+import { CoursesIndividual } from './pages/private/coursesindividual/coursesindividual';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -42,6 +43,12 @@ export const routes: Routes = [
       {
         path: 'courses',
         component: CoursesList,
+        canActivate: [RoleGuard],
+        data: { roles: [Roles.Admin, Roles.Teacher, Roles.User] }, //This define who can access
+      },
+      {
+        path: 'courses/individual/:id',
+        component: CoursesIndividual,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Admin, Roles.Teacher, Roles.User] }, //This define who can access
       },
