@@ -30,7 +30,8 @@ namespace backend_api.Functions
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
-                    message = "EventId not found."
+                    message = "EventId not found.",
+                    error = participantEventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
                 }); //Response a message if the error exist
                 return notFoundResponse;
             }

@@ -22,28 +22,28 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "insert/participant/grade")] HttpRequestData req)
         {
-            var insertGrade = await req.ReadFromJsonAsync<ParticipantsEventGradeRequestDTO>();
+            var insertGradeDTO = await req.ReadFromJsonAsync<ParticipantsEventGradeRequestDTO>();
 
-            if (insertGrade == null || !insertGrade.IsValid())
+            if (insertGradeDTO == null || !insertGradeDTO.IsValid())
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await notFoundResponse.WriteAsJsonAsync(new
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
                 {
                     Success = false,
-                    message = "Fields incorrect.",
-                    error = insertGrade?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                    Message = "Fields incorrect.",
+                    Error = insertGradeDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
                 }); //Response a message if the error exist
-                return notFoundResponse;
+                return BadRequest;
             }
 
-            var participantsEvent = await _participantsEventsRepository.insertGradeParticipantsEvent(insertGrade); //Checking request body with database
+            var participantsEvent = await _participantsEventsRepository.insertGradeParticipantsEvent(insertGradeDTO); //Checking request body with database
             if (!participantsEvent.Success)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
-                    message = participantsEvent.Message
+                    Message = participantsEvent.Message
                 }); //Response a message if the error exist
                 return notFoundResponse;
             }
