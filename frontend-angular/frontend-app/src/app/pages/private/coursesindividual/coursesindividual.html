@@ -3,7 +3,7 @@
 
         <!-- Voltar -->
         <div class="mb-6 flex items-center justify-between">
-            <a [routerLink]="['/courses/type', courseType]" [state]=" { course: courseType }"
+            <a [routerLink]="courseType.Type ? ['/courses/type', courseType.Type] : ['/topics']" [state]="courseType.Type ? { course: courseType } : undefined"
                 class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-700 hover:bg-blue-50 transition">
                 ← Back to list
             </a>
@@ -56,6 +56,21 @@
                         <p class="text-blue-700/70 italic">No results yet.</p>
                     </ng-template>
                 </div>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                <!-- Button to edit event -->
+                <button type="button"
+                    class="rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200">
+                    Register for the course
+                </button>
+
+                <!-- Button to close event -->
+                <button type="button"
+                    class="rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
+                    (click)="btnCloseEvent()">
+                    Close event
+                </button>
             </div>
         </div>
 
