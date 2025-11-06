@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { ModelListParticipants } from '../../../models/modelParticipant';
 import { TeacherService } from '../../../services/teacher';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { EventService } from '../../../services/events';
 
 @Component({
   selector: 'app-teacher-event',
@@ -26,10 +26,10 @@ export class TeacherEvents {
 
   eventId: number = 0;
 
-  // TODO: REVER CODIGO
   constructor(
     private route: ActivatedRoute,
     private teacherService: TeacherService,
+    private eventService: EventService,
     private fb: FormBuilder
   ) {
     this.editParticipants = fb.group({
@@ -53,7 +53,7 @@ export class TeacherEvents {
 
   //Get the event selected from Page teacher
   getEventFromTeacherPage() {
-    const passed = history.state?.['course']; // funciona após navegação normal
+    const passed = history.state?.['course'];
     if (passed) {
       //Add the get participants
       this.course = passed;
@@ -88,7 +88,6 @@ export class TeacherEvents {
       },
     });
   }
-
   //Button to save the grade and comments of individual student in backend
   btnSaveEdit() {
     const obj = {
@@ -163,7 +162,7 @@ export class TeacherEvents {
     };
 
     if (participantStatus.length === 0) {
-      this.teacherService.deleteEventById(obj).subscribe({
+      this.eventService.deleteEventById(obj).subscribe({
         next: (res) => {
           if(res){
             this.course.Status = false

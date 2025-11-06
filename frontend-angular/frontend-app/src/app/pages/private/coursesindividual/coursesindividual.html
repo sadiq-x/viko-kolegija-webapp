@@ -1,1 +1,63 @@
-<p>coursesindividual works!</p>
+<div class="min-h-screen bg-blue-50 py-10 px-4 flex items-start justify-center">
+    <div class="w-full max-w-3xl">
+
+        <!-- Voltar -->
+        <div class="mb-6 flex items-center justify-between">
+            <a [routerLink]="['/courses/type', courseType]" [state]=" { course: courseType }"
+                class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-700 hover:bg-blue-50 transition">
+                ← Back to list
+            </a>
+
+            <div class="text-blue-700/70 text-sm">Event details</div>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="loading()" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 animate-pulse">
+            <div class="h-6 w-1/2 bg-blue-100 rounded mb-4"></div>
+            <div class="h-4 w-3/4 bg-blue-100 rounded mb-2"></div>
+            <div class="h-4 w-2/3 bg-blue-100 rounded"></div>
+        </div>
+
+        <!-- Not found -->
+        <div *ngIf="!loading() && notFound()" class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+            Event not found.
+        </div>
+
+        <!-- Conteúdo -->
+        <div *ngIf="!loading() && event()" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+            <div class="flex items-start justify-between mb-4">
+                <h1 class="text-2xl font-bold text-blue-900">{{ event().Name }}</h1>
+                <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold border" [ngClass]="event().Status
+                      ? 'bg-green-100 text-green-700 border-green-200'
+                      : 'bg-red-100 text-red-700 border-red-200'">
+                    {{ event().Status ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+
+            <p class="text-blue-800/80 mb-4">{{ event().Description }}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-blue-900">
+                <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
+                    <p class="text-xs uppercase tracking-wide text-blue-700/70">Created</p>
+                    <p class="mt-1 font-medium">{{ event().DateCreate | date:'medium' }}</p>
+                </div>
+
+                <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4" *ngIf="event().TopicName">
+                    <p class="text-xs uppercase tracking-wide text-blue-700/70">Topic</p>
+                    <p class="mt-1">{{ event().TopicName }}</p>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h2 class="text-sm font-semibold text-blue-800 mb-2">Result</h2>
+                <div class="rounded-xl border border-blue-200 bg-blue-50/40 p-4">
+                    <p *ngIf="event().Results; else noResult">{{ event().Results }}</p>
+                    <ng-template #noResult>
+                        <p class="text-blue-700/70 italic">No results yet.</p>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

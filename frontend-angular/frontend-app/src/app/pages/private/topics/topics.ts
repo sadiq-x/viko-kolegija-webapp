@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, EventEmitter, signal, TrackByFunction } from '@angular/core';
+import { Component, computed, signal, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModelTopicsResponse } from '../../../models/modelTopics';
 import { TopicsService } from '../../../services/topics';
@@ -18,10 +18,7 @@ export class Topics {
   //Loading status
   loading = false;
 
-  /** (opcional) Evento quando o utilizador escolhe um tópico */
-  selectTopic = new EventEmitter<ModelTopicsResponse>();
-
-  //Search variable - signal
+  //Search query variable - signal
   query = signal<string>('');
 
   // Skeletons for loading array, it's a blur loading items, just used only for Ui
@@ -41,14 +38,13 @@ export class Topics {
       (t) => norm(t.Type ?? '').includes(q) || norm(t.Description ?? '').includes(q) //Else if have character, search in Type or Description the specific string
     );
   });
-  router: any;
 
   constructor(private topicService: TopicsService) {}
 
   ngOnInit() {
     this.loadTopics();
   }
-
+  //Get the Topics
   loadTopics() {
     this.loading = true; //Turn on before the request
     this.topicService.getTopics().subscribe({

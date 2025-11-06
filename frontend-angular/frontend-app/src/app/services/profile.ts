@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, of, Observable, pipe } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ModelUserProfileResponse } from '../models/modelUser';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   //Backend endpoint
+  //Get
   private apiUrlGetProfile = environment.apiUrl + 'get/profile';
+  //Update
   private apiUrlUpdateProfile = environment.apiUrl + 'update/profile';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   //Function getProfile with return type = ModelUserProfile or False
   getProfile(): Observable<ModelUserProfileResponse | false> {
@@ -24,12 +26,22 @@ export class ProfileService {
       })
     );
   }
-
-  updateProfile(obj: { EntityId: number, Username: string, Email: string, Image: string, NumberPhone: string, Address: string, Birthday: string, Nationality: string, Gender:string }): Observable<boolean> {
+  //Function updateProfile will update all information of user
+  updateProfile(obj: {
+    EntityId: number;
+    Username: string;
+    Email: string;
+    Image: string;
+    NumberPhone: string;
+    Address: string;
+    Birthday: string;
+    Nationality: string;
+    Gender: string;
+  }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateProfile, obj).pipe(
       map((response) => {
         return response?.success === true;
       })
-    )
+    );
   }
 }

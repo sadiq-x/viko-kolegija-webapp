@@ -9,10 +9,11 @@ import { ModelTopicsResponse } from '../models/modelTopics';
 })
 export class TopicsService {
   //Backend endpoint
+  //Get
   private apiUrlGetTopics = environment.apiUrl + 'get/topics';
 
   constructor(private http: HttpClient){}
-
+  //Get all existing topics 
   getTopics(): Observable<ModelTopicsResponse | false>{
     return this.http.get<any>(this.apiUrlGetTopics).pipe(
       map((response) => {
