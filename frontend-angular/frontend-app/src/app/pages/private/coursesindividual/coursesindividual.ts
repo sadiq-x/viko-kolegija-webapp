@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-coursesindividual',
@@ -20,23 +20,30 @@ export class CoursesIndividual {
   // Dados do evento
   event = signal<any | null>(null);
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
     this.loadCourse()
   }
 
   loadCourse() {
-    console.log(history.state?.['event']);
-    const test = history.state?.['event'].TopicName;
+   // this.loading.set(true)
+    //console.log(history.state?.['event']);
+    const test = history.state?.['event'];
     console.log(test)
-    this.courseType.Type = test;
-    console.log(this.courseType)
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    console.log('📌 ID do evento:', id);
 
-    setTimeout(() => {
-      const mockEvents = [
+    if (!test){
+      console.log("false")
+      this.loading.set(false)
+      this.notFound.set(true)
+      return;
+    }
+    this.courseType.Type = test.TopicName;
+
+    console.log(this.courseType.Type)
+    const id = Number(this.route.snapshot.paramMap.get('type'));
+
+    const mockEvents = 
         {
           Id: 1,
           Name: 'Frontend Masterclass',
@@ -45,14 +52,14 @@ export class CoursesIndividual {
           Status: true,
           TopicName: 'Frontend',
           Results: 'Excelente participação dos alunos.',
-        },
-      ];
+        }
+      ;
+      console.log(mockEvents)
 
-      console.log(this.event());
 
-      this.event.set(mockEvents);
+      this.event.set(test);
 
       this.loading.set(false);
-    }, 800); // simula 0.8s de atraso
   }
+  btnCloseEvent(){}
 }

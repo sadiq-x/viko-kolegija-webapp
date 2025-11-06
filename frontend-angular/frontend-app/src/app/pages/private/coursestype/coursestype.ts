@@ -25,8 +25,7 @@ export class CoursesType {
   getCourseFromTopicsPage() {
     const passed = history.state?.['course']; //Get the type from state received from topics page
     this.type = (this.route.snapshot.paramMap.get('type') ?? '').trim(); //Get the Type from url params
-    console.log(passed)
-    console.log(this.type)
+
     if (passed.Type === this.type) {
       this.loading = true;
       const obj = {
