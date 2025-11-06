@@ -8,6 +8,7 @@ import { map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class EventService {
+  //Backend endpoint
   //Get
   private apiUrlGetEventsByTopic = environment.apiUrl + 'get/events/byTopics';
   private apiUrlGetEventById = environment.apiUrl + 'get/events/byId';
@@ -17,8 +18,7 @@ export class EventService {
   private apiUrlDeleteEvent = environment.apiUrl + 'delete/event';
 
   constructor(private http: HttpClient) {}
-
-  //Get a Event with a specific EntityId
+  //Function getEventById will get a Event with a specific EntityId
   getEventById(): Observable<EventListResponse | false> {
     return this.http.get<any>(this.apiUrlGetEventById).pipe(
       map((response) => {
@@ -29,9 +29,9 @@ export class EventService {
       })
     );
   }
-  //Get a Event with a specific EntityId
+  //Function getEventById will get a Event with a specific Topic
   getEventByTopic(obj: { Topic: string }): Observable<EventListResponse | false> {
-    return this.http.post<any>(this.apiUrlGetEventsByTopic,obj).pipe(
+    return this.http.post<any>(this.apiUrlGetEventsByTopic, obj).pipe(
       map((response) => {
         if (response?.success && response?.events) {
           return response.events;
@@ -40,8 +40,7 @@ export class EventService {
       })
     );
   }
-
-  //Create new Event
+  //Function getEventById will create new Event
   createEvent(obj: {
     Name: string;
     Description: string;
@@ -58,8 +57,7 @@ export class EventService {
       })
     );
   }
-
-  //Close "delete" Event with a specific Id and CreateById
+  //Function getEventById will close "delete" Event with a specific Id and CreateById
   deleteEventById(obj: { Id: number; CreateById: number }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlDeleteEvent, obj).pipe(
       map((response) => {

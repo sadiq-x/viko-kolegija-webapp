@@ -9,6 +9,7 @@ import { TeacherService } from '../../../services/teacher';
 import { CommonModule } from '@angular/common';
 import { TopicsService } from '../../../services/topics';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { EventService } from '../../../services/events';
 
 @Component({
   selector: 'app-teacher',
@@ -27,6 +28,7 @@ export class Teacher implements OnInit {
   constructor(
     private fb: FormBuilder,
     private teacherService: TeacherService,
+    private eventService: EventService,
     private topicService: TopicsService,
     private router: Router
   ) {
@@ -42,7 +44,7 @@ export class Teacher implements OnInit {
     this.loadTopics();
     this.loadMyCourses();
   }
-
+  //Load all existing topics 
   private loadTopics() {
     this.loading.set(true);
     this.topicService.getTopics().subscribe({
@@ -63,7 +65,7 @@ export class Teacher implements OnInit {
       complete: () => this.loading.set(false),
     });
   }
-
+  //Load all curses of a specific teacher
   private loadMyCourses() {
     this.loading.set(true);
 
@@ -71,7 +73,7 @@ export class Teacher implements OnInit {
       return;
     }
 
-    this.teacherService.getEventById().subscribe({
+    this.eventService.getEventById().subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
           this.myCourses.set(
@@ -103,7 +105,7 @@ export class Teacher implements OnInit {
       return null;
     }
   }
-
+  //Button to create a event
   onCreateCourse() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -124,7 +126,7 @@ export class Teacher implements OnInit {
     };
 
     this.submitting.set(true);
-    this.teacherService.createEvent(payload).subscribe({
+    this.eventService.createEvent(payload).subscribe({
       next: (res) => {
         if (!res) {
           alert('Could not create course.');
@@ -141,8 +143,7 @@ export class Teacher implements OnInit {
       complete: () => this.submitting.set(false),
     });
   }
-
-  // helper de estado do botão
+  // helper of button state
   get submitDisabled() {
     return this.form.invalid || this.submitting();
   }

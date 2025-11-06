@@ -9,43 +9,16 @@ import { ModelListParticipants } from '../models/modelParticipant';
   providedIn: 'root',
 })
 export class TeacherService {
-  private apiUrlCreateEvent = environment.apiUrl + 'create/events';
-  private apiUrlGetEventById = environment.apiUrl + 'get/events/byId';
+  //Backend endpoint
+  //Get
   private apiUrlGetParticipants = environment.apiUrl + 'get/participants/';
+  //Insert
   private apiUrlInsertGradeParticipant = environment.apiUrl + 'insert/participant/grade';
+  //Update
   private apiUrlUpdateStatusParticipant = environment.apiUrl + 'update/participant/status';
-  private apiUrlDeleteEvent = environment.apiUrl + 'delete/event';
 
   constructor(private http: HttpClient) {}
-  //Create event in database
-  createEvent(obj: {
-    Name: string;
-    Description: string;
-    TopicsId: number;
-    CreateById: number;
-    DateCreate: string;
-  }): Observable<boolean> {
-    return this.http.post<any>(this.apiUrlCreateEvent, obj).pipe(
-      map((response) => {
-        if (!response?.success) {
-          return false as const;
-        }
-        return true;
-      })
-    );
-  }
-  //Get a event with a specific id
-  getEventById(): Observable<EventListResponse | false> {
-    return this.http.get<any>(this.apiUrlGetEventById).pipe(
-      map((response) => {
-        if (response?.success && response?.events) {
-          return response.events;
-        }
-        return false as const;
-      })
-    );
-  }
-  //Get the participants of a specific event
+  //Function getParticipantsIndividualEvent will get participants of a specific event
   getParticipantsIndividualEvent(eventId: number): Observable<ModelListParticipants | false> {
     return this.http.get<any>(`${this.apiUrlGetParticipants}${eventId}`).pipe(
       map((response) => {
@@ -57,7 +30,7 @@ export class TeacherService {
       })
     );
   }
-  //Insert grade and if exist comments of a student
+  //Function insertParticipantGrade will insert grade and if exist comments of a participant
   insertParticipantGrade(obj: {
     Id: number;
     EventId: number;
@@ -73,7 +46,7 @@ export class TeacherService {
       })
     );
   }
-  //Update status of a student
+  //Function updateParticipantStatus will update status of a participant
   updateParticipantStatus(obj: {
     Id: number;
     EventId: number;
@@ -81,18 +54,6 @@ export class TeacherService {
   }): Observable<boolean> {
     return this.http.put<any>(this.apiUrlUpdateStatusParticipant, obj).pipe(
       map((response) => {
-        if (response?.success) {
-          return true as const;
-        }
-        return false as const;
-      })
-    );
-  }
-  //Close "delete" the event by id
-  deleteEventById(obj: { Id: number; CreateById: number }): Observable<boolean> {
-    return this.http.post<any>(this.apiUrlDeleteEvent, obj).pipe(
-      map((response) => {
-        console.log(response)
         if (response?.success) {
           return true as const;
         }
