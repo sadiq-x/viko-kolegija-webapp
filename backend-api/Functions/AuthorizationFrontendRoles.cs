@@ -35,8 +35,7 @@ namespace backend_api.Functions
             }
 
             var (userId, username, roleType) = JwtAuth.Decoder(token); //Information of decoded token
-            Console.WriteLine("Role type -  " + roleType.ToString());
-            Console.WriteLine("username -  " + username.ToString());
+
             var roleTypeDto = new RolesRequestDTO //use the userModel for fill the data from token
             {
                 EntityId = userId,

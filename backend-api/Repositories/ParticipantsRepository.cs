@@ -9,6 +9,8 @@ namespace backend_api.Repositories
         Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId(ParticipantsListFromEventIdRequestDTO t);
         Task<(bool Success, string? Message)> insertGradeParticipantsEvent(ParticipantsEventGradeRequestDTO t);
         Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t);
+        Task<(bool Success, string? Message)> insertParticipantsEventInEvent(ParticipantsEventInsertInEventIdRequestDTO t);
+        Task<(bool Success, string? Message)> insertParticipantsEventParticipantDescription(ParticipantsEventInsertParticipantDescriptionRequestDTO t);
     }
 
     public class ParticipantsEventsRepository : IParticipantsEventsRepository
@@ -35,7 +37,7 @@ namespace backend_api.Repositories
 
                 var result = await dbContext.ParticipantsEvents
                     .AsNoTracking()
-                    .Where(pe => pe.EventId == t.EventId) // filtra pelo evento
+                    .Where(pe => pe.EventId == t.EventId)
                     .Select(u => new ParticipantsListFromEventIdResponseDTO
                     {
                         Id = u.Id,
@@ -45,7 +47,7 @@ namespace backend_api.Repositories
                         Status = u.Status,
                         Grade = u.Grade,
                         Comments = u.Comments,
-
+                        ParticipantDescription = u.ParticipantDescription
                     })
                     .ToListAsync();
 
@@ -84,7 +86,6 @@ namespace backend_api.Repositories
 
                 participantEvent.Grade = t.Grade;
 
-                // 4) Atualizar comentários apenas se vierem preenchidos (senão deixa como está
                 if (!string.IsNullOrWhiteSpace(t.Comments))
                 {
                     participantEvent.Comments = t.Comments;
@@ -131,5 +132,96 @@ namespace backend_api.Repositories
             }
         }
 
+        public async Task<(bool Success, string? Message)> insertParticipantsEventInEvent(ParticipantsEventInsertInEventIdRequestDTO t)
+        {
+            if (t.EventId <= 0) return (false, "EventId field empty.");
+            if (t.EntityId <= 0 || t.EntityId is null) return (false, "EntityId field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var eventExists = await dbContext.Events
+                .AsNoTracking()
+                .AnyAsync(e => e.Id == t.EventId);
+
+                if (!eventExists)
+                {
+                    return (false, "Event not found.");
+                }
+
+                var entityExists = await dbContext.Entities
+                .AsNoTracking()
+                .AnyAsync(e => e.Id == t.EntityId);
+
+                if (!entityExists)
+                {
+                    return (false, "Entity not found.");
+                }
+
+                var alreadyExists = await dbContext.ParticipantsEvents
+                .AsNoTracking()
+                .AnyAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId);
+
+                if (alreadyExists)
+                {
+                    return (false, "Participant already registered in this event.");
+                }
+
+                var participant = new ParticipantsEvents
+                {
+                    EventId = t.EventId,
+                    EntityId = t!.EntityId.Value,
+                    Status = true,
+                    Grade = "",
+                    Comments = ""
+                };
+
+                await dbContext.ParticipantsEvents.AddAsync(participant);
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Participant inserted successfully.");
+            }
+            catch (Exception)
+            {
+                return (false, "Error inserting participant.");
+            }
+        }
+        public async Task<(bool Success, string? Message)> insertParticipantsEventParticipantDescription(ParticipantsEventInsertParticipantDescriptionRequestDTO t)
+        {
+            if (t.EventId <= 0) return (false, "EventId field empty.");
+            if (t.EntityId is null || t.EntityId <= 0) return (false, "EntityId field empty.");
+            if (string.IsNullOrWhiteSpace(t.ParticipantDescription)) return (false, "ParticipantDescription field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+
+                var eventExists = await dbContext.Events
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.EventId);
+                if (!eventExists)
+                    return (false, "Event not found.");
+
+                var entityExists = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.EntityId);
+                if (!entityExists)
+                    return (false, "Entity not found.");
+
+                var participant = await dbContext.ParticipantsEvents
+                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId);
+
+                if (participant is null)
+                    return (false, "Participant not registered in this event.");
+
+                participant.ParticipantDescription = t.ParticipantDescription;
+
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Participant description updated successfully.");
+            }
+            catch (Exception)
+            {
+                return (false, "Error updating participant description.");
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace backend_api.Models
         public bool Status { get; init; } = default!;
         public string? Grade { get; init; } = default!;
         public string? Comments { get; init; } = default!;
+        public string? ParticipantDescription { get; init; } = default!;
     }
     //Dto Request to insert grade on individual student
     public sealed class ParticipantsEventGradeRequestDTO
@@ -32,7 +33,7 @@ namespace backend_api.Models
         public string? Comments { get; set; }
     }
     //Dto Request to update status of individual student
-    public sealed class ParticipantsEventUpdateStatusRequestDTO        
+    public sealed class ParticipantsEventUpdateStatusRequestDTO
     {
         [Required]
         public int Id { get; init; } = default!;
@@ -40,5 +41,23 @@ namespace backend_api.Models
         public int EventId { get; init; } = default!;
         [Required]
         public int EntityId { get; set; } = default!;
+    }
+    //Dto Request to insert participant in specific event
+    public sealed class ParticipantsEventInsertInEventIdRequestDTO
+    {
+        [Required]
+        public int EventId { get; set; } = default!;
+        [Required]
+        public int? EntityId { get; set; } = default!;
+    }
+    //Dto Request insert participant description in specific event
+    public sealed class ParticipantsEventInsertParticipantDescriptionRequestDTO        
+    {
+        [Required]
+        public int EventId { get; set; } = default!;
+        [Required]
+        public int? EntityId { get; set; } = default!;
+        [Required]
+        public string? ParticipantDescription { get; set; } = default!;
     }
 }
