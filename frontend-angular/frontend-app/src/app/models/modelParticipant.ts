@@ -7,3 +7,9 @@ export interface ModelListParticipants {
     Grade: string,
     Comments: string,
 }
+
+export interface ModelListParticipantInfo {
+    Grade: string,
+    Comments: string,
+    ParticipantDescription?: string | null
+}
