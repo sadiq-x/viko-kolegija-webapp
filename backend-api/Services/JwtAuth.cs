@@ -79,6 +79,21 @@ namespace backend_api.Services
             return userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId) && !string.IsNullOrEmpty(usernameClaim) ? (userId, usernameClaim) : (null, null); //Condition where the username and id need to be true to return own value, if haven't data return null
         }
 
+        public static int? DecoderUserId(string token) //Function to decode the information inside token, will decode the token for userId
+        {
+            if (token is null)
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler(); //Set the handler jwtSecurity
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken; //Read the token 
+
+            var userIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "EntityId"); //Claim the UserId from token
+
+            return userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId) ? userId : null; //Condition where the id need to be true to return own value, if haven't data return null
+        }
+
         public static (int? userId, string? username, string? roleType) Decoder(string token) //Function to decode the information inside token, will decode the token for a role type
         {
             if (string.IsNullOrEmpty(token))

@@ -140,7 +140,8 @@ namespace backend_api.Context
         public Entities Entity { get; set; } //Relationship with id of table Entities
         public bool Status { get; set; }//Status of participant in event, true represent inscription on event, false represent withdrawal 
         public string? Grade { get; set; } //Grade in 1 event of 1 participant
-        public string? Comments { get; set; } //Certificate Data in 1 event of 1 participant
+        public string? Comments { get; set; } //Comment of participant in some event
+        public string? ParticipantDescription { get; set; } //Text/Write area of participant in some event
     }
 
     [Table("Topics")] //Maps the class User for table User in Database
