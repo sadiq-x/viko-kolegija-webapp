@@ -1,0 +1,66 @@
+<div class="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8 px-4 flex justify-center items-start" *ngIf="user">
+    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-blue-100 p-6 transition hover:shadow-2xl">
+
+        <!-- Welcome message -->
+        <div class="mb-6 text-center">
+            <h2 class="text-xl font-semibold text-blue-800">
+                Thank you for registering, <span class="text-blue-900 underline">{{ user.Name }}</span>!
+            </h2>
+            <p class="text-blue-700/70 mt-1 text-sm">
+                Your account has been successfully created.
+                Please note that your profile must be reviewed and approved by an administrator before you can access
+                all features.
+            </p>
+        </div>
+
+        <hr class="border-blue-100 mb-5">
+
+        <!-- User info Username + Name -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div class="flex items-center gap-4">
+                <img [src]="imageUrl" alt="User avatar"
+                    class="w-24 h-24 rounded-full border-4 border-blue-100 object-cover shadow-sm" />
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-900 leading-tight">{{ user.Name }}</h1>
+                    <p class="text-blue-600 text-sm mt-1">@{{ user.Username }}</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-blue-100 mb-5">
+
+        <!-- User info Email + NumberPhone + Address + Birthday + Nationality + Gender-->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-blue-900">
+
+            <div>
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Email</p>
+                <p class="font-medium">{{ user.Email }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Phone</p>
+                <p class="font-medium">{{ user.NumberPhone }}</p>
+            </div>
+
+            <div class="sm:col-span-2">
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Address</p>
+                <p class="font-medium">{{ user.Address }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Birthday</p>
+                <p class="font-medium">{{ user.Birthday | date: 'longDate' }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Nationality</p>
+                <p class="font-medium">{{ user.Nationality }}</p>
+            </div>
+
+            <div>
+                <p class="text-xs uppercase tracking-wide text-blue-700/70 mb-1">Gender</p>
+                <p class="font-medium">{{ user.Gender }}</p>
+            </div>
+        </div>
+    </div>
+</div>
