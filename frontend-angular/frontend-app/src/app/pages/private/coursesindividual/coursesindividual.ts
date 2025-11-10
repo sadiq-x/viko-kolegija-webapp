@@ -72,7 +72,6 @@ export class CoursesIndividual {
 
     this.participantsService.getParticipantsIndividualEvent(this.idCourse).subscribe({
       next: (res) => {
-        console.log(res)
         if (res === false) {
           this.participantEventStatus = res;
           return;

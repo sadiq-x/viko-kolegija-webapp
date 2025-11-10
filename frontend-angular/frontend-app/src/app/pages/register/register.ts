@@ -25,8 +25,8 @@ function matchFieldsValidator(a: string, b: string): ValidatorFn {
     const v1 = group.get(a)?.value;
     const v2 = group.get(b)?.value;
     return v1 && v2 && v1 !== v2 ? { fieldsMismatch: true } : null;
-  }
-};
+  };
+}
 
 @Component({
   selector: 'app-register',
@@ -35,12 +35,11 @@ function matchFieldsValidator(a: string, b: string): ValidatorFn {
   styleUrls: ['./register.scss'],
 })
 export class Register {
-
   formRegister!: FormGroup; //Form of register
   imagePreview: string | null = null; //Variables of image preview
 
-  //Dial code helpers
-  dialCodes: ModelDialCode[] = DIAL_CODES;
+  dialCodes: ModelDialCode[] = DIAL_CODES; //Dial code helpers
+
   trackByDial = (_: number, d: ModelDialCode) => d.dial;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private route: Router) {
@@ -64,14 +63,14 @@ export class Register {
       },
       { validators: [matchFieldsValidator('password', 'confirmPassword')] }
     );
-  };
-  
+  }
+
   //Function to submit new register
   onSubmit() {
     if (this.formRegister.invalid) {
       this.formRegister.markAllAsTouched();
       return;
-    };
+    }
 
     const { password, confirmPassword } = this.formRegister.value;
 
@@ -79,7 +78,7 @@ export class Register {
     if (password !== confirmPassword) {
       this.formRegister.get('confirmPassword')?.setErrors({ mismatch: true });
       return;
-    };
+    }
 
     //Payload to send to backend
     const v = this.formRegister.value;
@@ -101,13 +100,14 @@ export class Register {
     this.auth.register(payload).subscribe({
       next: (res: boolean) => {
         console.log(res);
-        if (res){
+        if (res) {
+          this.route.navigate(['/register/profile'], { state: {user : payload} });
           //Need to create a page to show the new user created.
           //TODO: Todo this ->
         }
       },
     });
-  };
+  }
   //Function on image select
   onImageSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -128,12 +128,12 @@ export class Register {
       this.formRegister.patchValue({ image: base64WithPrefix });
     };
     reader.readAsDataURL(file);
-  };
+  }
   //Get full number phone with dial code and number phone
   getFullPhone(): string {
     const { countryCode, phone } = this.formRegister.getRawValue();
     return `${countryCode}${phone.replace(/\s+/g, '')}`;
-  };
+  }
   //Verify if the input number phone is only numbers
   allowOnlyNumbers(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -143,9 +143,9 @@ export class Register {
 
     //Update the form with clean value
     this.formRegister.patchValue({ numberPhone: input.value });
-  };
+  }
   //Property to disable the buttons
   get submitDisabled() {
     return this.formRegister.invalid;
-  };
+  }
 }

@@ -17,12 +17,14 @@ import { CoursesList } from './pages/private/courseslist/courseslist';
 import { TeacherEvents } from './pages/private/teacher-events/teacher-events';
 import { CoursesType } from './pages/private/coursestype/coursestype';
 import { CoursesIndividual } from './pages/private/coursesindividual/coursesindividual';
+import { RegisterProfile } from './pages/registerprofile/registerprofile';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: Home },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
+  { path: 'register/profile', component: RegisterProfile },
   {
     path: '',
     component: Layout,
