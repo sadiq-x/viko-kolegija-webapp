@@ -1,16 +1,17 @@
-<!-- Página de Login -->
+<!-- Page Login -->
 <div class="min-h-screen bg-blue-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md">
-        <!-- Logo / Título -->
+        <!-- Logo  Tittle -->
         <div class="text-center mb-6">
             <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain" />
             <h1 class="mt-3 text-2xl font-bold text-blue-800">Sign in</h1>
             <p class="mt-1 text-sm text-blue-700/70">Fill in the data securely.</p>
         </div>
 
-        <!-- Cartão -->
+        <!-- Card with login form -->
         <div class="bg-white rounded-2xl shadow-lg p-6">
             <form [formGroup]="form" (ngSubmit)="onLoginSubmit()" class="space-y-4" novalidate>
+
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
@@ -50,7 +51,7 @@
                     </p>
                 </div>
 
-                <!-- Opções -->
+                <!-- Option remember login  -->
                 <div class="flex items-center justify-between">
                     <label class="inline-flex items-center gap-2 text-sm text-blue-900">
                         <input type="checkbox" formControlName="remember"
@@ -60,7 +61,7 @@
                     <a href="#" class="text-sm font-medium text-blue-700 hover:underline">Do you need help?</a>
                 </div>
 
-                <!-- Botão Entrar (desativa enquanto formulário inválido) -->
+                <!-- Button login -->
                 <button type="submit" [disabled]="form.invalid" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
                  hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
                  active:translate-y-[1px] transition
@@ -68,7 +69,7 @@
                     Sign in
                 </button>
 
-                <!-- Divisor -->
+                <!-- Break line -->
                 <div class="relative my-2">
                     <div class="absolute inset-0 flex items-center">
                         <div class="w-full border-t border-blue-200"></div>
@@ -78,7 +79,7 @@
                     </div>
                 </div>
 
-                <!-- Ação secundária -->
+                <!-- Second action - If the user don't have email, can be redirected to sign in page-->
                 <p class="text-center text-sm text-blue-900">
                     Don't have an account?
                     <a routerLink="/register" class="font-semibold text-blue-700 hover:underline">Create account</a>

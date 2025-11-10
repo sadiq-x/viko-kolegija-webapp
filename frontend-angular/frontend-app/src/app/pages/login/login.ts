@@ -9,14 +9,13 @@ import { AuthService } from '../../services/authService';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.scss'
+  styleUrl: './login.scss',
 })
-
 export class Login {
-
+  //Login form
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required]],
@@ -28,20 +27,18 @@ export class Login {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
-    }
-    const payload = this.form.value; // { username, password, remember }
-
-    var credentials = {
-      "Username": this.form.value.username,
-      "PasswordHash": this.form.value.password
     };
 
-    this.authService.login(credentials).subscribe({
-      next: (status: boolean) => {
-      }, error: (e) => {
-        console.log(e)
-      }
-    })
+    var credentials = {
+      Username: this.form.value.username,
+      PasswordHash: this.form.value.password,
+    };
+
+    this.authService.login(credentials, this.form.value.remember).subscribe({
+      next: (res: boolean) => {},
+      error: (e) => {
+        console.log(e);
+      },
+    });
   }
 }
-
