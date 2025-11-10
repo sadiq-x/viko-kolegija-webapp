@@ -16,7 +16,7 @@ export const RoleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     switchMap((isAuth) => {
       //Confirm the local storage role with roles get in backend
       if (auth.getRole() != isAuth) {
-        auth.clearLocalStorage()
+        auth.clearLocalStorageAndSessionStorage()
         return of(router.createUrlTree(['/login']));
       }
       //Verify if the allow is empty, or the current role exist in enum roles

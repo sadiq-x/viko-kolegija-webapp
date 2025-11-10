@@ -8,7 +8,7 @@ import {
   ValidatorFn,
   FormGroup,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Route, Router, RouterLink } from '@angular/router';
 import { DIAL_CODES } from '../../data/dial-codes';
 import { ModelDialCode } from '../../models/model-dial-codes';
 import { CommonModule } from '@angular/common';
@@ -43,7 +43,7 @@ export class Register {
   dialCodes: ModelDialCode[] = DIAL_CODES;
   trackByDial = (_: number, d: ModelDialCode) => d.dial;
 
-  constructor(private fb: FormBuilder, private auth: AuthService) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private route: Router) {
     this.formRegister = this.fb.group(
       {
         username: ['', [Validators.required]],
@@ -101,6 +101,10 @@ export class Register {
     this.auth.register(payload).subscribe({
       next: (res: boolean) => {
         console.log(res);
+        if (res){
+          //Need to create a page to show the new user created.
+          //TODO: Todo this ->
+        }
       },
     });
   };

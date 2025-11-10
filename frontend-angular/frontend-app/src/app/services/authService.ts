@@ -18,15 +18,26 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {}
 
   //Request the backend to do user login
-  login(obj: { Username: string; PasswordHash: string }): Observable<boolean> {
-    return this.http.post<any>(this.apiUrlLogin, obj).pipe(
+  login(
+    objBody: { Username: string; PasswordHash: string },
+    objInput: boolean
+  ): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlLogin, objBody).pipe(
       map((response) => {
         if (response?.token && response?.user) {
           const role = response.user.roleType;
           let modelUser: ModelUserLoginResponse = response.user;
-          localStorage.setItem('authUser', JSON.stringify(modelUser));
-          localStorage.setItem('role', response.user.roleType);
-          localStorage.setItem('authToken', response.token);
+
+          //If the user turn on remember button, the credentials will be saved in localStorage, if not, the credentials will be saved in sessionStorage
+          if (objInput) {
+            localStorage.setItem('authUser', JSON.stringify(modelUser));
+            localStorage.setItem('role', response.user.roleType);
+            localStorage.setItem('authToken', response.token);
+          } else {
+            sessionStorage.setItem('authUser', JSON.stringify(modelUser));
+            sessionStorage.setItem('role', response.user.roleType);
+            sessionStorage.setItem('authToken', response.token);
+          }
           alert('Login Successful' + role);
 
           //Directs the client for the page according to the Role type
@@ -85,16 +96,18 @@ export class AuthService {
   //Logout the user, will remove the Token and Role
   logout() {
     localStorage.clear(); //Clear all items from local storage
+    sessionStorage.clear();
     this.router.navigate(['/login']); //Navigate to path Login
   }
   //Clear everything in local storage
-  clearLocalStorage() {
+  clearLocalStorageAndSessionStorage() {
     localStorage.clear();
+    sessionStorage.clear();
   }
   //For the Intercept Service
   //Get the Token from local storage
   getAuthToken() {
-    return localStorage.getItem('authToken') || null; //Get the Token if have, else return null
+    return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || null; //Get the Token if have, else return null
   }
   //Request backend to get verify of entityId, username and role type, will return true if the user are authorized to access the page who wants
   verifyRole(): Observable<string | false> {
@@ -110,7 +123,7 @@ export class AuthService {
   }
   //Get the Role from local storage
   getRole() {
-    const role = localStorage.getItem('role');
+    const role = localStorage.getItem('role') || sessionStorage.getItem('role');
     if (
       role === Roles.Admin ||
       role === Roles.Teacher ||
