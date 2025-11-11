@@ -10,6 +10,7 @@ import { map, Observable } from 'rxjs';
 export class EventService {
   //Backend endpoint
   //Get
+  private apiUrlGetEvents = environment.apiUrl + 'get/events';
   private apiUrlGetEventsByTopic = environment.apiUrl + 'get/events/byTopics';
   private apiUrlGetEventById = environment.apiUrl + 'get/events/byId';
   //Create
@@ -18,6 +19,19 @@ export class EventService {
   private apiUrlDeleteEvent = environment.apiUrl + 'delete/event';
 
   constructor(private http: HttpClient) {}
+  //Function getEvents will get all Events
+  getEvents(){
+    return this.http.get<any>(this.apiUrlGetEvents).pipe(
+      map((response)=>{
+        console.log(response)
+        if(response?.success && response?.events){
+          return response.events
+        }
+        return false as const
+      })
+    )
+  }
+
   //Function getEventById will get a Event with a specific EntityId
   getEventById(): Observable<EventListResponse | false> {
     return this.http.get<any>(this.apiUrlGetEventById).pipe(

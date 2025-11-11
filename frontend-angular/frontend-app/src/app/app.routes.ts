@@ -3,7 +3,6 @@ import { Home } from './pages/home/home';
 import { Profile } from './pages/private/profile/profile';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
-import { Courses } from './pages/private/courses/courses';
 import { Layout } from './pages/private/layout/layout';
 import { Dashboard } from './pages/private/dashboard/dashboard';
 import { AuthGuard } from './services/guardLogin';
@@ -18,6 +17,7 @@ import { TeacherEvents } from './pages/private/teacher-events/teacher-events';
 import { CoursesType } from './pages/private/coursestype/coursestype';
 import { CoursesIndividual } from './pages/private/coursesindividual/coursesindividual';
 import { RegisterProfile } from './pages/registerprofile/registerprofile';
+import { Help } from './pages/private/help/help';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -39,6 +39,12 @@ export const routes: Routes = [
       {
         path: 'profile',
         component: Profile,
+        canActivate: [RoleGuard],
+        data: { roles: [Roles.Admin, Roles.Teacher, Roles.User, Roles.Unauthorized] }, //This define who can access
+      },
+      {
+        path: 'help',
+        component: Help,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Admin, Roles.Teacher, Roles.User, Roles.Unauthorized] }, //This define who can access
       },
