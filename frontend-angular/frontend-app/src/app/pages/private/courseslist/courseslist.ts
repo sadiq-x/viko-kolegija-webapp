@@ -3,10 +3,11 @@ import { Component, computed, signal, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/events';
 import { EventListResponse, ModelEventsRequest } from '../../../models/modelEvents';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-courseslist',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './courseslist.html',
   styleUrl: './courseslist.scss',
 })
@@ -34,7 +35,6 @@ export class CoursesList {
     this.loading.set(true);
     this.eventService.getEvents().subscribe({
       next: (res) => {
-        console.log(res);
         if (Array.isArray(res)) {
           this.loading.set(false);
 
@@ -45,10 +45,11 @@ export class CoursesList {
             TopicName: e.TopicName || e.topicName,
             CreateById: e.CreateById || e.createById,
             DateCreate: e.DateCreate || e.dateCreate,
+            DateClose: e.DateClose || e.dateClose,
             Status: e.Status || e.status,
           }));
 
-          const activeMapped = mapped.filter((e) => e.Status === true); //Filtered courses by status true
+          const activeMapped = mapped.filter((e) => e.Status === "Open"); //Filtered courses by status open
 
           this.allCourses.set(activeMapped);
           return;

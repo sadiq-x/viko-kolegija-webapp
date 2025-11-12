@@ -95,19 +95,23 @@ export class AuthService {
   }
   //Logout the user, will remove the Token and Role
   logout() {
-    localStorage.clear(); //Clear all items from local storage
+    localStorage.clear(); //Clear all items from local storage/session storage
     sessionStorage.clear();
     this.router.navigate(['/login']); //Navigate to path Login
   }
-  //Clear everything in local storage
+  //Clear everything in local storage/session storage
   clearLocalStorageAndSessionStorage() {
     localStorage.clear();
     sessionStorage.clear();
   }
   //For the Intercept Service
-  //Get the Token from local storage
+  //Get the Token from local storage/session storage
   getAuthToken() {
     return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || null; //Get the Token if have, else return null
+  }
+  //Get the authUser from local storage/session storage
+  getAuthUser() {
+    return localStorage.getItem('authUser') || sessionStorage.getItem('authUser') || null
   }
   //Request backend to get verify of entityId, username and role type, will return true if the user are authorized to access the page who wants
   verifyRole(): Observable<string | false> {
@@ -121,7 +125,7 @@ export class AuthService {
       })
     );
   }
-  //Get the Role from local storage
+  //Get the Role from local storage/session storage
   getRole() {
     const role = localStorage.getItem('role') || sessionStorage.getItem('role');
     if (

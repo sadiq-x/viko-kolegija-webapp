@@ -38,8 +38,8 @@
         <!-- Hidden / default metadata (just information) -->
         <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
           <ul class="list-disc ml-5 space-y-1">
-            <li><strong>Status:</strong> true by default.</li>
-            <li><strong>Date create:</strong> set automatically on submit</li>
+            <li><strong>Status:</strong> Open by default.</li>
+            <li><strong>Date create:</strong> Set automatically on submit</li>
           </ul>
         </div>
 
@@ -69,8 +69,11 @@
               [routerLink]="['/teacher/event', c.Id]" [state]="{ course: c }">
               <div class="flex items-center justify-between">
                 <p class="font-semibold text-blue-800">{{ c.Name }}</p>
-                <span class="text-xs" [ngClass]="c.Status ? 'text-green-700' : 'text-red-600'">
-                  {{ c.Status ? 'Active' : 'Inactive' }}
+                <span class="text-xs" [ngClass]="{
+                    'text-green-700': c.Status === 'Open',
+                    'text-yellow-700': c.Status === 'Ongoing',
+                    'text-red-700': c.Status === 'Close'}">
+                  {{ c.Status }}
                 </span>
               </div>
 
@@ -81,6 +84,7 @@
               <div class="text-xs text-blue-700/70 mt-2 flex flex-wrap gap-3">
                 <span *ngIf="c.TopicName"><strong>Topic:</strong> {{ c.TopicName }}</span>
                 <span><strong>Created:</strong> {{ c.DateCreate | date:'medium' }}</span>
+                <span *ngIf="c.DateClose"><strong>Closed:</strong> {{ c.DateClose | date:'medium' }}</span>
               </div>
             </a>
           </li>

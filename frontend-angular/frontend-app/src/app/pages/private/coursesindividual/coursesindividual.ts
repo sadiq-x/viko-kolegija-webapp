@@ -4,11 +4,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ParticipantsService } from '../../../services/participants';
 import { ModelListParticipantInfo } from '../../../models/modelParticipant';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { isEmpty } from 'rxjs';
+import { Location } from '@angular/common';
+import { AuthService } from '../../../services/authService';
 
 @Component({
   selector: 'app-coursesindividual',
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './coursesindividual.html',
   styleUrl: './coursesindividual.scss',
 })
@@ -28,6 +29,8 @@ export class CoursesIndividual {
 
   //Boolean status of button register
   participantEventStatus: boolean = true;
+  //Type of login
+  loginType: string | null = null;
 
   //Information of participant
   participantInfo = signal<ModelListParticipantInfo[]>([]);
@@ -37,7 +40,10 @@ export class CoursesIndividual {
   constructor(
     private route: ActivatedRoute,
     private participantsService: ParticipantsService,
-    private fb: FormBuilder
+    private authService: AuthService,
+    private fb: FormBuilder,
+    private location: Location,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -46,6 +52,7 @@ export class CoursesIndividual {
     this.formEvent = this.fb.group({
       description: [''],
     });
+    this.loginType = this.authService.getRole();
   }
   //Function to load event
   loadCourse() {
@@ -82,6 +89,7 @@ export class CoursesIndividual {
               Grade: e.Grade || e.grade,
               Comments: e.Comments || e.comments,
               ParticipantDescription: e.ParticipantDescription || e.participantDescription,
+              Status: e.Status || e.status,
             }))
           );
         }
@@ -89,8 +97,6 @@ export class CoursesIndividual {
       },
     });
   }
-  //Button to exit of event - not used
-  btnCloseEvent() {}
   //Button to register on event
   btnRegisterEvent() {
     const obj = {
@@ -112,7 +118,7 @@ export class CoursesIndividual {
       eventId: this.idCourse,
       participantDescription: this.formEvent.get('description')?.value,
     };
-    console.log(obj)
+    console.log(obj);
     if (!obj.participantDescription || obj.participantDescription.trim().length === 0) {
       alert('You need to write your appointments');
       return;
@@ -122,13 +128,13 @@ export class CoursesIndividual {
       next: (res) => {
         console.log(res);
         if (res) {
-          this.participantEventStatus = res
-          this.participantInfo.update(current =>
-          current.map(item => ({
-            ...item,
-            ParticipantDescription: obj.participantDescription,
-          }))
-        );
+          this.participantEventStatus = res;
+          this.participantInfo.update((current) =>
+            current.map((item) => ({
+              ...item,
+              ParticipantDescription: obj.participantDescription,
+            }))
+          );
 
           this.formEvent.reset();
           return;
@@ -138,5 +144,23 @@ export class CoursesIndividual {
         }
       },
     });
+  }
+  goBack(event: Event) {
+    event.preventDefault();
+
+    // Se existe histórico de navegação no SPA, volta
+    if (window.history.length > 2) {
+      this.location.back();
+      return;
+    }
+
+    // Fallback: decide para onde ir
+    if (this.courseType?.Type) {
+      this.router.navigate(['/courses/type', this.courseType.Type], {
+        state: { course: this.courseType },
+      });
+    } else {
+      this.router.navigate(['/course']);
+    }
   }
 }
