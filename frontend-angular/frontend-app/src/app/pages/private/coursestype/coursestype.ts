@@ -35,17 +35,17 @@ export class CoursesType {
       this.eventService.getEventByTopic(obj).subscribe({
         next: (res) => {
           if (Array.isArray(res)) {
-            this.courses.set(
-              res.map((p: any) => ({
-                Id: p.Id ?? p.id,
-                Name: p.Name ?? p.name,
-                Description: p.Description ?? p.description,
-                TopicName: p.TopicName ?? p.topicName,
-                CreateById: p.CreateById ?? p.createById,
-                DateCreate: p.DateCreate ?? p.dateCreate,
-                Status: p.Status ?? p.status,
-              }))
-            );
+            const mapped = res.map((p: any) => ({
+              Id: p.Id ?? p.id,
+              Name: p.Name ?? p.name,
+              Description: p.Description ?? p.description,
+              TopicName: p.TopicName ?? p.topicName,
+              CreateById: p.CreateById ?? p.createById,
+              DateCreate: p.DateCreate ?? p.dateCreate,
+              DateClose: p.DateClose ?? p.dateClose,
+              Status: p.Status ?? p.status,
+            }));
+            this.courses.set(mapped.filter((e) => e.Status === "Open"));
             this.loading = false;
           } else {
             this.courses.set([]);

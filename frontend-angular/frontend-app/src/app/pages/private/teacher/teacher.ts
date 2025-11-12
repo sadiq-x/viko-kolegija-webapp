@@ -1,15 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-  EventListResponse,
-  ModelEventsRequest,
-} from '../../../models/modelEvents';
+import { EventListResponse, ModelEventsRequest } from '../../../models/modelEvents';
 import { ModelTopicsResponse } from '../../../models/modelTopics';
 import { TeacherService } from '../../../services/teacher';
 import { CommonModule } from '@angular/common';
 import { TopicsService } from '../../../services/topics';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { EventService } from '../../../services/events';
+import { AuthService } from '../../../services/authService';
 
 @Component({
   selector: 'app-teacher',
@@ -30,7 +28,7 @@ export class Teacher implements OnInit {
     private teacherService: TeacherService,
     private eventService: EventService,
     private topicService: TopicsService,
-    private router: Router
+    private authService: AuthService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -39,12 +37,11 @@ export class Teacher implements OnInit {
     });
   }
 
-
   ngOnInit(): void {
     this.loadTopics();
     this.loadMyCourses();
   }
-  //Load all existing topics 
+  //Load all existing topics
   private loadTopics() {
     this.loading.set(true);
     this.topicService.getTopics().subscribe({
@@ -56,9 +53,9 @@ export class Teacher implements OnInit {
               Type: x.Type ?? x.type,
               Description: x.Description ?? x.description,
             }))
-          ); // ✅ quando é array, coloca na signal
+          );
         } else {
-          this.topics.set([]); // falso/erro → lista vazia
+          this.topics.set([]);
         }
       },
       error: () => this.topics.set([]),
@@ -73,7 +70,7 @@ export class Teacher implements OnInit {
       return;
     }
 
-    this.eventService.getEventById().subscribe({
+    this.eventService.getEventByCreatedById().subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
           this.myCourses.set(
@@ -84,6 +81,7 @@ export class Teacher implements OnInit {
               TopicName: x.TopicName ?? x.topicName,
               CreateById: x.CreateById ?? x.createById,
               DateCreate: x.DateCreate ?? x.dateCreate,
+              DateClose: x.DateClose ?? x.dateClose,
               Status: x.Status ?? x.status,
               Results: x.Results ?? x.results,
             }))
@@ -96,7 +94,8 @@ export class Teacher implements OnInit {
   }
   //Get the current id of teacher
   private getCurrentTeacherId(): number | null {
-    const raw = localStorage.getItem('authUser');
+    const raw = this.authService.getAuthUser();
+
     if (!raw) return null;
     try {
       const parsed = JSON.parse(raw);
@@ -121,26 +120,28 @@ export class Teacher implements OnInit {
       Name: this.form.value.name,
       Description: this.form.value.description,
       TopicsId: this.form.value.topicId,
-      CreateById: teacherId,
-      DateCreate: new Date().toISOString(),
+      CreateById: teacherId
     };
-
     this.submitting.set(true);
     this.eventService.createEvent(payload).subscribe({
       next: (res) => {
         if (!res) {
           alert('Could not create course.');
           return;
+        } else {
+          alert('Course created successfully.');
+          this.form.reset();
+          this.form.markAsPristine();
+          this.form.markAsUntouched();
+          this.submitting.set(false);
+          this.loadMyCourses();
         }
-        console.log(res);
-        alert('Course created successfully.');
-        this.form.reset();
-        this.form.markAsPristine();
-        this.form.markAsUntouched();
-        this.loadMyCourses();
       },
-      error: () => alert('Error creating course.'),
-      complete: () => this.submitting.set(false),
+      error: () => {
+        this.submitting.set(false);
+        alert('Error creating course.');
+        return;
+      },
     });
   }
   // helper of button state

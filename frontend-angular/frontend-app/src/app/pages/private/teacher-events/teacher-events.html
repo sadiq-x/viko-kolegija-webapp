@@ -37,17 +37,28 @@
       <div class="flex items-start justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold text-blue-900">{{ course.Name }}</h1>
-          <p class="mt-2 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
-            {{ course.Description }}
+          <p class="mt-1">
+            <span
+              class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 text-xs font-semibold">
+              {{ course.TopicName }}
+            </span>
           </p>
         </div>
 
         <!-- Badge of state -->
-        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="course.Status
-                      ? 'bg-green-100 text-green-700 border border-green-200'
-                      : 'bg-red-100 text-red-700 border border-red-200'">
-          {{ course.Status ? 'Active' : 'Inactive' }}
+        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold border" [ngClass]="{
+            'bg-green-100 text-green-700 border-green-200': course.Status === 'Open',
+            'bg-yellow-100 text-yellow-700 border-yellow-200': course.Status === 'Ongoing',
+            'bg-red-100 text-red-700 border-red-200': course.Status === 'Close'}">
+          {{ course.Status }}
         </span>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <p class="mt-6 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
+          {{ course.Description }}
+        </p>
       </div>
 
       <!-- Meta info -->
@@ -58,14 +69,10 @@
             {{ course.DateCreate | date:'medium' }}
           </p>
         </div>
-
-        <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4" *ngIf="course.TopicName">
-          <p class="text-xs uppercase tracking-wide text-blue-700/70">Topic</p>
-          <p class="mt-1">
-            <span
-              class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 text-xs font-semibold">
-              {{ course.TopicName }}
-            </span>
+        <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
+          <p class="text-xs uppercase tracking-wide text-blue-700/70">Closed</p>
+          <p class="mt-1 font-medium text-blue-900">
+            {{ course.DateClose | date:'medium' }}
           </p>
         </div>
       </div>
@@ -91,7 +98,7 @@
         </button> -->
 
         <!-- Button to close event -->
-        <button type="button"
+        <button type="button" *ngIf="course.Status !== 'Close'"
           class="rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
           (click)="btnCloseEvent()">
           Close event
@@ -135,9 +142,10 @@
                   Edit
                 </button>
 
-                <button *ngIf="p.Status" type="button" class="rounded-lg bg-red-600/90 px-3 py-1.5 text-white border border-blue-200 text-sm font-semibold
-                         hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="btnInactive(p)">
-                  Inactive
+                <button *ngIf="p.Status" type="button" class="rounded-lg bg-green-600/90 px-3 py-1.5 text-white border border-blue-200 text-sm font-semibold
+                         hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  (click)="btnInactive(p)">
+                  Complete
                 </button>
               </div>
             </ng-container>
@@ -150,7 +158,8 @@
                   Save
                 </button>
                 <button type="button" class="rounded-lg bg-white px-3 py-1.5 text-blue-700 border border-blue-200 text-sm font-semibold
-                         hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200" (click)="btnCancelEdit()">
+                         hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  (click)="btnCancelEdit()">
                   Cancel
                 </button>
               </div>
@@ -168,7 +177,7 @@
             <p>
               <span class="font-medium text-blue-700/70">Status:</span>
               <span [ngClass]="p.Status ? 'text-green-700' : 'text-red-600'">
-                {{ p.Status ? 'Active' : 'Inactive' }}
+                {{ p.Status ? 'Ongoing' : 'Completed' }}
               </span>
             </p>
             <p>

@@ -24,9 +24,8 @@
     <div *ngIf="!loading && courses().length > 0"
       class="flex flex-col divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white shadow-sm">
 
-      <article *ngFor="let c of courses()" [routerLink]="c.Status ? ['/courses/individual', c.Id] : null"
-        [state]="{ event: c }" [class.cursor-pointer]="c.Status" [class.opacity-30]="!c.Status"
-        [class.pointer-events-none]="!c.Status" class="group p-5 transition hover:bg-blue-50">
+      <article *ngFor="let c of courses()" [routerLink]="['/courses/individual', c.Id]" [state]="{ event: c }"
+        [class.pointer-events-none]="!c.Status" class="group p-5 transition hover:bg-blue-50 cursor-pointer">
 
         <!-- Header event -->
         <div class="flex items-start justify-between mb-2">
@@ -34,10 +33,11 @@
             {{ c.Name }}
           </h3>
 
-          <span class="text-xs font-semibold rounded-full px-3 py-1 border" [ngClass]="c.Status
-                            ? 'bg-green-100 text-green-700 border-green-200'
-                            : 'bg-red-100 text-red-700 border-red-200'">
-            {{ c.Status ? 'Active' : 'Inactive' }}
+          <span class="text-xs font-semibold rounded-full px-3 py-1 border" [ngClass]="{
+                      'bg-green-100 text-green-700 border-green-200': c.Status === 'Open',
+                      'bg-yellow-100 text-yellow-700 border-yellow-200': c.Status === 'Ongoing',
+                      'bg-red-100 text-red-700 border-red-200': c.Status === 'Close'}">
+            {{ c.Status }}
           </span>
         </div>
 

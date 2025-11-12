@@ -11,5 +11,6 @@ export interface ModelListParticipants {
 export interface ModelListParticipantInfo {
     Grade: string,
     Comments: string,
-    ParticipantDescription?: string | null
+    ParticipantDescription: string | null,
+    Status: boolean
 }

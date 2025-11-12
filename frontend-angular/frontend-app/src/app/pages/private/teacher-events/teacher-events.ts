@@ -6,6 +6,7 @@ import { ModelListParticipants } from '../../../models/modelParticipant';
 import { TeacherService } from '../../../services/teacher';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EventService } from '../../../services/events';
+import { AuthService } from '../../../services/authService';
 
 @Component({
   selector: 'app-teacher-event',
@@ -30,7 +31,8 @@ export class TeacherEvents {
     private route: ActivatedRoute,
     private teacherService: TeacherService,
     private eventService: EventService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService
   ) {
     this.editParticipants = fb.group({
       grade: [
@@ -152,37 +154,21 @@ export class TeacherEvents {
       .filter((p) => p.Status == true)
       .map((p) => p.Status);
 
-    if (!this.getCurrentTeacherId()) {
-      return;
-    }
-
     const obj = {
-      Id: this.eventId,
-      CreateById: this.getCurrentTeacherId()!,
+      Id: this.eventId
     };
 
     if (participantStatus.length === 0) {
       this.eventService.deleteEventById(obj).subscribe({
         next: (res) => {
-          if(res){
-            this.course.Status = false
+          if (res) {
+            this.course.Status = "Close";
             return;
           }
         },
       });
     } else {
       alert('All students need to be classified and placed inactive');
-    }
-  }
-  //Get the current id of teacher
-  private getCurrentTeacherId(): number | null {
-    const raw = localStorage.getItem('authUser');
-    if (!raw) return null;
-    try {
-      const parsed = JSON.parse(raw);
-      return Number(parsed.entityId) || null;
-    } catch {
-      return null;
     }
   }
 }
