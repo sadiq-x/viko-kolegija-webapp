@@ -7,6 +7,8 @@ namespace backend_api.Models
     {
         [Required]
         public int EventId { get; set; } = default!;
+        [Required]
+        public int? EntityId { get; set; } = default!;
     }
     //Dto Response for a specific eventId
     public sealed class ParticipantsListFromEventIdResponseDTO

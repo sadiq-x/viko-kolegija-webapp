@@ -43,10 +43,10 @@ namespace backend_api.Functions
             return response; //Return
         }
 
-        [Function("getEventsById")]
+        [Function("getEventsByCreatedById")]
         [Produces("application/json")]
         public async Task<HttpResponseData> Run1(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/events/byId")] HttpRequestData req, FunctionContext executionContext)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/events/byCreatedById")] HttpRequestData req, FunctionContext executionContext)
         {
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
@@ -63,12 +63,12 @@ namespace backend_api.Functions
 
             var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); //Information of decoded token
 
-            var eventById = new EventListByIdRequestDTO
+            var eventById = new EventListByCreateByIdRequestDTO
             {
                 CreateById = userId
             };
 
-            if (eventById is null || !eventById.IsValid() || eventById.CreateById <= 0) //Verify if email and password are null, and reject the login
+            if (eventById is null || !eventById.IsValid() || eventById.CreateById <= 0 || eventById.CreateById is null) //Verify if email and password are null, and reject the login
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
                 await BadResponse.WriteAsJsonAsync(new
@@ -80,7 +80,7 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var events = await _eventsRepository.getEventsById(eventById); //Checking request body with database
+            var events = await _eventsRepository.getEventsByCreateById(eventById); //Checking request body with database
             if (events is null)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
@@ -141,5 +141,62 @@ namespace backend_api.Functions
             return response; //Return
         }
 
+        [Function("getEventsByEntityId")]
+        [Produces("application/json")]
+        public async Task<HttpResponseData> Run3(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/events/byEntityId")] HttpRequestData req, FunctionContext executionContext)
+        {
+            executionContext.Items.TryGetValue("Token", out var userObj);
+            var token = userObj as string;
+
+            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new
+                {
+                    Message = "Token don't receive"
+                }); //Response send with msg
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
+
+            var eventsEntityDTO = new EventListByEntityIdRequestDTO
+            {
+                EntityId = userId
+            };
+
+            if (eventsEntityDTO is null || !eventsEntityDTO.IsValid() || eventsEntityDTO.EntityId <= 0) //Verify if email and password are null, and reject the login
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Wrong parameters.",
+                    Error = eventsEntityDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                });
+                return BadResponse;
+            }
+
+            var events = await _eventsRepository.getEventsByEntityId(eventsEntityDTO); //Checking request body with database
+            if (events is null)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    message = "Events not found."
+                }); //Response a message if the error exist
+                return notFoundResponse;
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                events
+            });
+            return response; //Return
+        }
     }
 }

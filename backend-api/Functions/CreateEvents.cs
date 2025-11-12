@@ -22,6 +22,7 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "create/events")] HttpRequestData req)
         {
+            Console.WriteLine("Here");
             var createEvent = await req.ReadFromJsonAsync<EventCreateRequestDTO>();
 
             if (createEvent is null || !createEvent.IsValid()) //Verify if email and password are null, and reject the login
