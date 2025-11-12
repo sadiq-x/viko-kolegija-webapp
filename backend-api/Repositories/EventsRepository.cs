@@ -2,15 +2,17 @@ using backend_api.Context;
 using backend_api.Models;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace backend_api.Repositories
 {
     public interface IEventsRepository
     {
         Task<List<EventListResponseDTO>?> getAllEvents();
-        Task<List<EventListResponseDTO>?> getEventsById(EventListByIdRequestDTO t);
+        Task<List<EventListResponseDTO>?> getEventsByCreateById(EventListByCreateByIdRequestDTO t);
         Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t);
         Task<(bool Success, string? Message)> deleteEvent(EventCloseRequestDTO t);
         Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t);
+        Task<List<EventListResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t);
     }
 
     public class EventsRepository : IEventsRepository
@@ -36,7 +38,7 @@ namespace backend_api.Repositories
                         Description = x.Description,
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
-                        Status = x.Status
+                        Status = x.StatusEvents.Type //To change
 
                     }).ToListAsync();
 
@@ -50,7 +52,7 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<List<EventListResponseDTO>?> getEventsById(EventListByIdRequestDTO t)
+        public async Task<List<EventListResponseDTO>?> getEventsByCreateById(EventListByCreateByIdRequestDTO t)
         {
             if (t.CreateById <= 0) return null;
 
@@ -67,7 +69,7 @@ namespace backend_api.Repositories
                         Description = x.Description,
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
-                        Status = x.Status
+                        Status = x.StatusEvents.Type
                     }).ToListAsync();
 
                 if (result == null || result.Count == 0) return null;
@@ -87,8 +89,6 @@ namespace backend_api.Repositories
             if (string.IsNullOrWhiteSpace(t.Description)) return (false, "Description field empty.");
             if (t.TopicsId <= 0) return (false, "TopicId field empty."); ;
             if (t.CreateById <= 0) return (false, "CreateById field empty."); ;
-            if (string.IsNullOrWhiteSpace(t.DateCreate)) return (false, "DateCreate field empty.");
-
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
@@ -107,8 +107,8 @@ namespace backend_api.Repositories
                     Description = t.Description.Trim(),
                     TopicsId = t.TopicsId,
                     CreateById = t.CreateById,
-                    DateCreate = t.DateCreate,
-                    Status = t.Status,
+                    DateCreate= DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    StatusId = 1 //To change
                 };
 
                 //Create the event in database
@@ -127,7 +127,7 @@ namespace backend_api.Repositories
         {
             //Input validations
             if (t.Id <= 0) return (false, "Id field empty."); ;
-            if (t.CreateById <= 0) return (false, "CreateById field empty."); ;
+            if (t.CreateById <= 0 || t.CreateById is null) return (false, "CreateById field empty.");
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
@@ -139,7 +139,7 @@ namespace backend_api.Repositories
                     return (false, "Event not found."); ;
                 }
 
-                eventClose.Status = false;
+                eventClose.StatusId = 3;
 
                 await dbContext.SaveChangesAsync();
 
@@ -150,7 +150,7 @@ namespace backend_api.Repositories
                 return (false, "Event close unsuccessfully."); ;
             }
         }
-    
+
         public async Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t)
         {
             if (string.IsNullOrEmpty(t.Topic)) return null;
@@ -167,7 +167,36 @@ namespace backend_api.Repositories
                         Description = x.Description,
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
-                        Status = x.Status
+                        Status = x.StatusEvents.Type
+                    }).ToListAsync();
+
+                if (result is null || result.Count == 0) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        
+        public async Task<List<EventListResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var result = await dbContext.ParticipantsEvents
+                    .AsNoTracking()
+                    .Where(x => x.EntityId == t.EntityId)
+                    .Select(x => new EventListResponseDTO
+                    {
+                        Id = x.Id,
+                        Name = x.Event.Name,
+                        Description = x.Event.Description,
+                        TopicName = x.Event.Topics.Type,
+                        DateCreate = x.Event.DateCreate,
+                        Status = x.Event.StatusEvents.Type
                     }).ToListAsync();
 
                 if (result is null || result.Count == 0) return null;

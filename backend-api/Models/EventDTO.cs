@@ -13,9 +13,6 @@ namespace backend_api.Models
         public int TopicsId { get; set; } = default!;
         [Required]
         public int CreateById { get; set; } = default!;
-        [Required]
-        public string DateCreate { get; set; } = default!;
-        public bool Status { get; set; } = true;
     }
 
     //Dto Response for all Event without any filter
@@ -27,7 +24,7 @@ namespace backend_api.Models
         public string TopicName { get; init; } = default!;
         public int CreateById { get; init; } = default!;
         public string DateCreate { get; init; } = default!;
-        public bool Status { get; init; } = default!;
+        public string Status { get; init; } = default!;
     }
 
     //DTO Request for all Event from a specific Topics
@@ -45,7 +42,7 @@ namespace backend_api.Models
     }
 
     //DTO Request for all Event from a specific CreateById
-    public sealed class EventListByIdRequestDTO
+    public sealed class EventListByCreateByIdRequestDTO
     {
         [Required]
         public int? CreateById { get; set; } = default!;
@@ -63,6 +60,13 @@ namespace backend_api.Models
         [Required]
         public int Id { get; set; } = default!;
         [Required]
-        public int CreateById { get; set; } = default!;
+        public int? CreateById { get; set; } = default!;
+    }
+
+    //DTO Request for all Event from a specific EntityId
+    public sealed class EventListByEntityIdRequestDTO
+    {
+        [Required]
+        public int? EntityId { get; set; } = default!;
     }
 }

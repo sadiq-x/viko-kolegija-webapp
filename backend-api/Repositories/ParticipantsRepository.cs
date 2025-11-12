@@ -25,6 +25,7 @@ namespace backend_api.Repositories
         public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId(ParticipantsListFromEventIdRequestDTO t)
         {
             if (t.EventId <= 0) return null;
+            if (t.EntityId <= 0) return null;
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
@@ -37,7 +38,7 @@ namespace backend_api.Repositories
 
                 var result = await dbContext.ParticipantsEvents
                     .AsNoTracking()
-                    .Where(pe => pe.EventId == t.EventId)
+                    .Where(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId)
                     .Select(u => new ParticipantsListFromEventIdResponseDTO
                     {
                         Id = u.Id,
@@ -169,7 +170,7 @@ namespace backend_api.Repositories
                 var participant = new ParticipantsEvents
                 {
                     EventId = t.EventId,
-                    EntityId = t!.EntityId.Value,
+                    EntityId = t.EntityId.Value,
                     Status = true,
                     Grade = "",
                     Comments = ""

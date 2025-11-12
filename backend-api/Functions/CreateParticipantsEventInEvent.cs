@@ -32,7 +32,6 @@ namespace backend_api.Functions
             }
 
             executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
-
             var token = userObj as string; //Transform token object into string
 
             if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
@@ -53,9 +52,7 @@ namespace backend_api.Functions
 
             createParticipantDTO.EntityId = userId;
 
-            Console.WriteLine(createParticipantDTO.ToString());
-
-            if (createParticipantDTO == null || !createParticipantDTO.IsValid())
+            if (createParticipantDTO == null || !createParticipantDTO.IsValid() || createParticipantDTO.EntityId is null)
             {
                 var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadRequest.WriteAsJsonAsync(new

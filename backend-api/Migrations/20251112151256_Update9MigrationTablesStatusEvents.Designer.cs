@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend_api.Context;
 
@@ -10,9 +11,11 @@ using backend_api.Context;
 namespace backend_api.Migrations
 {
     [DbContext(typeof(MasterDbContext))]
-    partial class MasterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112151256_Update9MigrationTablesStatusEvents")]
+    partial class Update9MigrationTablesStatusEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,9 +90,6 @@ namespace backend_api.Migrations
 
                     b.Property<int>("CreateById")
                         .HasColumnType("int");
-
-                    b.Property<string>("DateClose")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DateCreate")
                         .IsRequired()

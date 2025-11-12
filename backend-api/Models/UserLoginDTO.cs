@@ -16,6 +16,7 @@ namespace backend_api.Models
     public sealed class UserLoginResponseDTO
     {
         public int EntityId { get; init; } = default!;
+        public string Name { get; init; } = default!;
         public string Username { get; init; } = default!;
         public string RoleType { get; init; } = default!;
     }

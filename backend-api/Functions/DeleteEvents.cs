@@ -20,11 +20,42 @@ namespace backend_api.Functions
         [Function("deleteEvents")]
         [Produces("application/json")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "delete/event")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "delete/event")] HttpRequestData req, FunctionContext executionContext)
         {
             var eventDTO = await req.ReadFromJsonAsync<EventCloseRequestDTO>();
 
-            if (eventDTO == null || !eventDTO.IsValid() || eventDTO.Id <= 0 || eventDTO.CreateById <= 0)
+            if (eventDTO is null) //Verify the Dto
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
+                return BadResponse;
+            }
+
+            executionContext.Items.TryGetValue("Token", out var userObj);
+            var token = userObj as string;
+
+            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new
+                {
+                    Message = "Token don't receive"
+                }); //Response send with msg
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
+
+            if (userId <= 0 || userId is null)
+            {
+                var badResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await badResponse.WriteAsJsonAsync(new { message = "Invalid token: userId not found." });
+                return badResponse;
+            }
+
+            eventDTO.CreateById = userId;
+
+            if (!eventDTO.IsValid() || eventDTO.Id <= 0 || eventDTO.CreateById <= 0 || eventDTO.CreateById is null)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
                 await notFoundResponse.WriteAsJsonAsync(new

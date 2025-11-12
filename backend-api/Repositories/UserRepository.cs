@@ -41,6 +41,7 @@ namespace backend_api.Repositories
                 .Select(join => new UserLoginResponseDTO
                 {
                     EntityId = join.u.EntityId,
+                    Name= join.u.Entity.Name ,
                     Username = join.u.Username,
                     RoleType = join.r.Type
                 })
@@ -84,7 +85,7 @@ namespace backend_api.Repositories
                     Address = t.Address.ToString().Trim(),
                     Birthday = t.Birthday.Trim(),
                     Nationality = t.Nationality.Trim(),
-                    Gender = t.Gender.Trim(),   
+                    Gender = t.Gender.Trim(),
                     RoleId = 5 //Set the Unauthorized
                 };
 
