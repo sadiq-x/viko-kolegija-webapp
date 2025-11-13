@@ -1,5 +1,5 @@
 <!-- Dashboard page -->
-<div class="min-h-screen bg-blue-50 py-8 px-4 flex justify-center">
+<div class="min-h-screen bg-gray-100 py-8 px-4 flex justify-center">
     <div class="w-full max-w-6xl space-y-6">
 
         <!-- User info (Name + Username + Role) -->
@@ -25,9 +25,14 @@
             <!-- Courses open/registered by user -->
             <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
                 <div class="mb-4 flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-blue-900">Cursos em que está inscrito</h2>
-                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200">
+                    <h2 class="text-lg font-semibold text-blue-900">Ongoing Courses</h2>
+                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200"
+                        *ngIf="enrolled.length >= 2 || enrolled.length == 0">
                         {{ enrolled().length }} Courses
+                    </span>
+                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200"
+                        *ngIf="enrolled.length == 1">
+                        {{ enrolled().length }} Course
                     </span>
                 </div>
 
@@ -37,16 +42,19 @@
                 </div>
 
                 <!-- List courses -->
-                <ul *ngIf="enrolled().length > 0" class="divide-y divide-blue-100">
-                    <li *ngFor="let c of enrolled(); trackBy: trackById" class="py-3">
+                <ul *ngIf="enrolled().length > 0" class="flex flex-col rounded-2xl">
+                    <li *ngFor="let c of enrolled(); trackBy: trackById"
+                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1"
+                        [routerLink]="['/courses/individual', c.Id]" [state]="{ event: c }">
                         <div class="flex items-start justify-between">
                             <div class="pr-3">
-                                <p class="font-semibold text-blue-900">{{ c.Name }}</p>
+                                <p class="font-semibold text-blue-900 group-hover:text-blue-600">{{ c.Name }}</p>
                                 <p class="text-sm text-blue-700/70 mt-0.5 line-clamp-2">{{ c.Description }}</p>
                                 <div class="mt-2 text-xs text-blue-700/70 flex gap-3 flex-wrap">
                                     <span *ngIf="c.TopicName"><strong>Type:</strong> {{ c.TopicName }}</span>
                                     <span *ngIf="c.DateCreate"><strong>Start:</strong> {{ c.DateCreate |
-                                        date:'mediumDate' }}</span>
+                                        date:'mediumDate' }}
+                                    </span>
                                 </div>
                             </div>
                             <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="{
@@ -64,8 +72,13 @@
             <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
                 <div class="mb-4 flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-blue-900">Concluded courses</h2>
-                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200">
+                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200"
+                        *ngIf="completed.length >= 2 || completed.length == 0">
                         {{ completed().length }} Courses
+                    </span>
+                    <span class="text-xs rounded-full px-3 py-1 bg-blue-50 text-blue-800 border border-blue-200"
+                        *ngIf="completed.length == 1">
+                        {{ completed().length }} Course
                     </span>
                 </div>
 
@@ -75,19 +88,31 @@
                 </div>
 
                 <!-- List Courses -->
-                <ul *ngIf="completed().length > 0" class="divide-y divide-blue-100">
-                    <li *ngFor="let c of completed(); trackBy: trackById" class="py-3">
+                <ul *ngIf="completed().length > 0" class="flex flex-col rounded-2xl">
+                    <li *ngFor="let c of completed(); trackBy: trackById"
+                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1"
+                        [routerLink]="['/courses/individual', c.Id]" [state]="{ event: c }">
                         <div class="flex items-start justify-between">
                             <div class="pr-3">
-                                <p class="font-semibold text-blue-900">{{ c.Name }}</p>
+                                <p class="font-semibold text-blue-900 group-hover:text-blue-600">{{ c.Name }}</p>
                                 <p class="text-sm text-blue-700/70 mt-0.5 line-clamp-2">{{ c.Description }}</p>
                                 <div class="mt-2 text-xs text-blue-700/70 flex gap-3 flex-wrap">
                                     <span *ngIf="c.TopicName"><strong>Type:</strong> {{ c.TopicName }}</span>
+                                    <span *ngIf="c.DateCreate"><strong>Start:</strong> {{ c.DateCreate |
+                                        date:'mediumDate' }}
+                                    </span>
                                     <span *ngIf="c.DateClose"><strong>Concluded:</strong> {{ c.DateClose |
                                         date:'mediumDate'
-                                        }}</span>
+                                        }}
+                                    </span>
                                     <span *ngIf="c.Grade"><strong>Nota:</strong> {{ c.Grade }}</span>
                                 </div>
+                                <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="{
+                                        'bg-green-100 text-green-700 border-green-200': c.Status === 'Open',
+                                        'bg-yellow-100 text-yellow-700 border-yellow-200': c.Status === 'Ongoing',
+                                        'bg-red-100 text-red-700 border-red-200': c.Status === 'Close'}">
+                                    {{ c.Status }}
+                                </span>
                             </div>
                             <span
                                 class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
