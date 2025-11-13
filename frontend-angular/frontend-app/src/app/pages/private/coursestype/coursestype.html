@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 py-10 px-4 flex justify-center">
+<div class="min-h-screen bg-gray-100 py-10 px-4 flex justify-center">
   <div class="w-full max-w-4xl">
 
     <!-- Header -->
@@ -22,10 +22,10 @@
 
     <!-- Vertical list of events -->
     <div *ngIf="!loading && courses().length > 0"
-      class="flex flex-col divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white shadow-sm">
+      class="flex flex-col rounded-2xl">
 
       <article *ngFor="let c of courses()" [routerLink]="['/courses/individual', c.Id]" [state]="{ event: c }"
-        [class.pointer-events-none]="!c.Status" class="group p-5 transition hover:bg-blue-50 cursor-pointer">
+        [class.pointer-events-none]="!c.Status" class="group p-5 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1">
 
         <!-- Header event -->
         <div class="flex items-start justify-between mb-2">

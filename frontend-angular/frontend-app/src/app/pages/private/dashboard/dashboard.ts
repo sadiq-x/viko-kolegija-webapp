@@ -4,10 +4,11 @@ import { ModelUserMini } from '../../../models/modelUser';
 import { AuthService } from '../../../services/authService';
 import { EventService } from '../../../services/events';
 import { EventParticipantListResponse } from '../../../models/modelEvents';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -54,8 +55,15 @@ export class Dashboard {
             Description: e.Description || e.Description,
             Grade: e.Grade || e.grade,
           }));
+
+          mapped.sort((a, b) => {
+            const da = new Date(a.DateCreate).getTime();
+            const db = new Date(b.DateCreate).getTime();
+            return db - da;
+          });
+
           this.completed.set(mapped.filter((e) => e.Status === 'Close'));
-          this.enrolled.set(mapped.filter((e) => e.Status === 'Ongoing' || 'Open'));
+          this.enrolled.set(mapped.filter((e) => e.Status === 'Ongoing' || e.Status === 'Open'));
           this.loading.set(false);
           return;
         }

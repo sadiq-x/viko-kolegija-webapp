@@ -1,4 +1,4 @@
-<div class=" bg-blue-50 py-10  px-4 flex items-start justify-center">
+<div class="bg-gray-100 py-10 px-4 flex items-start justify-center">
     <div class="w-full max-w-3xl">
 
         <!-- Button to get back on page -->
@@ -61,7 +61,8 @@
 
             <div class="mt-6 flex flex-wrap gap-3">
                 <!-- Button to edit event -->
-                <button type="button" *ngIf="!participantEventStatus && loginType == 'User'" (click)="btnRegisterEvent()"
+                <button type="button" *ngIf="!participantEventStatus && loginType == 'User'"
+                    (click)="btnRegisterEvent()"
                     class="rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200 cursor-pointer">
                     Register for the course
                 </button>

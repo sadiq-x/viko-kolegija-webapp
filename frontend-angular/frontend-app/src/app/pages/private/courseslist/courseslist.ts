@@ -35,7 +35,7 @@ export class CoursesList {
     this.loading.set(true);
     this.eventService.getEvents().subscribe({
       next: (res) => {
-        if (Array.isArray(res)) {
+        if (Array.isArray(res) && !!res) {
           this.loading.set(false);
 
           const mapped = res.map((e) => ({
@@ -48,6 +48,12 @@ export class CoursesList {
             DateClose: e.DateClose || e.dateClose,
             Status: e.Status || e.status,
           }));
+
+          mapped.sort((a, b) => {
+            const da = new Date(a.DateCreate).getTime();
+            const db = new Date(b.DateCreate).getTime();
+            return db - da;
+          });
 
           const activeMapped = mapped.filter((e) => e.Status === "Open"); //Filtered courses by status open
 

@@ -21,7 +21,7 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
   //Function getEvents will get all Events
-  getEvents() {
+  getEvents(): Observable<EventListResponse | false> {
     return this.http.get<any>(this.apiUrlGetEvents).pipe(
       map((response) => {
         if (response?.success && response?.events) {

@@ -1,13 +1,13 @@
-<!-- Página de Registo -->
+<!-- Page Register -->
 <div class="min-h-screen bg-blue-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md">
-        <!-- Logo / Título -->
+        <!-- Logo + Tittle -->
         <div class="text-center mb-6">
-            <!-- logo maior -->
+            <!-- Logo -->
             <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain" />
         </div>
 
-        <!-- Cabeçalho -->
+        <!-- Tittle -->
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-blue-800">Sign up</h1>
             <p class="mt-1 text-sm text-blue-700/70">
@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <!-- Cartão -->
+        <!-- Card -->
         <div class="bg-white rounded-2xl shadow-lg p-6">
             <form [formGroup]="formRegister" (ngSubmit)="onSubmit()" class="space-y-4" novalidate>
 
@@ -82,7 +82,7 @@
                         <img [src]="imagePreview || '/default-user-profile.jpg'" alt="Preview"
                             class="h-16 w-16 rounded-full border border-blue-200 object-cover bg-blue-50" />
 
-                        <!-- Input de ficheiro -->
+                        <!-- Input de file photo -->
                         <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" class="block w-full text-sm text-blue-900 file:mr-4 file:rounded-lg
                   file:border file:border-blue-200 file:bg-white file:px-3 file:py-2
                   file:text-blue-700 hover:file:bg-blue-50" />
@@ -186,7 +186,7 @@
             </form>
         </div>
 
-        <!-- Rodapé -->
+        <!-- Footer -->
         <p class="mt-6 text-center text-xs text-blue-700/70">
             By continuing, you accept the Terms and Privacy Policy.
         </p>
