@@ -16,8 +16,9 @@ export class EventService {
   private apiUrlGetEventByEntityId = environment.apiUrl + 'get/events/byEntityId';
   //Create
   private apiUrlCreateEvent = environment.apiUrl + 'create/events';
-  //Delete
-  private apiUrlDeleteEvent = environment.apiUrl + 'delete/event';
+  //Update
+  private apiUrlUpdateEventStatusClose = environment.apiUrl + 'update/event/close';
+  private apiUrlUpdateEventStatusOngoing = environment.apiUrl + 'update/event/ongoing';
 
   constructor(private http: HttpClient) {}
   //Function getEvents will get all Events
@@ -56,7 +57,7 @@ export class EventService {
   //Function getEventByEntityId will get a Event with a specific EntityId
   getEventByEntityId(): Observable<EventParticipantListResponse | false> {
     return this.http.get<any>(this.apiUrlGetEventByEntityId).pipe(
-      map((response) => {
+      map((response) => { 
         if (response?.success && response?.events) {
           return response.events;
         }
@@ -80,10 +81,23 @@ export class EventService {
       })
     );
   }
-  //Function getEventById will close "delete" Event with a specific Id and CreateById
-  deleteEventById(obj: { Id: number }): Observable<boolean> {
-    return this.http.post<any>(this.apiUrlDeleteEvent, obj).pipe(
+  //Function updateEventStatusClose will set status Close in a Event with a specific Id and CreateById
+  updateEventStatusClose(obj: { Id: number }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlUpdateEventStatusClose, obj).pipe(
       map((response) => {
+        console.log(response)
+        if (response?.success) {
+          return true as const;
+        }
+        return false as const;
+      })
+    );
+  }
+  //Function updateEventStatusOngoing will set status Ongoing in a Event with a specific Id and CreateById
+  updateEventStatusOngoing(obj: { Id: number }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlUpdateEventStatusOngoing, obj).pipe(
+      map((response) => {
+        console.log(response)
         if (response?.success) {
           return true as const;
         }

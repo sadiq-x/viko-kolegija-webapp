@@ -41,19 +41,22 @@ export class Dashboard {
   }
 
   private getCourses() {
+    //NEED TODO THIS
     this.eventService.getEventByEntityId().subscribe({
       next: (res) => {
+
         if (Array.isArray(res) && !!res) {
           const mapped = res.map((e: any) => ({
             Id: e.Id || e.id,
+            EventId: e.EventId || e.eventId,
             Name: e.Name || e.name,
             TopicName: e.TopicName || e.topicName,
-            CreateById: e.CreateById || e.createById,
             DateCreate: e.DateCreate || e.dateCreate,
             DateClose: e.DateClose || e.dateClose,
             Status: e.Status || e.status,
-            Description: e.Description || e.Description,
+            Description: e.Description || e.description,
             Grade: e.Grade || e.grade,
+            ParticipantDescription: e.ParticipantDescription || e.participantDescription
           }));
 
           mapped.sort((a, b) => {
@@ -63,6 +66,7 @@ export class Dashboard {
           });
 
           this.completed.set(mapped.filter((e) => e.Status === 'Close'));
+          console.log(this.completed())
           this.enrolled.set(mapped.filter((e) => e.Status === 'Ongoing' || e.Status === 'Open'));
           this.loading.set(false);
           return;

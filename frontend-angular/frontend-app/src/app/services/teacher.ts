@@ -19,17 +19,18 @@ export class TeacherService {
 
   constructor(private http: HttpClient) {}
   //Function getParticipantsIndividualEvent will get participants of a specific event
-  getParticipantsIndividualEvent(eventId: number): Observable<ModelListParticipants | false> {
-    return this.http.get<any>(`${this.apiUrlGetParticipants}${eventId}`).pipe(
-      map((response) => {
-        if (response?.success && response.participantsEvent) {
-          return response.participantsEvent;
-        } else if (!response.success) {
-          return false as const;
-        }
-      })
-    );
-  }
+  // getParticipantsIndividualEvent(eventId: number): Observable<ModelListParticipants | false> {
+  //   return this.http.get<any>(`${this.apiUrlGetParticipants}${eventId}`).pipe(
+  //     map((response) => {
+  //       console.log(response)
+  //       if (response?.success && response.participantsEvent) {
+  //         return response.participantsEvent;
+  //       } else if (!response.success) {
+  //         return false as const;
+  //       }
+  //     })
+  //   );
+  // }
   //Function insertParticipantGrade will insert grade and if exist comments of a participant
   insertParticipantGrade(obj: {
     Id: number;

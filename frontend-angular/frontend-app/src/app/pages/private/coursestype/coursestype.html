@@ -25,7 +25,7 @@
       class="flex flex-col rounded-2xl">
 
       <article *ngFor="let c of courses()" [routerLink]="['/courses/individual', c.Id]" [state]="{ event: c }"
-        [class.pointer-events-none]="!c.Status" class="group p-5 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1">
+        [class.pointer-events-none]="!c.Status" class="group p-5 cursor-pointer divide-gray-200 rounded-2xl border border-gray-200 hover:border-blue-500 bg-white hover:bg-blue-50 hover:shadow-md mb-1">
 
         <!-- Header event -->
         <div class="flex items-start justify-between mb-2">

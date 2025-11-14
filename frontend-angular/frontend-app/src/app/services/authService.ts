@@ -10,9 +10,13 @@ import { Roles } from '../models/modelRoles';
   providedIn: 'root',
 })
 export class AuthService {
+  //Login
   private apiUrlLogin = environment.apiUrl + 'auth/login';
+  //Register
   private apiUrlRegister = environment.apiUrl + 'auth/register';
+  //Update password
   private apiUrlUpdatePassword = environment.apiUrl + 'auth/update/password';
+  //Roles
   private apiUrlAuthorizationRole = environment.apiUrl + 'auth/roles';
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -24,7 +28,7 @@ export class AuthService {
   ): Observable<boolean> {
     return this.http.post<any>(this.apiUrlLogin, objBody).pipe(
       map((response) => {
-        if (response?.token && response?.user) {
+        if (response?.token && response?.user && response?.success) {
           const role = response.user.roleType;
           let modelUser: ModelUserLoginResponse = response.user;
 
@@ -38,7 +42,7 @@ export class AuthService {
             sessionStorage.setItem('role', response.user.roleType);
             sessionStorage.setItem('authToken', response.token);
           }
-          alert('Login Successful' + role);
+          alert('Login Successful');
 
           //Directs the client for the page according to the Role type
           switch (role) {
@@ -57,11 +61,13 @@ export class AuthService {
           }
           return true as const;
         }
+
+        alert('Login Unsuccessful');
         return false as const;
       }),
       catchError((error) => {
         if (error.status === 404 || error.status === 400) {
-          alert('Wrong Credentials.');
+          alert('Login Unsuccessful');
         }
         return of(false);
       })
@@ -111,7 +117,7 @@ export class AuthService {
   }
   //Get the authUser from local storage/session storage
   getAuthUser() {
-    return localStorage.getItem('authUser') || sessionStorage.getItem('authUser') || null
+    return localStorage.getItem('authUser') || sessionStorage.getItem('authUser') || null;
   }
   //Request backend to get verify of entityId, username and role type, will return true if the user are authorized to access the page who wants
   verifyRole(): Observable<string | false> {
