@@ -11,19 +11,31 @@ import { errorContext } from 'rxjs/internal/util/errorContext';
 export class ParticipantsService {
   //Backend endpoint
   //Get
-  private apiUrlGetParticipants = environment.apiUrl + 'get/participants/';
+  private apiUrlGetParticipants_user = environment.apiUrl + 'get/participants/';
+  private apiUrlGetParticipants_teacher = environment.apiUrl + 'get/participants/teacher/';
   //Insert
   private apiUrlInsertParticipantInEvent = environment.apiUrl + 'insert/participant/event';
   private apiUrlInsertParticipantParticipantDescription = environment.apiUrl + 'insert/participant/description';
 
-
   constructor(private http: HttpClient) {}
 
-  //Function getParticipantsIndividualEvent will get participants of a specific event
-  getParticipantsIndividualEvent(eventId: number): Observable<ModelListParticipants | false> {
-    return this.http.get<any>(`${this.apiUrlGetParticipants}${eventId}`).pipe(
+  //Function getParticipantsIndividualEvent_user will get participants of a specific event
+  getParticipantsIndividualEvent_user(eventId: number): Observable<ModelListParticipants | false> {
+    return this.http.get<any>(`${this.apiUrlGetParticipants_user}${eventId}`).pipe(
       map((response) => {
-        if (response?.success && response.participantsEvent) {
+        if (response?.success && response?.participantsEvent) {
+          return response.participantsEvent;
+        } else if (!response.success) {
+          return false as const;
+        }
+      })
+    );
+  }
+  //Function getParticipantsIndividualEvent_teacher will get participants of a specific event
+  getParticipantsIndividualEvent_teacher(eventId: number): Observable<ModelListParticipants | false> {
+    return this.http.get<any>(`${this.apiUrlGetParticipants_teacher}${eventId}`).pipe(
+      map((response) => {
+        if (response?.success && response?.participantsEvent) {
           return response.participantsEvent;
         } else if (!response.success) {
           return false as const;
@@ -37,20 +49,23 @@ export class ParticipantsService {
       map((response) => {
         if (response?.success) {
           return true as const;
-        } else{
+        } else {
           return false as const;
         }
       })
     );
   }
   //Function insertParticipantParticipantDescription will insert description at a specific participant
-  insertParticipantParticipantDescription(obj: { eventId: number, participantDescription: string }): Observable<boolean> {
+  insertParticipantParticipantDescription(obj: {
+    eventId: number;
+    participantDescription: string;
+  }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlInsertParticipantParticipantDescription, obj).pipe(
       map((response) => {
-        console.log(response)
+        console.log(response);
         if (response?.success) {
           return true as const;
-        } else{
+        } else {
           return false as const;
         }
       })

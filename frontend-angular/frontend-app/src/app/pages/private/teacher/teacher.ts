@@ -73,19 +73,25 @@ export class Teacher implements OnInit {
     this.eventService.getEventByCreatedById().subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
-          this.myCourses.set(
-            res.map((x: any) => ({
-              Id: x.Id ?? x.id,
-              Name: x.Name ?? x.name,
-              Description: x.Description ?? x.description,
-              TopicName: x.TopicName ?? x.topicName,
-              CreateById: x.CreateById ?? x.createById,
-              DateCreate: x.DateCreate ?? x.dateCreate,
-              DateClose: x.DateClose ?? x.dateClose,
-              Status: x.Status ?? x.status,
-              Results: x.Results ?? x.results,
-            }))
-          );
+          const mapped = res.map((x: any) => ({
+            Id: x.Id ?? x.id,
+            Name: x.Name ?? x.name,
+            Description: x.Description ?? x.description,
+            TopicName: x.TopicName ?? x.topicName,
+            CreateById: x.CreateById ?? x.createById,
+            DateCreate: x.DateCreate ?? x.dateCreate,
+            DateClose: x.DateClose ?? x.dateClose,
+            Status: x.Status ?? x.status,
+            Results: x.Results ?? x.results,
+          }));
+
+          mapped.sort((a, b) => {
+            const da = new Date(a.DateCreate).getTime();
+            const db = new Date(b.DateCreate).getTime();
+            return db - da;
+          });
+
+          this.myCourses.set(mapped);
         }
       },
       error: () => this.myCourses.set([]),
@@ -120,7 +126,7 @@ export class Teacher implements OnInit {
       Name: this.form.value.name,
       Description: this.form.value.description,
       TopicsId: this.form.value.topicId,
-      CreateById: teacherId
+      CreateById: teacherId,
     };
     this.submitting.set(true);
     this.eventService.createEvent(payload).subscribe({

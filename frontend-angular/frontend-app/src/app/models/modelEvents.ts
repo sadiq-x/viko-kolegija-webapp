@@ -18,14 +18,15 @@ export interface EventListResponse {
 
 export interface EventParticipantListResponse {
   Id: number;
+  EventId: number;
   Name: string;
   Description: string;
   TopicName: string;
-  CreateById: number;
   DateCreate: string;
   DateClose: string | null;
   Status: string;
   Grade: string;
+  ParticipantDescription: string;
 }
 
 export interface EventListByIdRequest {

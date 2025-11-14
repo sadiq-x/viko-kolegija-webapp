@@ -17,28 +17,31 @@ export class Login {
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
-      username: ['', [Validators.required]],
+      username: ['', [Validators.required, this.noSpacesValidator]],
       password: ['', [Validators.required]],
       remember: [false],
     });
   }
-
+  //Function to mage login
   onLoginSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    };
-
     var credentials = {
-      Username: this.form.value.username,
+      Username: this.form.value.username.replace(/\s+/g, ''),
       PasswordHash: this.form.value.password,
     };
 
+    if (this.form.invalid && credentials == null) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     this.authService.login(credentials, this.form.value.remember).subscribe({
       next: (res: boolean) => {},
-      error: (e) => {
-        console.log(e);
-      },
+      error: (e) => {},
     });
+  }
+  //Function to validate spaces
+  noSpacesValidator(control: any) {
+    const hasSpaces = /\s/.test(control.value);
+    return hasSpaces ? { spacesNotAllowed: true } : null;
   }
 }

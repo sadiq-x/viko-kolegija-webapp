@@ -35,6 +35,7 @@ export class CoursesList {
     this.loading.set(true);
     this.eventService.getEvents().subscribe({
       next: (res) => {
+        console.log(res)
         if (Array.isArray(res) && !!res) {
           this.loading.set(false);
 

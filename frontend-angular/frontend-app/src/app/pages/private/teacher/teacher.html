@@ -10,7 +10,7 @@
         <!-- Name -->
         <div>
           <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
-          <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+          <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
                         placeholder:text-blue-900/40 focus:outline-none focus:ring-4
                         focus:ring-blue-200 focus:border-blue-400" placeholder="Course title" />
         </div>
@@ -65,7 +65,7 @@
       <ng-template #listTpl>
         <ul class="space-y-3">
           <li *ngFor="let c of myCourses()">
-            <a class="block rounded-xl border border-blue-200 p-3 hover:bg-blue-50 transition cursor-pointer"
+            <a class="block rounded-xl border border-gray-200 p-3 hover:bg-blue-50 transition cursor-pointer hover:border-blue-500"
               [routerLink]="['/teacher/event', c.Id]" [state]="{ course: c }">
               <div class="flex items-center justify-between">
                 <p class="font-semibold text-blue-800">{{ c.Name }}</p>

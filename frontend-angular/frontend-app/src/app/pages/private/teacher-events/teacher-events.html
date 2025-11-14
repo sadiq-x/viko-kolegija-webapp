@@ -90,16 +90,18 @@
         </div>
       </div>
 
-      <div class="mt-6 flex flex-wrap gap-3">
-        <!-- Button to edit event -->
-        <!-- <button type="button"
-          class="rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200">
-          Edit event
-        </button> -->
+      <div class="mt-6  gap-3" *ngIf="course.Status != 'Close'">
+        <h2 class="text-sm font-semibold text-blue-800">Change the status event for</h2>
+        <!-- Button to change status event - Ongoing -->
+        <button type="button" *ngIf="course.Status == 'Open'"
+          class="mt-2 rounded-xl bg-yellow-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-200"
+          (click)="btnOngoingEvent()">
+          Ongoing event
+        </button>
 
-        <!-- Button to close event -->
-        <button type="button" *ngIf="course.Status !== 'Close'"
-          class="rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
+        <!-- Button to change status event - Close -->
+        <button type="button" *ngIf="course.Status == 'Ongoing'"
+          class="mt-2 rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
           (click)="btnCloseEvent()">
           Close event
         </button>
@@ -107,7 +109,7 @@
     </div>
 
     <!-- Participants -->
-    <div class="mt-8">
+    <div class="mt-8" *ngIf="!errorLoadPage">
       <h2 class="text-sm font-semibold text-blue-800 mb-3">Participants</h2>
 
       <!-- Loading -->
@@ -142,7 +144,7 @@
                   Edit
                 </button>
 
-                <button *ngIf="p.Status" type="button" class="rounded-lg bg-green-600/90 px-3 py-1.5 text-white border border-blue-200 text-sm font-semibold
+                <button *ngIf="p.Grade" type="button" class="rounded-lg bg-green-600/90 px-3 py-1.5 text-white border border-blue-200 text-sm font-semibold
                          hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-blue-200"
                   (click)="btnInactive(p)">
                   Complete

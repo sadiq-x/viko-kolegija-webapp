@@ -15,7 +15,7 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
-                    <input id="username" type="text" formControlName="username" autocomplete="username"
+                    <input id="username" type="text" formControlName="username" autocomplete="username" (keydown.space)="$event.preventDefault()"
                         placeholder="Username" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
                    placeholder:text-blue-900/40 focus:outline-none focus:ring-4
                    focus:ring-blue-200 focus:border-blue-400" aria-describedby="username-help" required />
@@ -36,7 +36,7 @@
                     placeholder:text-blue-900/40 focus:outline-none focus:ring-4
                     focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" type="password"
                             aria-describedby="password-help" />
-                        <button type="button" aria-label="Mostrar palavra-passe"
+                        <button type="button" aria-label="Show password"
                             class="absolute inset-y-0 right-2 my-auto inline-flex items-center justify-center rounded-lg p-2 text-blue-700/70 hover:bg-blue-50"
                             onclick="const c=document.getElementById('password'); c.type = c.type==='password' ? 'text':'password';">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"

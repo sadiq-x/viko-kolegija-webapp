@@ -53,6 +53,7 @@ export class CoursesIndividual {
       description: [''],
     });
     this.loginType = this.authService.getRole();
+    
   }
   //Function to load event
   loadCourse() {
@@ -77,13 +78,13 @@ export class CoursesIndividual {
       return;
     }
 
-    this.participantsService.getParticipantsIndividualEvent(this.idCourse).subscribe({
+    this.participantsService.getParticipantsIndividualEvent_user(this.idCourse).subscribe({
       next: (res) => {
-        if (res === false) {
-          this.participantEventStatus = res;
-          return;
-        }
-        if (Array.isArray(res)) {
+        // if (res === false) {
+        //   
+        //   return;
+
+        if (Array.isArray(res) && !!res) {
           this.participantInfo.set(
             res.map((e: any) => ({
               Grade: e.Grade || e.grade,
@@ -92,7 +93,9 @@ export class CoursesIndividual {
               Status: e.Status || e.status,
             }))
           );
+          return;
         }
+        this.participantEventStatus = false;
         return;
       },
     });
