@@ -2,13 +2,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace backend_api.Models
 {
-    //Dto Request for a specific eventId
-    public sealed class ParticipantsListFromEventIdRequestDTO
+    //Dto Request for a specific eventId - User
+    public sealed class ParticipantsListFromEventIdUserRequestDTO
     {
         [Required]
         public int EventId { get; set; } = default!;
         [Required]
         public int? EntityId { get; set; } = default!;
+    }
+    //Dto Request for a specific eventId - Teacher
+    public sealed class ParticipantsListFromEventIdTeacherRequestDTO
+    {
+        [Required]
+        public int EventId { get; set; } = default!;
     }
     //Dto Response for a specific eventId
     public sealed class ParticipantsListFromEventIdResponseDTO

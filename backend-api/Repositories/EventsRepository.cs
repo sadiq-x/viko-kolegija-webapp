@@ -10,9 +10,10 @@ namespace backend_api.Repositories
         Task<List<EventListResponseDTO>?> getAllEvents();
         Task<List<EventListResponseDTO>?> getEventsByCreateById(EventListByCreateByIdRequestDTO t);
         Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t);
-        Task<(bool Success, string? Message)> deleteEvent(EventCloseRequestDTO t);
+        Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t);
+        Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t);
         Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t);
-        Task<List<EventListResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t);
+        Task<List<EventListStudentResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t);
     }
 
     public class EventsRepository : IEventsRepository
@@ -107,7 +108,7 @@ namespace backend_api.Repositories
                     Description = t.Description.Trim(),
                     TopicsId = t.TopicsId,
                     CreateById = t.CreateById,
-                    DateCreate= DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    DateCreate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                     StatusId = 1 //To change
                 };
 
@@ -123,7 +124,7 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<(bool Success, string? Message)> deleteEvent(EventCloseRequestDTO t)
+        public async Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t)
         {
             //Input validations
             if (t.Id <= 0) return (false, "Id field empty."); ;
@@ -132,7 +133,7 @@ namespace backend_api.Repositories
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
                 var eventClose = await dbContext.Events
-                    .SingleOrDefaultAsync(x => x.Id == t.Id && x.CreateById == t.CreateById);
+                    .SingleOrDefaultAsync(x => x.Id == t.Id && x.CreateById == t.CreateById && x.StatusId == 2);
 
                 if (eventClose is null)
                 {
@@ -143,11 +144,39 @@ namespace backend_api.Repositories
 
                 await dbContext.SaveChangesAsync();
 
-                return (true, "Event close successfully."); ;
+                return (true, "Event status close successfully."); ;
             }
             catch
             {
-                return (false, "Event close unsuccessfully."); ;
+                return (false, "Event status close unsuccessfully."); ;
+            }
+        }
+
+        public async Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t)
+        {
+            //Input validations
+            if (t.Id <= 0) return (false, "Id field empty."); ;
+            if (t.CreateById <= 0 || t.CreateById is null) return (false, "CreateById field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var eventOngoing = await dbContext.Events
+                    .SingleOrDefaultAsync(x => x.Id == t.Id && x.CreateById == t.CreateById && x.StatusId == 1);
+
+                if (eventOngoing is null)
+                {
+                    return (false, "Event not found."); ;
+                }
+
+                eventOngoing.StatusId = 2;
+
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Event status ongoing successfully."); ;
+            }
+            catch
+            {
+                return (false, "Event status ongoing unsuccessfully."); ;
             }
         }
 
@@ -179,8 +208,8 @@ namespace backend_api.Repositories
                 throw;
             }
         }
-        
-        public async Task<List<EventListResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t)
+
+        public async Task<List<EventListStudentResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t)
         {
             if (t.EntityId <= 0) return null;
             try
@@ -189,14 +218,18 @@ namespace backend_api.Repositories
                 var result = await dbContext.ParticipantsEvents
                     .AsNoTracking()
                     .Where(x => x.EntityId == t.EntityId)
-                    .Select(x => new EventListResponseDTO
+                    .Select(x => new EventListStudentResponseDTO
                     {
                         Id = x.Id,
+                        EventId = x.EventId,
                         Name = x.Event.Name,
                         Description = x.Event.Description,
                         TopicName = x.Event.Topics.Type,
                         DateCreate = x.Event.DateCreate,
-                        Status = x.Event.StatusEvents.Type
+                        DateClose = x.Event.DateClose!,
+                        Status = x.Event.StatusEvents.Type,
+                        Grade = x.Grade!,
+                        ParticipantDescription = x.ParticipantDescription!
                     }).ToListAsync();
 
                 if (result is null || result.Count == 0) return null;
