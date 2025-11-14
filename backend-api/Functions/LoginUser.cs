@@ -30,7 +30,7 @@ namespace backend_api.Functions
                 {
                     message = "Wrong Credentials.",
                     error = loginUserDto?.Validate().Select(e => e.ToString()) ?? new List<string>()
-                }); 
+                });
                 return BadResponse;
             }
 
@@ -38,14 +38,23 @@ namespace backend_api.Functions
             if (user is null || string.IsNullOrEmpty(user.Username) || user.EntityId <= 0 || string.IsNullOrEmpty(user.RoleType))
             {
                 // Parse the request body to extract username and password
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await notFoundResponse.WriteStringAsync("Login not found."); //Reponse a message if the error exist
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Login not found."
+                });
                 return notFoundResponse;
             }
 
             string token = JwtAuth.GenerateToken(user.Username, user.EntityId, user.RoleType); //Create token with username and id
             var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
-            await response.WriteAsJsonAsync(new { user, token });
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                user,
+                token
+            });
             return response; //Return the response, with username and token Jwt Authorization 
         }
     }

@@ -25,6 +25,22 @@ namespace backend_api.Models
         public int CreateById { get; init; } = default!;
         public string DateCreate { get; init; } = default!;
         public string Status { get; init; } = default!;
+        public string Grade { get; init; } = default!;
+    }
+
+    //Dto Response for all Event without any filter
+    public sealed class EventListStudentResponseDTO
+    {
+        public int Id { get; init; } = default!;
+        public int EventId { get; init; } = default!; 
+        public string Name { get; init; } = default!;
+        public string Description { get; init; } = default!;
+        public string TopicName { get; init; } = default!;
+        public string DateCreate { get; init; } = default!;
+        public string DateClose { get; init; } = default!;
+        public string Status { get; init; } = default!;
+        public string Grade { get; init; } = default!;
+        public string ParticipantDescription { get; init; } = default!;
     }
 
     //DTO Request for all Event from a specific Topics
@@ -55,7 +71,7 @@ namespace backend_api.Models
         public string DateCreate { get; init; } = default!;
     }
     //DTO Request for close a event with a specific id
-    public sealed class EventCloseRequestDTO
+    public sealed class EventChangeStatusRequestDTO
     {
         [Required]
         public int Id { get; set; } = default!;

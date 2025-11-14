@@ -6,7 +6,8 @@ namespace backend_api.Repositories
 {
     public interface IParticipantsEventsRepository
     {
-        Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId(ParticipantsListFromEventIdRequestDTO t);
+        Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_User(ParticipantsListFromEventIdUserRequestDTO t);
+        Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Teacher(ParticipantsListFromEventIdTeacherRequestDTO t);
         Task<(bool Success, string? Message)> insertGradeParticipantsEvent(ParticipantsEventGradeRequestDTO t);
         Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t);
         Task<(bool Success, string? Message)> insertParticipantsEventInEvent(ParticipantsEventInsertInEventIdRequestDTO t);
@@ -22,7 +23,7 @@ namespace backend_api.Repositories
             _readContextFactory = readContextFactory;
         }
 
-        public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId(ParticipantsListFromEventIdRequestDTO t)
+        public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_User(ParticipantsListFromEventIdUserRequestDTO t)
         {
             if (t.EventId <= 0) return null;
             if (t.EntityId <= 0) return null;
@@ -39,6 +40,47 @@ namespace backend_api.Repositories
                 var result = await dbContext.ParticipantsEvents
                     .AsNoTracking()
                     .Where(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId)
+                    .Select(u => new ParticipantsListFromEventIdResponseDTO
+                    {
+                        Id = u.Id,
+                        EntityId = u.EntityId,
+                        Name = u.Entity.Name,
+                        Email = u.Entity.Email,
+                        Status = u.Status,
+                        Grade = u.Grade,
+                        Comments = u.Comments,
+                        ParticipantDescription = u.ParticipantDescription
+                    })
+                    .ToListAsync();
+                Console.WriteLine(eventExist.ToString());
+                Console.WriteLine(result.ToString());
+                if (result.Count == 0)
+                    return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Teacher(ParticipantsListFromEventIdTeacherRequestDTO t)
+        {
+            if (t.EventId <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId);
+
+                if (!eventExist)
+                {
+                    return null;
+                }
+
+                var result = await dbContext.ParticipantsEvents
+                    .AsNoTracking()
+                    .Where(pe => pe.EventId == t.EventId)
                     .Select(u => new ParticipantsListFromEventIdResponseDTO
                     {
                         Id = u.Id,

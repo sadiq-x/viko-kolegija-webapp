@@ -16,14 +16,13 @@ namespace backend_api.Functions
         {
             _participantsEventsRepository = participantsEventsRepository;
         }
-        // ! This need to be changed.
-        //TODO: The function need to get the token to know how are doing the request
-        [Function("getParticipantFromEvent")]
+
+        [Function("getParticipantFromEventId-User")]
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run(
+        public async Task<HttpResponseData> Run1(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/participants/{eventId:int}")] HttpRequestData req, int eventId, FunctionContext executionContext)
         {
-            var participantEventDTO = new ParticipantsListFromEventIdRequestDTO { EventId = eventId };
+            var participantEventDTO = new ParticipantsListFromEventIdUserRequestDTO { EventId = eventId };
 
             if (participantEventDTO is null) //Verify the Dto
             {
@@ -65,9 +64,7 @@ namespace backend_api.Functions
                 return BadRequest;
             }
 
-            //////
-
-            var participantsEvent = await _participantsEventsRepository.getParticipantsFromEventId(participantEventDTO); //Checking request body with database
+            var participantsEvent = await _participantsEventsRepository.getParticipantsFromEventId_User(participantEventDTO); //Checking request body with database
             if (participantsEvent is null || participantsEvent.Count == 0)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
@@ -87,5 +84,46 @@ namespace backend_api.Functions
             });
             return response; //Return
         }
+    
+        [Function("getParticipantFromEventId-Teacher")]
+        [Produces("application/json")]
+        public async Task<HttpResponseData> Run2(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/participants/teacher/{eventId:int}")] HttpRequestData req, int eventId)
+        {
+            var participantEventDTO = new ParticipantsListFromEventIdTeacherRequestDTO { EventId = eventId };
+
+            if (participantEventDTO is null || !participantEventDTO.IsValid() || participantEventDTO.EventId <= 0)
+            {
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Invalid request body.",
+                    Error = participantEventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                });
+                return BadRequest;
+            }
+
+            var participantsEvent = await _participantsEventsRepository.getParticipantsFromEventId_Teacher(participantEventDTO); //Checking request body with database
+            if (participantsEvent is null || participantsEvent.Count == 0)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    message = "Participants not found."
+                }); //Response a message if the error exist
+                return notFoundResponse;
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                participantsEvent
+            });
+            return response; //Return
+        }
+    
     }
 }
