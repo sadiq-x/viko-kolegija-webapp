@@ -16,6 +16,9 @@ export class ParticipantsService {
   //Insert
   private apiUrlInsertParticipantInEvent = environment.apiUrl + 'insert/participant/event';
   private apiUrlInsertParticipantParticipantDescription = environment.apiUrl + 'insert/participant/description';
+  private apiUrlInsertGradeParticipant = environment.apiUrl + 'insert/participant/grade';
+  //Update
+  private apiUrlUpdateStatusParticipant = environment.apiUrl + 'update/participant/status';
 
   constructor(private http: HttpClient) {}
 
@@ -68,6 +71,37 @@ export class ParticipantsService {
         } else {
           return false as const;
         }
+      })
+    );
+  }
+  //Function insertParticipantGrade will insert grade and if exist comments of a participant
+  insertParticipantGrade(obj: {
+    Id: number;
+    EventId: number;
+    Grade: string;
+    Comments?: string;
+  }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlInsertGradeParticipant, obj).pipe(
+      map((response) => {
+        if (response?.success) {
+          return true as const;
+        }
+        return false as const;
+      })
+    );
+  }
+  //Function updateParticipantStatus will update status of a participant
+  updateParticipantStatus(obj: {
+    Id: number;
+    EventId: number;
+    EntityId: number;
+  }): Observable<boolean> {
+    return this.http.put<any>(this.apiUrlUpdateStatusParticipant, obj).pipe(
+      map((response) => {
+        if (response?.success) {
+          return true as const;
+        }
+        return false as const;
       })
     );
   }

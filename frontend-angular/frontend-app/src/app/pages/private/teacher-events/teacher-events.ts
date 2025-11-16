@@ -8,6 +8,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { EventService } from '../../../services/events';
 import { AuthService } from '../../../services/authService';
 import { ParticipantsService } from '../../../services/participants';
+import { EventListResponse } from '../../../models/modelEvents';
 
 @Component({
   selector: 'app-teacher-event',
@@ -17,26 +18,23 @@ import { ParticipantsService } from '../../../services/participants';
   styleUrls: ['./teacher-events.scss'],
 })
 export class TeacherEvents {
-  course: any = null;
-  loading = true;
-
-  errorLoadPage: boolean = false;
-
-  participants = signal<ModelListParticipants[]>([]);
-  loadingParticipants = signal<boolean>(false);
+  course = signal<EventListResponse[]>([]); //Variable to receive course
+  loadingCourse = signal<boolean>(false); //Loading view UI of course
+  participants = signal<ModelListParticipants[]>([]); //List of participants
+  loadingParticipants = signal<boolean>(false); //Loading view UI of participants
+  errorLoadingParticipants: boolean = true; //Variable if the participant don't exist, will set false, remove every UI of participant
 
   editingId = signal<number | null>(null);
   editParticipants: FormGroup;
 
-  eventId: number = 0;
+  private eventId: number = 0;
+  private coursePassed: any;
 
   constructor(
     private route: ActivatedRoute,
-    private teacherService: TeacherService,
     private eventService: EventService,
     private participantsService: ParticipantsService,
-    private fb: FormBuilder,
-
+    private fb: FormBuilder
   ) {
     this.editParticipants = fb.group({
       grade: [
@@ -53,33 +51,52 @@ export class TeacherEvents {
   }
 
   ngOnInit(): void {
-    this.getEventFromTeacherPage();
-  }
+    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
+    this.coursePassed = history.state?.['course'];
 
-  //Get the event selected from Page teacher
-  getEventFromTeacherPage() {
-    const passed = history.state?.['course'];
-    
-    //! SEE THIS
-    //Refactoring this
-
-    if (passed) {
-      this.getParticipants();
-      this.course = passed;
-      this.loading = false;
+    if (!this.coursePassed && this.coursePassed.Id != this.eventId) {
       return;
     }
-    this.loading = false;
-    this.errorLoadPage = true;
+
+    this.getEvent();
+  }
+
+  //Get the event from backend, from specific eventId
+  private getEvent() {
+    this.loadingCourse.set(true);
+    this.eventService.getEventByEventId(this.eventId).subscribe({
+      next: (res) => {
+        if (!res) {
+          this.course.set([]);
+          return;
+        }
+
+        const x = res as any;
+        this.course.set([
+          {
+            Id: x.Id ?? x.id,
+            Name: x.Name ?? x.name,
+            Description: x.Description ?? x.description,
+            TopicName: x.TopicName ?? x.topicName,
+            CreateBy: x.CreateBy ?? x.createBy,
+            DateCreate: x.DateCreate ?? x.dateCreate,
+            DateClose: x.DateClose ?? x.dateClose,
+            Status: x.Status ?? x.status,
+          },
+        ]);
+        this.loadingCourse.set(false);
+        this.getParticipants();
+      },
+    });
   }
   //Get the participants from backend, from specific eventId
-  getParticipants() {
+  private getParticipants() {
     this.loadingParticipants.set(true);
-    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
     this.participantsService.getParticipantsIndividualEvent_teacher(this.eventId).subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
           this.loadingParticipants.set(false);
+          this.errorLoadingParticipants = false;
           this.participants.set(
             res.map((x: any) => ({
               Id: x.id ?? x.Id,
@@ -91,11 +108,11 @@ export class TeacherEvents {
               Comments: x.comments ?? x.Comments,
             }))
           );
-
           return;
         }
         this.participants.set([]);
         this.loadingParticipants.set(false);
+        this.errorLoadingParticipants = false;
       },
     });
   }
@@ -109,11 +126,11 @@ export class TeacherEvents {
     };
 
     if (!obj.Grade) {
-      alert("You need to insert grade of student")
+      alert('You need to insert grade of student');
     }
 
     //Request to backend
-    this.teacherService.insertParticipantGrade(obj).subscribe({
+    this.participantsService.insertParticipantGrade(obj).subscribe({
       next: (res) => {
         if (res) {
           alert('Participant grade update');
@@ -149,7 +166,7 @@ export class TeacherEvents {
       EntityId: p.EntityId,
     };
 
-    this.teacherService.updateParticipantStatus(obj).subscribe({
+    this.participantsService.updateParticipantStatus(obj).subscribe({
       next: (res) => {
         if (res) {
           alert('Participant status inactive');
@@ -162,33 +179,47 @@ export class TeacherEvents {
       },
     });
   }
+  //! To be tested
   //Button to change status event - Close status
   btnCloseEvent() {
-    const participantStatus = this.participants()
-      .filter((p) => p.Status == false)
-      .map((p) => p.Status);
+    const participants = this.participants();
+    const course = this.course().filter((e) => e.Status === 'Ongoing');
 
-    const obj = {
-      Id: this.eventId,
-    };
-    console.log(participantStatus.length);
-
-    if (
-      participantStatus.length > 0 &&
-      this.participants().length > 0 &&
-      this.course.Status === 'Ongoing'
-    ) {
-      this.eventService.updateEventStatusClose(obj).subscribe({
-        next: (res) => {
-          if (res) {
-            this.course.Status = 'Close';
-            return;
-          }
-        },
-      });
-    } else {
-      alert('All students need to be classified and placed inactive');
+    if (!course) {
+      alert('Only ongoing events can be closed.');
+      return;
     }
+
+    if (participants.length === 0) {
+      alert('You need participants to be able to close the event.');
+      return;
+    }
+
+    const hasActive = participants.some((p) => p.Status === true);
+
+    const hasNoGrade = participants.some(
+      (p) =>
+        p.Grade == null ||
+        p.Grade === '' ||
+        (typeof p.Grade === 'string' && p.Grade.trim().length === 0)
+    );
+
+    if (hasActive || hasNoGrade) {
+      alert('All students need to be graded and set as inactive before closing the event.');
+      return;
+    }
+
+    const obj = { Id: this.eventId };
+
+    this.eventService.updateEventStatusClose(obj).subscribe({
+      next: (res) => {
+        if (res) {
+          this.course.update((list) =>
+            list.map((c) => (c.Id === this.eventId ? { ...c, Status: 'Close' } : c))
+          );
+        }
+      },
+    });
   }
   //Button to change status event - Ongoing status
   btnOngoingEvent() {
@@ -196,21 +227,26 @@ export class TeacherEvents {
       .filter((p) => p.Status == true)
       .map((p) => p.Status);
 
+    const courseStatus = this.course().filter((e) => e.Status === 'Open');
+
     const obj = {
       Id: this.eventId,
     };
 
-    if (this.participants().length > 0 && this.course.Status === 'Open') {
-      this.eventService.updateEventStatusOngoing(obj).subscribe({
-        next: (res) => {
-          if (res) {
-            this.course.Status = 'Ongoing';
-            return;
-          }
-        },
-      });
-    } else {
-      alert('The course need have student for you can change the status');
+    if (this.participants().length == 0 && !!courseStatus) {
+      alert('You need have students listed on the event.');
+      return;
     }
+
+    this.eventService.updateEventStatusOngoing(obj).subscribe({
+      next: (res) => {
+        if (res) {
+          this.course.update((list) =>
+            list.map((c) => (c.Id === this.eventId ? { ...c, Status: 'Ongoing' } : c))
+          );
+          return;
+        }
+      },
+    });
   }
 }

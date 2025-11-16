@@ -78,7 +78,7 @@ export class Teacher implements OnInit {
             Name: x.Name ?? x.name,
             Description: x.Description ?? x.description,
             TopicName: x.TopicName ?? x.topicName,
-            CreateById: x.CreateById ?? x.createById,
+            CreateBy: x.CreateBy ?? x.createBy,
             DateCreate: x.DateCreate ?? x.dateCreate,
             DateClose: x.DateClose ?? x.dateClose,
             Status: x.Status ?? x.status,
@@ -116,18 +116,13 @@ export class Teacher implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const teacherId = this.getCurrentTeacherId();
-    if (!teacherId) {
-      alert('No teacher logged in.');
-      return;
-    }
 
     const payload: ModelEventsRequest = {
       Name: this.form.value.name,
       Description: this.form.value.description,
       TopicsId: this.form.value.topicId,
-      CreateById: teacherId,
     };
+    
     this.submitting.set(true);
     this.eventService.createEvent(payload).subscribe({
       next: (res) => {

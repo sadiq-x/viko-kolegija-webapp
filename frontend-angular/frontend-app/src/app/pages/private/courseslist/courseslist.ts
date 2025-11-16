@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, signal, TrackByFunction } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../services/events';
-import { EventListResponse, ModelEventsRequest } from '../../../models/modelEvents';
+import { EventListResponse } from '../../../models/modelEvents';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -35,7 +35,6 @@ export class CoursesList {
     this.loading.set(true);
     this.eventService.getEvents().subscribe({
       next: (res) => {
-        console.log(res)
         if (Array.isArray(res) && !!res) {
           this.loading.set(false);
 
@@ -44,10 +43,10 @@ export class CoursesList {
             Name: e.Name || e.name,
             Description: e.Description || e.description,
             TopicName: e.TopicName || e.topicName,
-            CreateById: e.CreateById || e.createById,
             DateCreate: e.DateCreate || e.dateCreate,
             DateClose: e.DateClose || e.dateClose,
             Status: e.Status || e.status,
+            CreateBy: e.CreateBy || e.createBy,
           }));
 
           mapped.sort((a, b) => {

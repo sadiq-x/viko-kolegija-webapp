@@ -13,11 +13,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  //Loading information status view
-  loading = signal<boolean>(true);
+  loading = signal<boolean>(true); //Loading information status view
 
-  //User info
-  user = signal<ModelUserMini[]>([]);
+  user = signal<ModelUserMini[]>([]); //User information
 
   //Courses list
   enrolled = signal<EventParticipantListResponse[]>([]); //Courses actives
@@ -44,7 +42,6 @@ export class Dashboard {
     //NEED TODO THIS
     this.eventService.getEventByEntityId().subscribe({
       next: (res) => {
-
         if (Array.isArray(res) && !!res) {
           const mapped = res.map((e: any) => ({
             Id: e.Id || e.id,
@@ -56,7 +53,7 @@ export class Dashboard {
             Status: e.Status || e.status,
             Description: e.Description || e.description,
             Grade: e.Grade || e.grade,
-            ParticipantDescription: e.ParticipantDescription || e.participantDescription
+            ParticipantDescription: e.ParticipantDescription || e.participantDescription,
           }));
 
           mapped.sort((a, b) => {
@@ -66,7 +63,6 @@ export class Dashboard {
           });
 
           this.completed.set(mapped.filter((e) => e.Status === 'Close'));
-          console.log(this.completed())
           this.enrolled.set(mapped.filter((e) => e.Status === 'Ongoing' || e.Status === 'Open'));
           this.loading.set(false);
           return;

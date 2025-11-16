@@ -6,6 +6,8 @@ import { ModelListParticipantInfo } from '../../../models/modelParticipant';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { AuthService } from '../../../services/authService';
+import { EventListResponse } from '../../../models/modelEvents';
+import { EventService } from '../../../services/events';
 
 @Component({
   selector: 'app-coursesindividual',
@@ -14,78 +16,89 @@ import { AuthService } from '../../../services/authService';
   styleUrl: './coursesindividual.scss',
 })
 export class CoursesIndividual {
-  //Type of topic course
-  courseType = {
-    Type: '',
-  };
-  //State of loading and not found
-  loading = signal(true);
-  notFound = signal(false);
+  courseType = { Type: '' }; //Variable type of topic course
+  course = signal<EventListResponse[]>([]); //Variable to receive course
+  loadingCourse = signal<boolean>(false); //Loading view UI of course
+  participant = signal<ModelListParticipantInfo[]>([]); //Variable to receive participant
+  participantEventStatus: boolean = true; //Variable if the participant don't are registered, will set false, remove every UI of participant
+  formEvent!: FormGroup; //form of Description input
 
-  //Content of event
-  event = signal<any | null>(null);
-  //Id event
-  idCourse: number = 0;
-
-  //Boolean status of button register
-  participantEventStatus: boolean = true;
-  //Type of login
-  loginType: string | null = null;
-
-  //Information of participant
-  participantInfo = signal<ModelListParticipantInfo[]>([]);
-
-  formEvent!: FormGroup;
+  loginType: string | null = null; //Variable type of login
+  
+  private eventId: number = 0;
+  private coursePassed: any;
 
   constructor(
     private route: ActivatedRoute,
     private participantsService: ParticipantsService,
+    private eventService: EventService,
     private authService: AuthService,
     private fb: FormBuilder,
     private location: Location,
     private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.loadCourse();
-    this.loadParticipantInformation();
+  ) {
     this.formEvent = this.fb.group({
       description: [''],
     });
-    this.loginType = this.authService.getRole();
-    
   }
-  //Function to load event
-  loadCourse() {
-    this.loading.set(true);
-    const passed = history.state?.['event'];
 
-    if (!passed) {
-      this.loading.set(false);
-      this.notFound.set(true);
+  ngOnInit() {
+    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
+    this.coursePassed = history.state?.['event'];
+    this.courseType.Type = this.coursePassed.TopicName;
+
+    if (!this.coursePassed && !this.eventId && !this.courseType.Type) {
       return;
     }
-    this.courseType.Type = passed.TopicName;
 
-    this.idCourse = Number(this.route.snapshot.paramMap.get('id'));
+    this.getEvent();
+    this.loginType = this.authService.getRole();
+  }
 
-    this.loading.set(false);
-    this.event.set(passed);
+  //Get the event from backend, from specific eventId
+  private getEvent() {
+    this.loadingCourse.set(true);
+
+    this.eventService.getEventByEventId(this.eventId).subscribe({
+      next: (res) => {
+        if (!res) {
+          this.loadingCourse.set(false);
+          this.course.set([]);
+          return;
+        }
+
+        const x = res as any;
+        this.course.set([
+          {
+            Id: x.Id ?? x.id,
+            Name: x.Name ?? x.name,
+            Description: x.Description ?? x.description,
+            TopicName: x.TopicName ?? x.topicName,
+            CreateBy: x.CreateBy ?? x.createBy,
+            DateCreate: x.DateCreate ?? x.dateCreate,
+            DateClose: x.DateClose ?? x.dateClose,
+            Status: x.Status ?? x.status,
+          },
+        ]);
+
+        this.loadingCourse.set(false);
+        this.getParticipant();
+      },
+    });
   }
   //Get the information of a individual participant
-  loadParticipantInformation() {
-    if (this.idCourse <= 0 || !this.idCourse) {
-      return;
-    }
-
-    this.participantsService.getParticipantsIndividualEvent_user(this.idCourse).subscribe({
+  private getParticipant() {
+    this.participantsService.getParticipantsIndividualEvent_user(this.eventId).subscribe({
       next: (res) => {
-        // if (res === false) {
-        //   
-        //   return;
+        console.log(res)
+        if (!res) {
+          this.participant.set([]);
+          this.participantEventStatus = false;
+          return;
+        }
 
-        if (Array.isArray(res) && !!res) {
-          this.participantInfo.set(
+        if (Array.isArray(res)) {
+          this.participant.set(
             res.map((e: any) => ({
               Grade: e.Grade || e.grade,
               Comments: e.Comments || e.comments,
@@ -95,33 +108,38 @@ export class CoursesIndividual {
           );
           return;
         }
-        this.participantEventStatus = false;
-        return;
       },
     });
   }
   //Button to register on event
   btnRegisterEvent() {
     const obj = {
-      eventId: this.idCourse,
+      eventId: this.eventId,
     };
+
+    if (!obj.eventId && this.loginType != 'User') {
+      return;
+    }
 
     this.participantsService.insertParticipantsInEvent(obj).subscribe({
       next: (res) => {
-        if (res) {
-          this.participantEventStatus = res;
-          this.loadParticipantInformation();
+        if (!res) {
+          this.participantEventStatus = false;
+          return;
         }
+
+        this.participantEventStatus = true;
+        this.getParticipant();
       },
     });
   }
   //Button to insert description of student on event
   btnInsertParticipantDescription() {
     const obj = {
-      eventId: this.idCourse,
+      eventId: this.eventId,
       participantDescription: this.formEvent.get('description')?.value,
     };
-    console.log(obj);
+
     if (!obj.participantDescription || obj.participantDescription.trim().length === 0) {
       alert('You need to write your appointments');
       return;
@@ -130,34 +148,31 @@ export class CoursesIndividual {
     this.participantsService.insertParticipantParticipantDescription(obj).subscribe({
       next: (res) => {
         console.log(res);
-        if (res) {
-          this.participantEventStatus = res;
-          this.participantInfo.update((current) =>
-            current.map((item) => ({
-              ...item,
-              ParticipantDescription: obj.participantDescription,
-            }))
-          );
-
-          this.formEvent.reset();
-          return;
-        } else {
+        if (!res) {
           alert("The actual description isn't saved");
           return;
         }
+
+        this.participantEventStatus = true;
+        this.participant.update((current) =>
+          current.map((item) => ({
+            ...item,
+            ParticipantDescription: obj.participantDescription,
+          }))
+        );
+
+        this.formEvent.reset();
       },
     });
   }
   goBack(event: Event) {
     event.preventDefault();
 
-    // Se existe histórico de navegação no SPA, volta
     if (window.history.length > 2) {
       this.location.back();
       return;
     }
 
-    // Fallback: decide para onde ir
     if (this.courseType?.Type) {
       this.router.navigate(['/courses/type', this.courseType.Type], {
         state: { course: this.courseType },

@@ -19,97 +19,82 @@
       </div>
     </div>
 
-    <!-- Loading skeleton -->
-    <div *ngIf="loading" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 animate-pulse">
-      <div class="h-6 w-1/2 bg-blue-100 rounded mb-4"></div>
-      <div class="h-4 w-3/4 bg-blue-100 rounded mb-2"></div>
-      <div class="h-4 w-2/3 bg-blue-100 rounded mb-6"></div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="h-16 bg-blue-100 rounded"></div>
-        <div class="h-16 bg-blue-100 rounded"></div>
-      </div>
-    </div>
-
-    <!-- Content -->
-    <div *ngIf="!loading && course; else notFound" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
-
-      <!-- Header -->
-      <div class="flex items-start justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-blue-900">{{ course.Name }}</h1>
-          <p class="mt-1">
-            <span
-              class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 text-xs font-semibold">
-              {{ course.TopicName }}
-            </span>
-          </p>
+    <!-- Loading view -->
+        <div *ngIf="loadingCourse()" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6 animate-pulse">
+            <div class="h-6 w-1/2 bg-blue-100 rounded mb-4"></div>
+            <div class="h-4 w-3/4 bg-blue-100 rounded mb-2"></div>
+            <div class="h-4 w-2/3 bg-blue-100 rounded"></div>
         </div>
 
-        <!-- Badge of state -->
-        <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold border" [ngClass]="{
+    <!-- Content -->
+    <div *ngIf="!loadingCourse() && course().length == 1; else notFoundEvent"
+      class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+      <div *ngFor="let course of course()">
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-blue-900">{{ course.Name }}</h1>
+            <p class="mt-1">
+              <span
+                class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 text-xs font-semibold">
+                {{ course.TopicName }}
+              </span>
+            </p>
+          </div>
+
+          <!-- Badge of state -->
+          <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold border" [ngClass]="{
             'bg-green-100 text-green-700 border-green-200': course.Status === 'Open',
             'bg-yellow-100 text-yellow-700 border-yellow-200': course.Status === 'Ongoing',
             'bg-red-100 text-red-700 border-red-200': course.Status === 'Close'}">
-          {{ course.Status }}
-        </span>
-      </div>
+            {{ course.Status }}
+          </span>
+        </div>
 
-      <!-- Description -->
-      <div>
-        <p class="mt-6 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
-          {{ course.Description }}
-        </p>
-      </div>
-
-      <!-- Meta info -->
-      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
-          <p class="text-xs uppercase tracking-wide text-blue-700/70">Created</p>
-          <p class="mt-1 font-medium text-blue-900">
-            {{ course.DateCreate | date:'medium' }}
+        <!-- Description -->
+        <div>
+          <p class="mt-6 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
+            {{ course.Description }}
           </p>
         </div>
-        <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
-          <p class="text-xs uppercase tracking-wide text-blue-700/70">Closed</p>
-          <p class="mt-1 font-medium text-blue-900">
-            {{ course.DateClose | date:'medium' }}
-          </p>
+
+        <!-- Meta info -->
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
+            <p class="text-xs uppercase tracking-wide text-blue-700/70">Created</p>
+            <p class="mt-1 font-medium text-blue-900">
+              {{ course.DateCreate | date:'medium' }}
+            </p>
+          </div>
+          <div class="rounded-xl border border-blue-200 bg-blue-50/50 p-4">
+            <p class="text-xs uppercase tracking-wide text-blue-700/70">Closed</p>
+            <p class="mt-1 font-medium text-blue-900">
+              {{ course.DateClose | date:'medium' }}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <!-- Results -->
-      <div class="mt-6">
-        <h2 class="text-sm font-semibold text-blue-800">Result</h2>
-        <div class="mt-2 rounded-xl border border-blue-200 bg-blue-50/40 p-4">
-          <p class="text-blue-900" *ngIf="course.Results; else noResult">
-            {{ course.Results }}
-          </p>
-          <ng-template #noResult>
-            <p class="text-blue-700/70 italic">No results available yet.</p>
-          </ng-template>
+        <div class="mt-6  gap-3" *ngIf="course.Status != 'Close'">
+          <h2 class="text-sm font-semibold text-blue-800">Change the status event for</h2>
+          <!-- Button to change status event - Ongoing -->
+          <button type="button" *ngIf="course.Status == 'Open'"
+            class="mt-2 rounded-xl bg-yellow-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-200"
+            (click)="btnOngoingEvent()">
+            Ongoing event
+          </button>
+
+          <!-- Button to change status event - Close -->
+          <button type="button" *ngIf="course.Status == 'Ongoing'"
+            class="mt-2 rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
+            (click)="btnCloseEvent()">
+            Close event
+          </button>
         </div>
-      </div>
-
-      <div class="mt-6  gap-3" *ngIf="course.Status != 'Close'">
-        <h2 class="text-sm font-semibold text-blue-800">Change the status event for</h2>
-        <!-- Button to change status event - Ongoing -->
-        <button type="button" *ngIf="course.Status == 'Open'"
-          class="mt-2 rounded-xl bg-yellow-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-200"
-          (click)="btnOngoingEvent()">
-          Ongoing event
-        </button>
-
-        <!-- Button to change status event - Close -->
-        <button type="button" *ngIf="course.Status == 'Ongoing'"
-          class="mt-2 rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200"
-          (click)="btnCloseEvent()">
-          Close event
-        </button>
       </div>
     </div>
 
     <!-- Participants -->
-    <div class="mt-8" *ngIf="!errorLoadPage">
+    <div class="mt-8" *ngIf="!errorLoadingParticipants">
       <h2 class="text-sm font-semibold text-blue-800 mb-3">Participants</h2>
 
       <!-- Loading -->
@@ -119,14 +104,8 @@
         <div class="h-4 w-2/3 bg-blue-100 rounded"></div>
       </div>
 
-      <!-- Empty badge if don't have any events -->
-      <div *ngIf="!loadingParticipants() && participants().length === 0"
-        class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
-        No participants yet.
-      </div>
-
       <!-- Vertical list of participants -->
-      <div *ngIf="!loadingParticipants() && participants().length > 0" class="flex flex-col">
+      <div *ngIf="!loadingParticipants() && participants().length > 0 else notFoundParticipant" class="flex flex-col">
 
         <div *ngFor="let p of participants()" class="border-b border-blue-200 bg-white p-4 last:border-b-0">
 
@@ -225,10 +204,16 @@
       </div>
     </div>
 
-    <!-- Not found -->
-    <ng-template #notFound>
+    <!-- Not found Event -->
+    <ng-template #notFoundEvent>
       <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
         Event not found.
+      </div>
+    </ng-template>
+    <!-- Not found Participant -->
+    <ng-template #notFoundParticipant>
+      <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+        No participants yet.
       </div>
     </ng-template>
   </div>

@@ -56,7 +56,7 @@
         <div>
           <label for="numberPhone" class="block text-sm font-medium text-blue-900">Phone number</label>
 
-          <div class="mt-1 flex rounded-xl border border-blue-200 overflow-hidden">
+          <div class="mt-1 flex overflow-hidden rounded-xl border border-blue-200 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-400 transition">
             <!-- Indicative / Dial code -->
             <select formControlName="countryCode"
               class="bg-white px-3 py-2 text-blue-900 focus:outline-none border-r border-blue-200">
@@ -67,7 +67,8 @@
 
             <!-- Número -->
             <input id="numberPhone" type="tel" formControlName="numberPhone" required maxlength="20" pattern="[0-9]*"
-              inputmode="numeric" (input)="allowOnlyNumbers($event)" class="w-full px-3 py-2 text-blue-900 focus:outline-none placeholder:text-blue-900/40"
+              inputmode="numeric" (input)="allowOnlyNumbers($event)"
+              class="w-full px-3 py-2 text-blue-900 focus:outline-none placeholder:text-blue-900/40"
               placeholder="912 345 678" />
           </div>
 
@@ -80,24 +81,24 @@
         <div>
           <label for="address" class="block text-sm font-medium text-blue-900">Address</label>
           <input id="address" type="text" formControlName="address" required maxlength="200" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="Street, number, city" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Street, number, city" />
         </div>
 
         <!-- Birthday -->
         <div>
           <label for="birthday" class="block text-sm font-medium text-blue-900">Birthday</label>
           <input id="birthday" type="date" formControlName="birthday" required class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="Street, number, city" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Street, number, city" />
         </div>
 
         <!-- Nationality -->
         <div>
           <label for="nationality" class="block text-sm font-medium text-blue-900">Nationality</label>
           <input id="nationality" type="text" formControlName="nationality" required maxlength="20" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="Street, number, city" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Street, number, city" />
           <p class="mt-1 text-xs text-blue-700/70">
             Maximum 20 characters.
           </p>
@@ -107,8 +108,8 @@
         <div>
           <label for="gender" class="block text-sm font-medium text-blue-900">Gender</label>
           <input id="gender" type="text" formControlName="gender" required maxlength="20" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="Street, number, city" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Street, number, city" />
           <p class="mt-1 text-xs text-blue-700/70">
             Maximum 20 characters.
           </p>
@@ -136,8 +137,8 @@
         <div>
           <label for="password" class="block text-sm font-medium text-blue-900">Password</label>
           <input id="password" type="password" formControlName="password" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••" />
           <p class="mt-1 text-xs text-blue-700/70">
             Minimum 8 characters, including lowercase, uppercase and digit.
           </p>
@@ -147,8 +148,8 @@
         <div>
           <label for="confirmPassword" class="block text-sm font-medium text-blue-900">Confirm password</label>
           <input id="confirmPassword" type="password" formControlName="confirmPassword" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="••••••••" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••" />
           <p *ngIf="passwordForm.get('confirmPassword')?.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched"
             class="mt-1 text-xs text-red-600">
             Passwords do not match.
