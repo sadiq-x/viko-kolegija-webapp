@@ -11,6 +11,7 @@ namespace backend_api.Repositories
         Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t); //Task to update user password
         Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t); //Task to update user 
         Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t); //Task to update user 
+        Task<List<UserGetAllResponseDTO>?> GetUsers(UserGetAllRequestDTO t); //Task to get all users
     }
 
     public class UserRepository : IUserRepository
@@ -41,7 +42,7 @@ namespace backend_api.Repositories
                 .Select(join => new UserLoginResponseDTO
                 {
                     EntityId = join.u.EntityId,
-                    Name= join.u.Entity.Name ,
+                    Name = join.u.Entity.Name,
                     Username = join.u.Username,
                     RoleType = join.r.Type
                 })
@@ -231,6 +232,49 @@ namespace backend_api.Repositories
                 if (result is null) return null;
 
                 return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<UserGetAllResponseDTO>?> GetUsers(UserGetAllRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+
+                var isAdmin = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.EntityId && e.Roles.Type == "Admin");
+
+                if (!isAdmin) return null;
+
+                var users = await dbContext.Users
+                    .AsNoTracking()
+                    .Include(u => u.Entity)
+                    .Select(u => new UserGetAllResponseDTO
+                    {
+                        Id = u.Entity.Id,
+                        Username = u.Username,
+                        Name = u.Entity.Name,
+                        Email = u.Entity.Email,
+                        Image = u.Entity.Image,
+                        NumberPhone = u.Entity.NumberPhone,
+                        Address = u.Entity.Address,
+                        Birthday = u.Entity.Birthday,
+                        Nationality = u.Entity.Nationality,
+                        Gender = u.Entity.Gender,
+                        Role = u.Entity.Roles.Type
+                    })
+                    .ToListAsync();
+
+                if (users == null || users.Count == 0)
+                    return null;
+
+                return users;
             }
             catch (Exception)
             {
