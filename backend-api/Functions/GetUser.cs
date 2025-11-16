@@ -20,7 +20,7 @@ namespace backend_api.Functions
 
         [Function("authGetUser")]
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run(
+        public async Task<HttpResponseData> Run1(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/profile")] HttpRequestData req, FunctionContext executionContext)
         {
             executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
@@ -58,6 +58,61 @@ namespace backend_api.Functions
             var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
             await response.WriteAsJsonAsync(new { user });
             return response; //Return the response, with username and token Jwt Authorization 
+        }
+
+        [Function("getUser")]
+        [Produces("application/json")]
+        public async Task<HttpResponseData> Run2(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/users")] HttpRequestData req, FunctionContext executionContext)
+        {
+            executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
+            var token = userObj as string; //Transform token object into string
+
+            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." }); //Response send with msg
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token);
+
+            var requestDTO = new UserGetAllRequestDTO
+            {
+                EntityId = userId
+            };
+
+            if (requestDTO is null || !requestDTO.IsValid() || requestDTO.EntityId <= 0)
+            {
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Invalid request body.",
+                    Error = requestDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                });
+                return BadRequest;
+            }
+
+            var usersResponse = await _userRepository.GetUsers(requestDTO); //Checking request body with database
+            if (usersResponse is null || usersResponse.Count == 0)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    message = "Users not found."
+                }); //Response a message if the error exist
+                return notFoundResponse;
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                usersResponse
+            });
+            return response; //Return
         }
 
     }

@@ -22,7 +22,7 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/events")] HttpRequestData req)
         {
-            var events = await _eventsRepository.getAllEvents(); //Checking request body with database
+            var events = await _eventsRepository.getEvents();
             if (events is null)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
@@ -63,7 +63,7 @@ namespace backend_api.Functions
 
             var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); //Information of decoded token
 
-            var eventById = new EventListByCreateByIdRequestDTO
+            var eventById = new EventByCreateByIdRequestDTO
             {
                 CreateById = userId
             };
@@ -161,7 +161,7 @@ namespace backend_api.Functions
 
             var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
 
-            var eventsEntityDTO = new EventListByEntityIdRequestDTO
+            var eventsEntityDTO = new EventStudentByEntityIdRequestDTO
             {
                 EntityId = userId
             };
@@ -178,7 +178,7 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var events = await _eventsRepository.getEventsByEntityId(eventsEntityDTO); //Checking request body with database
+            var events = await _eventsRepository.getEventsStudentByEntityId(eventsEntityDTO); //Checking request body with database
             if (events is null)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
@@ -198,5 +198,46 @@ namespace backend_api.Functions
             });
             return response; //Return
         }
+
+        [Function("getEventsByEventId")]
+        [Produces("application/json")]
+        public async Task<HttpResponseData> Run4(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/events/byEventId/{eventId:int}")] HttpRequestData req, int eventId)
+        {
+            var eventDTO = new EventByEventIdRequestDTO { Id = eventId };
+
+            if (eventDTO is null || !eventDTO.IsValid() || eventDTO.Id <= 0)
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                await BadResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Wrong parameters.",
+                    Error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                });
+                return BadResponse;
+            }
+
+            var eventResponse = await _eventsRepository.getEventsByEventId(eventDTO); //Checking request body with database
+            if (eventResponse is null)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    message = "Events not found."
+                }); //Response a message if the error exist
+                return notFoundResponse;
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                eventResponse
+            });
+            return response; //Return
+        }
+
     }
 }

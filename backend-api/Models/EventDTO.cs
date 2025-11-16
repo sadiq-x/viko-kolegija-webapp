@@ -1,7 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace backend_api.Models
-{
+{   
+    //Responses
     //Dto Request to create a Event
     public sealed class EventCreateRequestDTO
     {
@@ -12,7 +13,7 @@ namespace backend_api.Models
         [Required]
         public int TopicsId { get; set; } = default!;
         [Required]
-        public int CreateById { get; set; } = default!;
+        public int? CreateById { get; set; } = default!;
     }
 
     //Dto Response for all Event without any filter
@@ -22,10 +23,10 @@ namespace backend_api.Models
         public string Name { get; init; } = default!;
         public string Description { get; init; } = default!;
         public string TopicName { get; init; } = default!;
-        public int CreateById { get; init; } = default!;
         public string DateCreate { get; init; } = default!;
+        public string DateClose { get; init; } = default!;
         public string Status { get; init; } = default!;
-        public string Grade { get; init; } = default!;
+        public string CreateBy { get; init; } = default!;
     }
 
     //Dto Response for all Event without any filter
@@ -42,7 +43,7 @@ namespace backend_api.Models
         public string Grade { get; init; } = default!;
         public string ParticipantDescription { get; init; } = default!;
     }
-
+    //Requests
     //DTO Request for all Event from a specific Topics
     public sealed class EventListByTopicsRequestDTO
     {
@@ -58,17 +59,10 @@ namespace backend_api.Models
     }
 
     //DTO Request for all Event from a specific CreateById
-    public sealed class EventListByCreateByIdRequestDTO
+    public sealed class EventByCreateByIdRequestDTO
     {
         [Required]
         public int? CreateById { get; set; } = default!;
-    }
-
-    //DTO Request for all Event from a specific Date
-    public sealed class EventListByDateCreateRequestDTO
-    {
-        [Required]
-        public string DateCreate { get; init; } = default!;
     }
     //DTO Request for close a event with a specific id
     public sealed class EventChangeStatusRequestDTO
@@ -80,9 +74,16 @@ namespace backend_api.Models
     }
 
     //DTO Request for all Event from a specific EntityId
-    public sealed class EventListByEntityIdRequestDTO
+    public sealed class EventStudentByEntityIdRequestDTO
     {
         [Required]
         public int? EntityId { get; set; } = default!;
+    }
+
+    //DTO Request for all Event from a specific EntityId
+    public sealed class EventByEventIdRequestDTO
+    {
+        [Required]
+        public int? Id { get; set; } = default!;
     }
 }

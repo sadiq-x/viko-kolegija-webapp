@@ -7,13 +7,15 @@ namespace backend_api.Repositories
 {
     public interface IEventsRepository
     {
-        Task<List<EventListResponseDTO>?> getAllEvents();
-        Task<List<EventListResponseDTO>?> getEventsByCreateById(EventListByCreateByIdRequestDTO t);
-        Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t);
-        Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t);
-        Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t);
-        Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t);
-        Task<List<EventListStudentResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t);
+        Task<List<EventListResponseDTO>?> getEvents(); //Get the list of all events 
+        Task<List<EventListResponseDTO>?> getEventsByCreateById(EventByCreateByIdRequestDTO t); //Get the list of all events with a specific CreateByID
+        Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t); //Get the list of all events with a specific Topic
+        Task<List<EventListStudentResponseDTO>?> getEventsStudentByEntityId(EventStudentByEntityIdRequestDTO t); //Get the list of all events with a specific EntityId
+        Task<EventListResponseDTO?> getEventsByEventId(EventByEventIdRequestDTO t); //Get the list of all events with a specific EventId
+        Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t); //Create event
+        Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t); //Update event with the status Close and set the DateClose
+        Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t); //Update event with the status Ongoing
+
     }
 
     public class EventsRepository : IEventsRepository
@@ -25,7 +27,7 @@ namespace backend_api.Repositories
             _readContextFactory = readContextFactory;
         }
 
-        public async Task<List<EventListResponseDTO>?> getAllEvents()
+        public async Task<List<EventListResponseDTO>?> getEvents()
         {
             try
             {
@@ -39,8 +41,9 @@ namespace backend_api.Repositories
                         Description = x.Description,
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
-                        Status = x.StatusEvents.Type //To change
-
+                        DateClose = x.DateClose!,
+                        Status = x.StatusEvents.Type,
+                        CreateBy = x.Entities.Name
                     }).ToListAsync();
 
                 if (result == null || result.Count == 0) return null;
@@ -53,10 +56,9 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<List<EventListResponseDTO>?> getEventsByCreateById(EventListByCreateByIdRequestDTO t)
+        public async Task<List<EventListResponseDTO>?> getEventsByCreateById(EventByCreateByIdRequestDTO t)
         {
             if (t.CreateById <= 0) return null;
-
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
@@ -70,6 +72,7 @@ namespace backend_api.Repositories
                         Description = x.Description,
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
+                        DateClose = x.DateClose!,
                         Status = x.StatusEvents.Type
                     }).ToListAsync();
 
@@ -83,18 +86,109 @@ namespace backend_api.Repositories
             }
         }
 
+        public async Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t)
+        {
+            if (string.IsNullOrEmpty(t.Topic)) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var result = await dbContext.Events
+                    .AsNoTracking()
+                    .Where(x => x.Topics.Type == t.Topic)
+                    .Select(x => new EventListResponseDTO
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                        TopicName = x.Topics.Type,
+                        DateCreate = x.DateCreate,
+                        DateClose = x.DateClose!,
+                        Status = x.StatusEvents.Type
+                    }).ToListAsync();
+
+                if (result is null || result.Count == 0) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<EventListStudentResponseDTO>?> getEventsStudentByEntityId(EventStudentByEntityIdRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var result = await dbContext.ParticipantsEvents
+                    .AsNoTracking()
+                    .Where(x => x.EntityId == t.EntityId)
+                    .Select(x => new EventListStudentResponseDTO
+                    {
+                        Id = x.Id,
+                        EventId = x.EventId,
+                        Name = x.Event.Name,
+                        Description = x.Event.Description,
+                        TopicName = x.Event.Topics.Type,
+                        DateCreate = x.Event.DateCreate,
+                        DateClose = x.Event.DateClose!,
+                        Status = x.Event.StatusEvents.Type,
+                        Grade = x.Grade!,
+                        ParticipantDescription = x.ParticipantDescription!
+                    }).ToListAsync();
+
+                if (result is null || result.Count == 0) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<EventListResponseDTO?> getEventsByEventId(EventByEventIdRequestDTO t)
+        {
+            if (t.Id <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var result = await dbContext.Events
+                    .AsNoTracking()
+                    .Where(x => x.Id == t.Id)
+                    .Select(x => new EventListResponseDTO
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                        TopicName = x.Topics.Type,
+                        DateCreate = x.DateCreate,
+                        DateClose = x.DateClose!,
+                        Status = x.StatusEvents.Type
+                    }).FirstOrDefaultAsync();
+
+                if (result is null) return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t)
         {
-            //Input validations
             if (string.IsNullOrWhiteSpace(t.Name)) return (false, "Name field empty.");
             if (string.IsNullOrWhiteSpace(t.Description)) return (false, "Description field empty.");
             if (t.TopicsId <= 0) return (false, "TopicId field empty."); ;
-            if (t.CreateById <= 0) return (false, "CreateById field empty."); ;
+            if (t.CreateById <= 0 || t.CreateById is null) return (false, "CreateById field empty."); ;
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
 
-                // Verify if the topicId exist in table Topics
                 var topic = await dbContext.Topics
                 .AsNoTracking()
                 .AnyAsync(x => x.Id == t.TopicsId);
@@ -107,12 +201,12 @@ namespace backend_api.Repositories
                     Name = t.Name.Trim(),
                     Description = t.Description.Trim(),
                     TopicsId = t.TopicsId,
-                    CreateById = t.CreateById,
+                    CreateById = t.CreateById.Value, 
                     DateCreate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                    StatusId = 1 //To change
+                    DateClose = null,
+                    StatusId = 1 
                 };
 
-                //Create the event in database
                 dbContext.Events.Add(eventCreate);
                 await dbContext.SaveChangesAsync();
 
@@ -126,21 +220,21 @@ namespace backend_api.Repositories
 
         public async Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t)
         {
-            //Input validations
             if (t.Id <= 0) return (false, "Id field empty."); ;
             if (t.CreateById <= 0 || t.CreateById is null) return (false, "CreateById field empty.");
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
-                var eventClose = await dbContext.Events
+                var result = await dbContext.Events
                     .SingleOrDefaultAsync(x => x.Id == t.Id && x.CreateById == t.CreateById && x.StatusId == 2);
 
-                if (eventClose is null)
+                if (result is null)
                 {
                     return (false, "Event not found."); ;
                 }
 
-                eventClose.StatusId = 3;
+                result.DateClose = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+                result.StatusId = 3;
 
                 await dbContext.SaveChangesAsync();
 
@@ -180,66 +274,5 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t)
-        {
-            if (string.IsNullOrEmpty(t.Topic)) return null;
-            try
-            {
-                using var dbContext = _readContextFactory.CreateDbContext();
-                var result = await dbContext.Events
-                    .AsNoTracking()
-                    .Where(x => x.Topics.Type == t.Topic)
-                    .Select(x => new EventListResponseDTO
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        Description = x.Description,
-                        TopicName = x.Topics.Type,
-                        DateCreate = x.DateCreate,
-                        Status = x.StatusEvents.Type
-                    }).ToListAsync();
-
-                if (result is null || result.Count == 0) return null;
-
-                return result;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<List<EventListStudentResponseDTO>?> getEventsByEntityId(EventListByEntityIdRequestDTO t)
-        {
-            if (t.EntityId <= 0) return null;
-            try
-            {
-                using var dbContext = _readContextFactory.CreateDbContext();
-                var result = await dbContext.ParticipantsEvents
-                    .AsNoTracking()
-                    .Where(x => x.EntityId == t.EntityId)
-                    .Select(x => new EventListStudentResponseDTO
-                    {
-                        Id = x.Id,
-                        EventId = x.EventId,
-                        Name = x.Event.Name,
-                        Description = x.Event.Description,
-                        TopicName = x.Event.Topics.Type,
-                        DateCreate = x.Event.DateCreate,
-                        DateClose = x.Event.DateClose!,
-                        Status = x.Event.StatusEvents.Type,
-                        Grade = x.Grade!,
-                        ParticipantDescription = x.ParticipantDescription!
-                    }).ToListAsync();
-
-                if (result is null || result.Count == 0) return null;
-
-                return result;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
     }
 }

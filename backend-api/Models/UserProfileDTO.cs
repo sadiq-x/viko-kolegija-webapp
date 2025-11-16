@@ -25,4 +25,24 @@ namespace backend_api.Models
         public string? Nationality { get; init; } = default!;
         public string? Gender { get; init; } = default!;
     }
+
+    public sealed class UserGetAllRequestDTO
+    {
+        [Required]
+        public int? EntityId { get; set; } = default!;
+    }
+    public sealed class UserGetAllResponseDTO
+    {
+        public int Id { get; init; } = default!;
+        public string Username { get; init; } = default!;
+        public string Name { get; init; } = default!;
+        public string Email { get; init; } = default!;
+        public string? Image { get; init; }
+        public string NumberPhone { get; init; } = default!;
+        public string Address { get; init; } = default!;
+        public string? Birthday { get; init; } = default!;
+        public string? Nationality { get; init; } = default!;
+        public string? Gender { get; init; } = default!;
+        public string? Role { get; init; } = default!;
+    }
 }
