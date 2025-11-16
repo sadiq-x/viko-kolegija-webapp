@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { EventListResponse, EventParticipantListResponse } from '../models/modelEvents';
+import { EventListResponse, EventParticipantListResponse, ModelEventsRequest } from '../models/modelEvents';
 import { map, Observable } from 'rxjs';
 
 @Injectable({
@@ -14,6 +14,7 @@ export class EventService {
   private apiUrlGetEventsByTopic = environment.apiUrl + 'get/events/byTopics';
   private apiUrlGetEventByCreatedById = environment.apiUrl + 'get/events/byCreatedById';
   private apiUrlGetEventByEntityId = environment.apiUrl + 'get/events/byEntityId';
+  private apiUrlGetEventByEventId = environment.apiUrl + 'get/events/byEventId/';
   //Create
   private apiUrlCreateEvent = environment.apiUrl + 'create/events';
   //Update
@@ -65,13 +66,19 @@ export class EventService {
       })
     );
   }
+  //Function getEventByEventId will get a Event with a specific EventId
+  getEventByEventId(eventId:number): Observable<EventListResponse | false> {
+    return this.http.get<any>(`${this.apiUrlGetEventByEventId}${eventId}`).pipe(
+      map((response) => { 
+        if (response?.success && response?.eventResponse) {
+          return response.eventResponse;
+        }
+        return false as const;
+      })
+    );
+  }
   //Function getEventById will create new Event
-  createEvent(obj: {
-    Name: string;
-    Description: string;
-    TopicsId: number;
-    CreateById: number;
-  }): Observable<boolean> {
+  createEvent(obj: ModelEventsRequest): Observable<boolean> {
     return this.http.post<any>(this.apiUrlCreateEvent, obj).pipe(
       map((response) => {
         if (!response?.success) {

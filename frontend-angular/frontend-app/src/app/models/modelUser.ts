@@ -31,9 +31,10 @@ export interface ModelUserProfileResponse {
   Nationality: string;
   Gender: string;
 }
-//Model User mini to be used on dashboard page
+//Model User mini to be used on Dashboard Page
 export interface ModelUserMini {
   Name: string;
   Username: string;
   RoleType: string;
 }
+

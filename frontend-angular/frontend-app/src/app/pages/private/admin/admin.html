@@ -1,1 +1,267 @@
-<p>admin works!</p>
+<!-- Admin Page -->
+<div class="min-h-screen bg-gray-50 py-8 px-4 flex justify-center">
+    <div class="w-full max-w-6xl space-y-8">
+        <!-- Header tittle -->
+        <header class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-blue-800">Admin Panel</h1>
+                <p class="text-sm text-gray-700">
+                    Manage students, teachers and courses.
+                </p>
+            </div>
+        </header>
+
+        <!-- ===================== Users ===================== -->
+        <section class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-blue-900">Students</h2>
+                <span class="text-xs text-gray-500">
+                    Total: {{ filteredUsers().length }}
+                </span>
+            </div>
+
+            <div class=" items-center justify-between mb-4">
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Search</label>
+                    <input type="text" [ngModel]="usersQuery()" (ngModelChange)="usersQuery.set($event)"
+                        placeholder="Search by name, username or role ..." class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                   text-gray-900 placeholder:text-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+                            <th class="px-3 py-2">Image</th>
+                            <th class="px-3 py-2">Name</th>
+                            <th class="px-3 py-2">Username</th>
+                            <th class="px-3 py-2">Email</th>
+                            <th class="px-3 py-2">NumberPhone</th>
+                            <th class="px-3 py-2">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let u of filteredUsers(); trackBy: trackByUserId"
+                            class="border-b border-gray-100 hover:bg-blue-50/40">
+                            <!-- Image Column -->
+                            <td class="px-3 py-2">
+                                <img [src]="u.Image || 'default-user-profile.jpg'" alt="{{ u.Name }}'s profile photo"
+                                    class="h-10 w-10 rounded-full border border-gray-300 object-cover" />
+                            </td>
+                            <!-- Name -->
+                            <td class="px-3 py-2 font-medium text-blue-900">
+                                {{ u.Name }}
+                            </td>
+                            <!-- Username -->
+                            <td class="px-3 py-2">
+                                {{ u.Username }}
+                            </td>
+                            <!-- Email -->
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ u.Email }}
+                            </td>
+                            <!-- NumberPhone -->
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ u.NumberPhone }}
+                            </td>
+                            <!-- Role -->
+                            <td class="px-3 py-2">
+                                <select class="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs text-gray-800
+                                focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
+                                    [ngModel]="u.Role" (ngModelChange)="onStudentRoleChange(u, $event)">
+                                    <option *ngFor="let r of limitedRoles" [value]="r">
+                                        {{ r }}
+                                    </option>
+                                </select>
+                            </td>
+                        </tr>
+                        <!-- Not users found -->
+                        <tr *ngIf="users().length === 0">
+                            <td colspan="5" class="px-3 py-4 text-center text-gray-500 text-sm">
+                                No users found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===================== Teachers ===================== -->
+        <section class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-blue-900">Teachers</h2>
+                <span class="text-xs text-gray-500">
+                    Total: {{ filteredTeachers().length }}
+                </span>
+            </div>
+
+            <div class=" items-center justify-between mb-4">
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Search</label>
+                    <input type="text" [ngModel]="teachersQuery()" (ngModelChange)="teachersQuery.set($event)"
+                        placeholder="Search by name, username or role ..." class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                   text-gray-900 placeholder:text-gray-400
+                   focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+                            <th class="px-3 py-2">Image</th>
+                            <th class="px-3 py-2">Name</th>
+                            <th class="px-3 py-2">Username</th>
+                            <th class="px-3 py-2">Email</th>
+                            <th class="px-3 py-2">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let t of filteredTeachers(); trackBy: trackByUserId"
+                            class="border-b border-gray-100 hover:bg-blue-50/40">
+                            <!-- Image Column -->
+                            <td class="px-3 py-2">
+                                <img [src]="t.Image || 'default-user-profile.jpg'" alt="{{ t.Name }}'s profile photo"
+                                    class="h-10 w-10 rounded-full border border-gray-300 object-cover" />
+                            </td>
+                            <td class="px-3 py-2 font-medium text-blue-900">
+                                {{ t.Name }}
+                            </td>
+                            <td class="px-3 py-2">
+                                {{ t.Username }}
+                            </td>
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ t.Email }}
+                            </td>
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ t.Role }}
+                            </td>
+                        </tr>
+                        <!-- Not users found -->
+                        <tr *ngIf="filteredTeachers().length === 0">
+                            <td colspan="5" class="px-3 py-4 text-center text-gray-500 text-sm">
+                                No teachers found.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===================== CURSOS ===================== -->
+        <section class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-blue-900">Courses</h2>
+                <button type="button" (click)="btnResetCourseFilters()" class="rounded-xl border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700
+                 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                    Reset filters
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-blue-50/40 border border-blue-100 rounded-xl p-4">
+                <!-- Name + Description -->
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Search</label>
+                    <input type="text" [ngModel]="courseQuery()" (ngModelChange)="courseQuery.set($event)"
+                        placeholder="Search by name or description..." class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                   text-gray-900 placeholder:text-gray-400
+                   focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400" />
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Status</label>
+                    <select [ngModel]="courseStatusFilter()" (ngModelChange)="courseStatusFilter.set($event)" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                   text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400">
+                        <option value="">All</option>
+                        <option *ngFor="let s of courseStatusOptions()" [value]="s">
+                            {{ s }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Dates -->
+                <div class="flex flex-col gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">From</label>
+                        <input type="date" [ngModel]="courseDateFrom()" (ngModelChange)="courseDateFrom.set($event)"
+                            class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                     text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">To</label>
+                        <input type="date" [ngModel]="courseDateTo()" (ngModelChange)="courseDateTo.set($event)" class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm
+                     text-gray-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="loadingCourses()" class="space-y-2">
+                <div class="h-10 bg-gray-200 rounded-xl animate-pulse"></div>
+                <div class="h-10 bg-gray-200 rounded-xl animate-pulse"></div>
+            </div>
+
+            <!-- Tabela de cursos -->
+            <div *ngIf="!loadingCourses() && filteredCourses().length > 0" class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-700">
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50 text-xs uppercase text-gray-500">
+                            <th class="px-3 py-2">Name</th>
+                            <th class="px-3 py-2">Description</th>
+                            <th class="px-3 py-2">Type</th>
+                            <th class="px-3 py-2">Status</th>
+                            <th class="px-3 py-2">Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of filteredCourses(); trackBy: trackByCourseId"
+                            class="border-b border-gray-100 hover:bg-blue-50/40">
+                            <td class="px-3 py-2 font-medium text-blue-900">
+                                {{ c.Name }}
+                            </td>
+                            <td class="px-3 py-2 max-w-md truncate" [title]="c.Description">
+                                {{ c.Description }}
+                            </td>
+                            <td class="px-3 py-2 text-xs">
+                                {{ c.TopicName || '—' }}
+                            </td>
+                            <td class="px-3 py-2">
+                                <span
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border"
+                                    [ngClass]="
+                    c.Status === 'Open'
+                      ? 'bg-green-100 text-green-700 border-green-200'
+                      : c.Status === 'Ongoing'
+                      ? 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                      : 'bg-red-100 text-red-700 border-red-200'
+                  ">
+                                    {{ c.Status }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-2 text-xs text-gray-500">
+                                {{ c.DateCreate | date: 'mediumDate' }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sem cursos -->
+            <div *ngIf="!loadingCourses() && filteredCourses().length === 0"
+                class="rounded-2xl border border-gray-200 bg-white p-6 text-center text-gray-600">
+                No courses match the selected filters.
+            </div>
+            <!-- Not found Courses -->
+            <ng-template #notFoundCourses>
+                <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                    No courses match the selected filters.
+                </div>
+            </ng-template>
+        </section>
+
+    </div>
+</div>

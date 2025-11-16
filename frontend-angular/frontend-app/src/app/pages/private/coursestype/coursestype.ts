@@ -40,7 +40,7 @@ export class CoursesType {
               Name: p.Name ?? p.name,
               Description: p.Description ?? p.description,
               TopicName: p.TopicName ?? p.topicName,
-              CreateById: p.CreateById ?? p.createById,
+              CreateBy: p.CreateBy ?? p.createBy,
               DateCreate: p.DateCreate ?? p.dateCreate,
               DateClose: p.DateClose ?? p.dateClose,
               Status: p.Status ?? p.status,

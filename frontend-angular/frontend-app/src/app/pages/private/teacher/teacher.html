@@ -11,16 +11,14 @@
         <div>
           <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
           <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
-                        placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                        focus:ring-blue-200 focus:border-blue-400" placeholder="Course title" />
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Course title" />
         </div>
 
         <!-- Description -->
         <div>
           <label for="description" class="block text-sm font-medium text-blue-900">Description</label>
           <textarea id="description" formControlName="description" rows="5" maxlength="2000" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                           placeholder:text-blue-900/40 focus:outline-none focus:ring-4
-                           focus:ring-blue-200 focus:border-blue-400"
+                           placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Explain what students will learn..."></textarea>
         </div>
 
@@ -28,7 +26,7 @@
         <div>
           <label for="topicId" class="block text-sm font-medium text-blue-900">Topic</label>
           <select id="topicId" formControlName="topicId" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-                         focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400">
+                         focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option [ngValue]="null" disabled>Choose a topic</option>
             <option *ngFor="let t of topics()" [ngValue]="t.Id">{{ t.Type }}</option>
           </select>
@@ -64,11 +62,11 @@
 
       <ng-template #listTpl>
         <ul class="space-y-3">
-          <li *ngFor="let c of myCourses()">
+          <li *ngFor="let c of myCourses()" class="group">
             <a class="block rounded-xl border border-gray-200 p-3 hover:bg-blue-50 transition cursor-pointer hover:border-blue-500"
               [routerLink]="['/teacher/event', c.Id]" [state]="{ course: c }">
               <div class="flex items-center justify-between">
-                <p class="font-semibold text-blue-800">{{ c.Name }}</p>
+                <p class="font-semibold text-gray-900 group-hover:text-blue-600">{{ c.Name }}</p>
                 <span class="text-xs" [ngClass]="{
                     'text-green-700': c.Status === 'Open',
                     'text-yellow-700': c.Status === 'Ongoing',
@@ -77,11 +75,11 @@
                 </span>
               </div>
 
-              <p class="text-sm text-blue-700/70 mt-1 line-clamp-2">
+              <p class="text-sm text-gray-700 mt-1 line-clamp-2">
                 {{ c.Description }}
               </p>
 
-              <div class="text-xs text-blue-700/70 mt-2 flex flex-wrap gap-3">
+              <div class="text-xs text-gray-600 mt-2 flex flex-wrap gap-3">
                 <span *ngIf="c.TopicName"><strong>Topic:</strong> {{ c.TopicName }}</span>
                 <span><strong>Created:</strong> {{ c.DateCreate | date:'medium' }}</span>
                 <span *ngIf="c.DateClose"><strong>Closed:</strong> {{ c.DateClose | date:'medium' }}</span>

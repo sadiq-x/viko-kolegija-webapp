@@ -36,22 +36,18 @@
                     </span>
                 </div>
 
-                <!-- No courses View -->
-                <div *ngIf="enrolled().length === 0" class="text-blue-700/70 text-sm">
-                    You not yet enrolled in any courses.
-                </div>
 
                 <!-- List courses -->
-                <ul *ngIf="enrolled().length > 0" class="flex flex-col rounded-2xl">
+                <ul *ngIf="enrolled().length > 0 else notFoundEnrolledCourses" class="flex flex-col rounded-2xl">
                     <li *ngFor="let c of enrolled(); trackBy: trackById"
-                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1"
+                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1 group"
                         [routerLink]="['/courses/individual', c.EventId]" [state]="{ event: c }">
                         <div class="flex items-start justify-between">
                             <div class="pr-3">
-                                <p class="font-semibold text-blue-900 group-hover:text-blue-600">{{ c.Name }}</p>
-                                <div class="mt-2 text-xs text-blue-700/70 flex gap-3 flex-wrap">
+                                <p class="font-semibold text-gray-900 group-hover:text-blue-600">{{ c.Name }}</p>
+                                <div class="mt-2 text-xs text-gray-600 flex gap-3 flex-wrap">
                                     <span *ngIf="c.TopicName"><strong>Type:</strong> {{ c.TopicName }}</span>
-                                    <span *ngIf="c.DateCreate"><strong>Start:</strong> {{ c.DateClose |
+                                    <span *ngIf="c.DateCreate"><strong>Start:</strong> {{ c.DateCreate |
                                         date:'mediumDate' }}
                                     </span>
                                 </div>
@@ -81,20 +77,15 @@
                     </span>
                 </div>
 
-                <!-- No courses View -->
-                <div *ngIf="completed().length === 0" class="text-blue-700/70 text-sm">
-                    You haven't completed any courses yet.
-                </div>
-
                 <!-- List Courses -->
-                <ul *ngIf="completed().length > 0" class="flex flex-col rounded-2xl">
+                <ul *ngIf="completed().length > 0 else notFoundCompletedCourses" class="flex flex-col rounded-2xl">
                     <li *ngFor="let c of completed(); trackBy: trackById"
-                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1"
+                        class="p-4 cursor-pointer divide-gray-200 rounded-2xl hover:border hover:border-gray-200 bg-white hover:bg-blue-50 hover:shadow-md mb-1 group"
                         [routerLink]="['/courses/individual', c.EventId]" [state]="{ event: c }">
                         <div class="flex items-start justify-between">
                             <div class="pr-3">
-                                <p class="font-semibold text-blue-900 group-hover:text-blue-600">{{ c.Name }}</p>
-                                <div class="mt-2 text-xs text-blue-700/70 flex gap-3 flex-wrap">
+                                <p class="font-semibold text-gray-900 group-hover:text-blue-600">{{ c.Name }}</p>
+                                <div class="mt-2 text-xs text-gray-600 flex gap-3 flex-wrap">
                                     <span *ngIf="c.TopicName"><strong>Type:</strong> {{ c.TopicName }}</span>
                                     <span *ngIf="c.DateCreate"><strong>Date:</strong>
                                         {{ c.DateCreate | date:'mediumDate' }} - {{ c.DateClose | date:'mediumDate' }}
@@ -114,5 +105,17 @@
             </div>
 
         </section>
+        <!-- Not found Enrolled Courses -->
+        <ng-template #notFoundEnrolledCourses>
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                You not yet enrolled in any courses.
+            </div>
+        </ng-template>
+        <!-- Not found Completed Courses -->
+        <ng-template #notFoundCompletedCourses>
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                You haven't completed any courses yet.
+            </div>
+        </ng-template>
     </div>
 </div>

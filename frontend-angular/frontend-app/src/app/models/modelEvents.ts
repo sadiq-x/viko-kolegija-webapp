@@ -1,7 +1,6 @@
 export interface ModelEventsRequest {
   Name: string;
   Description: string;
-  CreateById: number;
   TopicsId: number;
 }
 
@@ -10,7 +9,7 @@ export interface EventListResponse {
   Name: string;
   Description: string;
   TopicName: string;
-  CreateById: number;
+  CreateBy: number;
   DateCreate: string;
   DateClose: string | null;
   Status: string;
