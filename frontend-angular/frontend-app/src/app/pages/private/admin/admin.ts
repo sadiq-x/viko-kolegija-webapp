@@ -1,11 +1,15 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, signal, TrackByFunction } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../../../services/users';
 import { ModelEntities } from '../../../models/modelEntity';
 import { TeacherService } from '../../../services/teacher';
 import { RolesTypes } from '../../../data/roles';
 import { EventService } from '../../../services/events';
+import { RouterLink } from '@angular/router';
+import { TopicsService } from '../../../services/topics';
+import { ModelTopicsResponse } from '../../../models/modelTopics';
+import { RolesService } from '../../../services/roles';
 
 interface AdminUsers {
   Id: number;
@@ -28,23 +32,34 @@ interface AdminCourse {
   DateClose: string;
 }
 
+interface AdminTopics {
+  Id: number;
+  Type: string;
+  Description: string;
+}
+
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, RouterLink, ReactiveFormsModule],
   templateUrl: './admin.html',
   styleUrl: './admin.scss',
 })
 export class Admin {
   user = signal<ModelEntities[]>([]); //Users information
 
-  limitedRoles: RolesTypes[] = [RolesTypes.User, RolesTypes.Unauthorized]; //List with limited roles for Users and Unauthorized's
+  typesRoles: RolesTypes[] = [
+    RolesTypes.User,
+    RolesTypes.Unauthorized,
+    RolesTypes.Teacher,
+    RolesTypes.Admin,
+  ]; //List with limited roles for Users and Unauthorized's
 
-  loadingCourses = signal<boolean>(false);
+  loadingCourses = signal<boolean>(false); //Boolean variable to load view "loading"
 
   private allUsers = signal<ModelEntities[]>([]); //List of all users
   private allCourses = signal<AdminCourse[]>([]); //List of all courses
-
+  private allTopics = signal<ModelTopicsResponse[]>([]); //List of all topics
   //Consume the signal allUsers, and return all Users and Unauthorized's
   users = computed<AdminUsers[]>(() => {
     const list = this.allUsers() ?? [];
@@ -52,23 +67,37 @@ export class Admin {
   });
   //Consume the signal allUsers, and return all Teachers
   teachers = computed<AdminUsers[]>(() => {
-    return this.allUsers().filter((u) => u.Role === RolesTypes.Teacher);
+    return this.allUsers().filter(
+      (u) => u.Role === RolesTypes.Teacher || u.Role === RolesTypes.Admin
+    );
   });
 
   usersQuery = signal<string>(''); //Search query Name + Username + Role
-  //! TODO
   teachersQuery = signal<string>(''); //Search query Name + Username + Status
-
+  topicsQuery = signal<string>(''); //Search query Type + Description
   courseQuery = signal<string>(''); //Search Name + Description + Status + Date
-  courseStatusFilter = signal<string>(''); // Open / Ongoing / Close
+
+  courseStatusFilter = signal<string>(''); //All status of courses
+  typesFilter = signal<string>(''); //All types of courses
   courseDateFrom = signal<string>(''); // yyyy-MM-dd
   courseDateTo = signal<string>(''); // yyyy-MM-dd
 
-  constructor(private userService: UserService, private eventService: EventService) {}
+  newTopic = {
+    Type: '',
+    Description: '',
+  };
+
+  constructor(
+    private userService: UserService,
+    private eventService: EventService,
+    private topicService: TopicsService,
+    private roleService: RolesService
+  ) {}
 
   ngOnInit(): void {
     this.getUsers();
     this.getCourses();
+    this.getTopics();
   }
 
   //Get the all users from backend
@@ -112,23 +141,47 @@ export class Admin {
         }
 
         if (Array.isArray(res)) {
-          this.allCourses.set(
-            res.map((x: any) => ({
-              Id: x.Id ?? x.id,
-              Name: x.Name ?? x.name,
-              Description: x.Description ?? x.description,
-              TopicName: x.TopicName ?? x.topicName,
-              CreateBy: x.CreateBy ?? x.createBy,
-              Status: x.Status ?? x.status,
-              DateCreate: x.DateCreate ?? x.dateCreate,
-              DateClose: x.DateClose ?? x.dateClose,
-            }))
-          );
+          const mapped = res.map((x: any) => ({
+            Id: x.Id ?? x.id,
+            Name: x.Name ?? x.name,
+            Description: x.Description ?? x.description,
+            TopicName: x.TopicName ?? x.topicName,
+            CreateBy: x.CreateBy ?? x.createBy,
+            Status: x.Status ?? x.status,
+            DateCreate: x.DateCreate ?? x.dateCreate,
+            DateClose: x.DateClose ?? x.dateClose,
+          }));
+
+          mapped.sort((a, b) => {
+            const da = new Date(a.DateCreate).getTime();
+            const db = new Date(b.DateCreate).getTime();
+            return db - da;
+          });
+
+          this.allCourses.set(mapped);
         }
       },
     });
   }
-  //Filter to filter all users User/Unauthorized by name + username + role
+  //Get the all topics from backend
+  private getTopics() {
+    this.topicService.getTopics().subscribe({
+      next: (res) => {
+        if (Array.isArray(res) && res) {
+          this.allTopics.set(
+            res.map((x: any) => ({
+              Id: x.Id ?? x.id,
+              Type: x.Type ?? x.type,
+              Description: x.Description ?? x.description,
+            }))
+          );
+        } else {
+          this.allTopics.set([]);
+        }
+      },
+    });
+  }
+  //Function to filtered all users with or without filters
   filteredUsers = computed<AdminUsers[]>(() => {
     const list = this.users() ?? [];
     const q = this.normalize(this.usersQuery().trim());
@@ -137,14 +190,16 @@ export class Admin {
       if (q) {
         const name = this.normalize(c.Name ?? '');
         const username = this.normalize(c.Username ?? '');
+        const email = this.normalize(c.Email ?? '');
         const role = this.normalize(c.Role ?? '');
-        if (!name.includes(q) && !username.includes(q) && !role.includes(q)) return false;
+        if (!name.includes(q) && !username.includes(q) && !email.includes(q) && !role.includes(q))
+          return false;
       }
 
       return true;
     });
   });
-  //Filter to filter all teachers by name + username
+  //Function to filtered all teachers with or without filters
   filteredTeachers = computed<AdminUsers[]>(() => {
     const list = this.teachers() ?? [];
     const q = this.normalize(this.teachersQuery().trim());
@@ -153,12 +208,65 @@ export class Admin {
       if (q) {
         const name = this.normalize(c.Name ?? '');
         const username = this.normalize(c.Username ?? '');
-        if (!name.includes(q) && !username.includes(q)) return false;
+        const email = this.normalize(c.Email ?? '');
+        if (!name.includes(q) && !username.includes(q) && !email.includes(q)) return false;
       }
 
       return true;
     });
   });
+  //Function to filtered all courses with or without filters
+  filteredCourses = computed<AdminCourse[]>(() => {
+    const list = this.allCourses() ?? [];
+    const q = this.normalize(this.courseQuery().trim());
+    const status = this.courseStatusFilter();
+    const types = this.typesFilter();
+    const from = this.courseDateFrom();
+    const to = this.courseDateTo();
+
+    return list.filter((c) => {
+      if (q) {
+        const name = this.normalize(c.Name ?? '');
+        const description = this.normalize(c.Description ?? '');
+        if (!name.includes(q) && !description.includes(q)) return false;
+      }
+
+      if (types && c.TopicName !== types) return false;
+
+      if (status && c.Status !== status) return false;
+
+      const courseDate = new Date(c.DateCreate);
+
+      if (from) {
+        const dFrom = new Date(from);
+        if (courseDate < dFrom) return false;
+      }
+
+      if (to) {
+        const dTo = new Date(to);
+        dTo.setHours(23, 59, 59, 999);
+        if (courseDate > dTo) return false;
+      }
+
+      return true;
+    });
+  });
+  //Function to filtered all topics with or without filters
+  filteredTopics = computed<AdminTopics[]>(() => {
+    const list = this.allTopics() ?? [];
+    const q = this.normalize(this.topicsQuery().trim());
+
+    return list.filter((c) => {
+      if (q) {
+        const type = this.normalize(c.Type ?? '');
+        const description = this.normalize(c.Description ?? '');
+        if (!type.includes(q) && !description.includes(q)) return false;
+      }
+
+      return true;
+    });
+  });
+
   //List of all status of the list course
   courseStatusOptions = computed<string[]>(() => {
     const list = this.allCourses() ?? [];
@@ -172,78 +280,63 @@ export class Admin {
 
     return Array.from(set).sort(); // opcional: ordena alfabeticamente
   });
+  //List of all types of the list course
+  typesOptions = computed<string[]>(() => {
+    const list = this.allCourses() ?? [];
+    const set = new Set<string>();
+
+    list.forEach((c) => {
+      if (c.TopicName) {
+        set.add(c.TopicName);
+      }
+    });
+
+    return Array.from(set).sort(); // opcional: ordena alfabeticamente
+  });
   trackByUserId: TrackByFunction<AdminUsers> = (_, item) => item.Id;
   trackByCourseId: TrackByFunction<AdminCourse> = (_, item) => item.Id;
+  //Function to normalize strings
   private normalize(str: string): string {
     return str
       .normalize('NFD')
       .replace(/\p{Diacritic}/gu, '')
       .toLowerCase();
   }
-  //To check
-  //? read everything below
-
-  // ------- Students-Unauthorized / Teachers -------
-
-  // troca de role vinda do <select> na tabela de estudantes
-  onStudentRoleChange(user: AdminUsers, newRole: string) {
-    console.log(user);
-    console.log(newRole);
+  //Function to change role of specific user
+  onRoleChange(user: AdminUsers, newRole: string) {
     const role = newRole as RolesTypes;
 
-    this.allUsers.update((list) =>
-      list.map((u) =>
-        u.Id === user.Id
-          ? {
-              ...u,
-              Role: role,
-            }
-          : u
-      )
-    );
+    const obj = {
+      Id: user.Id,
+      Email: user.Email,
+      Type: role,
+    };
 
-    // aqui, no futuro:
-    // this.adminService.updateUserRole(user.Id, role).subscribe(...)
-  }
+    if (!obj.Id || !obj.Email || !obj.Type) {
+      return;
+    }
 
-  filteredCourses = computed<AdminCourse[]>(() => {
-    const list = this.allCourses() ?? [];
-    const q = this.normalize(this.courseQuery().trim());
-    const status = this.courseStatusFilter();
-    const from = this.courseDateFrom();
-    const to = this.courseDateTo();
-
-    return list.filter((c) => {
-      // 1) filtro por texto (Name + Description)
-      if (q) {
-        const name = this.normalize(c.Name ?? '');
-        const desc = this.normalize(c.Description ?? '');
-        if (!name.includes(q) && !desc.includes(q)) return false;
-      }
-
-      // 2) filtro por status
-      if (status && c.Status !== status) return false;
-
-      // 3) filtro por datas (string ISO → Date)
-      const courseDate = new Date(c.DateCreate);
-
-      if (from) {
-        const dFrom = new Date(from);
-        if (courseDate < dFrom) return false;
-      }
-
-      if (to) {
-        const dTo = new Date(to);
-        dTo.setHours(23, 59, 59, 999); // incluir o dia final
-        if (courseDate > dTo) return false;
-      }
-
-      return true;
+    this.roleService.updateParticipantStatus(obj).subscribe({
+      next: (res) => {
+        console.log(res)
+        if (!res) {
+          alert('User role change successful.');
+          return;
+        }
+        //? Check this
+        this.allUsers.update((list) =>
+          list.map((u) =>
+            u.Id === user.Id
+              ? {
+                  ...u,
+                  Role: role,
+                }
+              : u
+          )
+        );
+      },
     });
-  });
-
-  
-
+  }
   //Button to reset all filters of courses
   btnResetCourseFilters() {
     this.courseQuery.set('');
@@ -251,4 +344,43 @@ export class Admin {
     this.courseDateFrom.set('');
     this.courseDateTo.set('');
   }
+  //Button to delete a specific topic
+  btnDeleteTopic(topic: { Id: number; Type: string; Description: string }) {
+    if (!confirm(`Are you sure you want to delete the topic "${topic.Type}"?`)) {
+      return;
+    }
+
+    this.topicService.deleteTopics(topic).subscribe({
+      next: (res) => {
+        if (!res) {
+          alert('Topic impossible to delete.');
+        }
+        this.allTopics.update((list) => list.filter((t) => t.Id !== topic.Id));
+        alert('Topic deleted successful.');
+        return;
+      },
+    });
+  }
+  //Function to create new topics
+  createTopic() {
+    if (!this.newTopic.Description || !this.newTopic.Type) {
+      alert('Fill the fields.');
+      return;
+    }
+
+    this.topicService.insertTopics(this.newTopic).subscribe({
+      next: (res) => {
+        if (!res) {
+          alert('Topic not created.');
+          return;
+        }
+        alert('Topic created successfully.');
+        this.getTopics();
+        this.newTopic = { Type: '', Description: '' };
+      },
+    });
+  }
+  //Helper
+  //? Check this
+  trackByTopicId = (_: number, topic: any) => topic.Id;
 }

@@ -96,6 +96,7 @@ export class CoursesList {
         const name = this.normalize(c.Name ?? '');
         const desc = this.normalize(c.Description ?? '');
         const topic = this.normalize(c.TopicName ?? '');
+        const createBy = this.normalize(c.CreateBy ?? '');
 
         //DateCreate always come with string ISO: "2025-10-22T15:26:29.700Z"
         const rawDate = c.DateCreate ?? '';
@@ -103,7 +104,7 @@ export class CoursesList {
         const normalizedDate = this.normalize(dateOnly);
 
         const matchesText =
-          name.includes(q) || desc.includes(q) || topic.includes(q) || normalizedDate.includes(q);
+          name.includes(q) || desc.includes(q) || topic.includes(q) || normalizedDate.includes(q) || createBy.includes(q);
 
         if (!matchesText) return false;
       }

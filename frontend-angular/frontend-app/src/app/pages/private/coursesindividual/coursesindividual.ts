@@ -53,6 +53,7 @@ export class CoursesIndividual {
 
     this.getEvent();
     this.loginType = this.authService.getRole();
+    
   }
 
   //Get the event from backend, from specific eventId
@@ -80,7 +81,6 @@ export class CoursesIndividual {
             Status: x.Status ?? x.status,
           },
         ]);
-
         this.loadingCourse.set(false);
         this.getParticipant();
       },
@@ -90,7 +90,6 @@ export class CoursesIndividual {
   private getParticipant() {
     this.participantsService.getParticipantsIndividualEvent_user(this.eventId).subscribe({
       next: (res) => {
-        console.log(res)
         if (!res) {
           this.participant.set([]);
           this.participantEventStatus = false;
