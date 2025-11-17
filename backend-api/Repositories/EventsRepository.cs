@@ -158,6 +158,7 @@ namespace backend_api.Repositories
                 var result = await dbContext.Events
                     .AsNoTracking()
                     .Where(x => x.Id == t.Id)
+
                     .Select(x => new EventListResponseDTO
                     {
                         Id = x.Id,
@@ -166,6 +167,7 @@ namespace backend_api.Repositories
                         TopicName = x.Topics.Type,
                         DateCreate = x.DateCreate,
                         DateClose = x.DateClose!,
+                        CreateBy = x.Entities.Name,
                         Status = x.StatusEvents.Type
                     }).FirstOrDefaultAsync();
 
