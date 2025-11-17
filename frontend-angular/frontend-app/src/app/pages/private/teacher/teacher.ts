@@ -38,11 +38,11 @@ export class Teacher implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTopics();
+    this.getTopics();
     this.loadMyCourses();
   }
-  //Load all existing topics
-  private loadTopics() {
+  //Get the all topics from backend
+  private getTopics() {
     this.loading.set(true);
     this.topicService.getTopics().subscribe({
       next: (res) => {

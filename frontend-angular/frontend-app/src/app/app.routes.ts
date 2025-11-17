@@ -18,6 +18,8 @@ import { CoursesType } from './pages/private/coursestype/coursestype';
 import { CoursesIndividual } from './pages/private/coursesindividual/coursesindividual';
 import { RegisterProfile } from './pages/registerprofile/registerprofile';
 import { Help } from './pages/private/help/help';
+import { AdminEvents } from './pages/private/admin-events/admin-events';
+import { AdminCreateEvents } from './pages/private/admin-create-events/admin-create-events';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -78,7 +80,6 @@ export const routes: Routes = [
         component: Teacher,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Teacher] },
-        children: [], //This define who can access
       },
       {
         path: 'teacher/event/:id',
@@ -89,6 +90,18 @@ export const routes: Routes = [
       {
         path: 'admin',
         component: Admin,
+        canActivate: [RoleGuard],
+        data: { roles: [Roles.Admin] }, //This define who can access
+      },
+      {
+        path: 'admin/event/:id',
+        component: AdminEvents,
+        canActivate: [RoleGuard],
+        data: { roles: [Roles.Admin] }, //This define who can access
+      },
+      {
+        path: 'admin/create/course',
+        component: AdminCreateEvents,
         canActivate: [RoleGuard],
         data: { roles: [Roles.Admin] }, //This define who can access
       },

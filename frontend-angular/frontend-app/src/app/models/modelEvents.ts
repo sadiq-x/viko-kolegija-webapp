@@ -9,7 +9,7 @@ export interface EventListResponse {
   Name: string;
   Description: string;
   TopicName: string;
-  CreateBy: number;
+  CreateBy: string;
   DateCreate: string;
   DateClose: string | null;
   Status: string;

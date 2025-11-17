@@ -1,0 +1,68 @@
+<!-- Admin Create Course Page -->
+<div class="min-h-screen bg-gray-50 flex justify-center py-10 px-4">
+  <div class="w-full max-w-6xl space-y-8">
+    <!-- Create Event -->
+    <div class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+      <h1 class="text-xl font-bold text-blue-800">Create Course / Event</h1>
+      <p class="text-sm text-blue-700/70 mb-4">Fill the fields to publish a new course.</p>
+
+      <form [formGroup]="form" (ngSubmit)="onCreateCourse()" class="space-y-4" novalidate>
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-blue-900">Name</label>
+          <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900 
+                        placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Course title" />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-blue-900">Description</label>
+          <textarea id="description" formControlName="description" rows="5" maxlength="2000" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                           placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Explain what students will learn..."></textarea>
+        </div>
+
+        <!-- Topic -->
+        <div>
+          <label for="topicId" class="block text-sm font-medium text-blue-900">Topic</label>
+          <select id="topicId" formControlName="topicId" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                         focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option [ngValue]="null" disabled>Choose a topic</option>
+            <option *ngFor="let t of topics()" [ngValue]="t.Id">{{ t.Type }}</option>
+          </select>
+        </div>
+
+        <!-- Teacher - This need to be checked --> 
+        <div>
+          <label for="teacher" class="block text-sm font-medium text-blue-900">Teacher</label>
+
+          <!-- Elemento de seleção pesquisa+input -->
+          <input id="teacher" list="teachersList" [ngModel]="selectedTeacherName"
+            (ngModelChange)="onTeacherSelect($event)" placeholder="Choose a teacher..." class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+          <!-- Datalist com opções -->
+          <datalist id="teachersList">
+            <option *ngFor="let t of teachers()" [value]="t.Name"></option>
+          </datalist>
+        </div>
+
+        <!-- Hidden / default metadata (just information) -->
+        <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+          <ul class="list-disc ml-5 space-y-1">
+            <li><strong>Status:</strong> Open by default.</li>
+            <li><strong>Date create:</strong> Set automatically on submit</li>
+          </ul>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" [disabled]="submitDisabled" class="w-full rounded-xl bg-blue-600/90 px-4 py-2.5 font-semibold text-white shadow-lg
+                       hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-200
+                       active:translate-y-[1px] transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Create course
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
