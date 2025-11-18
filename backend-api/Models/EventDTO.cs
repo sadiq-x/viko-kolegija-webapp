@@ -28,7 +28,24 @@ namespace backend_api.Models
         [Required]
         public int? AdminId { get; set; } = default!;
     }
-
+    //Dto Request for Admin to edit a full Event
+    public sealed class EventEditAdminRequestDTO
+    {
+        [Required]
+        public int Id { get; set; } = default!;
+        [Required]
+        public string Name { get; set; } = default!;
+        [Required]
+        public string Description { get; set; } = default!;
+        [Required]
+        public string Type { get; set; } = default!;
+        [Required]
+        public string CreateBy { get; set; } = default!;
+        [Required]
+        public string DateCreate { get; set; } = default!;
+        [Required]
+        public int? AdminId { get; set; } = default!;
+    }
     //Dto Response for all Event without any filter
     public sealed class EventListResponseDTO
     {

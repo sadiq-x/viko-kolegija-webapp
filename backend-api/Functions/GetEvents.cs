@@ -8,11 +8,11 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace backend_api.Functions
 {
-    public class GetCoursesFunction
+    public class GetEvents
     {
         public readonly IEventsRepository _eventsRepository;
 
-        public GetCoursesFunction(IEventsRepository eventsRepository)
+        public GetEvents(IEventsRepository eventsRepository)
         {
             _eventsRepository = eventsRepository;
         }
