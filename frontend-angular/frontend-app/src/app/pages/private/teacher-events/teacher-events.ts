@@ -28,7 +28,6 @@ export class TeacherEvents {
   editParticipants: FormGroup;
 
   private eventId: number = 0;
-  private coursePassed: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,10 +50,10 @@ export class TeacherEvents {
   }
 
   ngOnInit(): void {
-    this.eventId = Number(this.route.snapshot.paramMap.get('id'));
-    this.coursePassed = history.state?.['course'];
+    this.eventId = Number(this.route.snapshot.paramMap.get('id')) || 0;
+    const coursePassed = history.state?.['course'];
 
-    if (!this.coursePassed && this.coursePassed.Id != this.eventId) {
+    if (!coursePassed || (coursePassed.Id ?? coursePassed.id) !== this.eventId) {
       return;
     }
 
@@ -118,19 +117,18 @@ export class TeacherEvents {
   }
   //Button to save the grade and comments of individual student in backend
   btnSaveEdit() {
-    const obj = {
+    const payload = {
       Id: this.editingId()!,
       EventId: this.eventId,
       Grade: this.editParticipants.value.grade.toString(),
       Comments: this.editParticipants.value.comments,
     };
 
-    if (!obj.Grade) {
+    if (!payload.Grade) {
       alert('You need to insert grade of student');
     }
 
-    //Request to backend
-    this.participantsService.insertParticipantGrade(obj).subscribe({
+    this.participantsService.insertParticipantGrade(payload).subscribe({
       next: (res) => {
         if (res) {
           alert('Participant grade update');
@@ -160,13 +158,13 @@ export class TeacherEvents {
   //Button to inactive student from a event
   btnInactive(p: any) {
     console.log(p);
-    const obj = {
+    const payload = {
       Id: p.Id,
       EventId: this.eventId,
       EntityId: p.EntityId,
     };
 
-    this.participantsService.updateParticipantStatus(obj).subscribe({
+    this.participantsService.updateParticipantStatus(payload).subscribe({
       next: (res) => {
         if (res) {
           alert('Participant status inactive');
@@ -209,9 +207,9 @@ export class TeacherEvents {
       return;
     }
 
-    const obj = { Id: this.eventId };
+    const payload = { Id: this.eventId };
 
-    this.eventService.updateEventStatusClose(obj).subscribe({
+    this.eventService.updateEventStatusClose(payload).subscribe({
       next: (res) => {
         if (res) {
           this.course.update((list) =>
@@ -223,13 +221,9 @@ export class TeacherEvents {
   }
   //Button to change status event - Ongoing status
   btnOngoingEvent() {
-    const participantStatus = this.participants()
-      .filter((p) => p.Status == true)
-      .map((p) => p.Status);
-
     const courseStatus = this.course().filter((e) => e.Status === 'Open');
 
-    const obj = {
+    const payload = {
       Id: this.eventId,
     };
 
@@ -238,7 +232,7 @@ export class TeacherEvents {
       return;
     }
 
-    this.eventService.updateEventStatusOngoing(obj).subscribe({
+    this.eventService.updateEventStatusOngoing(payload).subscribe({
       next: (res) => {
         if (res) {
           this.course.update((list) =>

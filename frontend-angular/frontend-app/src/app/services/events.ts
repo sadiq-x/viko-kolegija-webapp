@@ -25,6 +25,7 @@ export class EventService {
   //Update
   private apiUrlUpdateEventStatusClose = environment.apiUrl + 'update/event/close';
   private apiUrlUpdateEventStatusOngoing = environment.apiUrl + 'update/event/ongoing';
+  private apiUrlUpdateEvent_admin = environment.apiUrl + 'update/event';
 
   constructor(private http: HttpClient) {}
   //Function getEvents will get all Events
@@ -124,6 +125,25 @@ export class EventService {
   //Function updateEventStatusOngoing will set status Ongoing in a Event with a specific Id and CreateById
   updateEventStatusOngoing(obj: { Id: number }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateEventStatusOngoing, obj).pipe(
+      map((response) => {
+        console.log(response);
+        if (response?.success) {
+          return true as const;
+        }
+        return false as const;
+      })
+    );
+  }
+  //Function updateEvent_admin will update a full event from admin
+  updateEvent_admin(obj: {
+    Id: number;
+    Name: string;
+    Description: string;
+    Type: string;
+    CreateBy: string;
+    DateCreate: string;
+  }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlUpdateEvent_admin, obj).pipe(
       map((response) => {
         console.log(response);
         if (response?.success) {
