@@ -33,19 +33,23 @@
           </select>
         </div>
 
-        <!-- Teacher - This need to be checked --> 
+        <!-- Teacher -->
         <div>
-          <label for="teacher" class="block text-sm font-medium text-blue-900">Teacher</label>
+          <label for="teacherSelect" class="block text-sm font-medium text-blue-900">Teacher</label>
 
-          <!-- Elemento de seleção pesquisa+input -->
-          <input id="teacher" list="teachersList" [ngModel]="selectedTeacherName"
-            (ngModelChange)="onTeacherSelect($event)" placeholder="Choose a teacher..." class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
-           focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <!-- Search -->
+          <input type="text" [(ngModel)]="teacherQuery" [ngModelOptions]="{ standalone: true }"
+            placeholder="Search teacher by name..." class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-sm text-blue-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2" />
 
-          <!-- Datalist com opções -->
-          <datalist id="teachersList">
-            <option *ngFor="let t of teachers()" [value]="t.Name"></option>
-          </datalist>
+          <!-- Dropdown list of teachers -->
+          <select id="teacherSelect" formControlName="teacherId" class="w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option [ngValue]="null" disabled selected>Choose a teacher</option>
+            <option *ngFor="let t of filteredTeachers()" [ngValue]="t.Id">
+              {{ t.Name }}
+            </option>
+          </select>
         </div>
 
         <!-- Hidden / default metadata (just information) -->
