@@ -5,39 +5,31 @@ using backend_api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace backend_api.Functions
 {
-    public class DeleteTopics
+    public class GetTeachers
     {
-        public readonly ITopicsRepository _topicsRepository;
+        private readonly IUserRepository _userRepository;
 
-        public DeleteTopics(ITopicsRepository topicsRepository)
+        public GetTeachers(IUserRepository userRepository)
         {
-            _topicsRepository = topicsRepository;
+            _userRepository = userRepository;
         }
 
-        [Function("deleteTopic")]
+        [Function("getTeachers")]
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "delete/topic")] HttpRequestData req, FunctionContext executionContext)
+        public async Task<HttpResponseData> Run1(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/teachers")] HttpRequestData req, FunctionContext executionContext)
         {
-            var deleteTopicDTO = await req.ReadFromJsonAsync<TopicsDeleteRequestDTO>();
-
-            if (deleteTopicDTO is null)
-            {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
-                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
-                return BadResponse;
-            }
-
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
             if (string.IsNullOrEmpty(token))
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
-                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive" });
                 return BadResponse;
             }
 
@@ -50,38 +42,42 @@ namespace backend_api.Functions
                 return badResponse;
             }
 
-            deleteTopicDTO.EntityId = userId;
+            var teacherDTO = new TeacherRequestDTO
+            {
+                EntityId = userId,
+            };
 
-            if (deleteTopicDTO == null || !deleteTopicDTO.IsValid() || deleteTopicDTO.EntityId is null)
+            if (teacherDTO == null || !teacherDTO.IsValid() || teacherDTO.EntityId is null)
             {
                 var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadRequest.WriteAsJsonAsync(new
                 {
                     Success = false,
                     Message = "Fields incorrect.",
-                    Error = deleteTopicDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                    Error = teacherDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
                 });
                 return BadRequest;
             }
 
-            var topicDeleted = await _topicsRepository.deleteTopics(deleteTopicDTO);
-            if (!topicDeleted.Success)
+            var teachers = await _userRepository.GetTeachers(teacherDTO); //Checking request body with database
+            if (teachers is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
-                    Message = topicDeleted.Message
+                    message = "Teachers not found."
                 });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
             await response.WriteAsJsonAsync(new
             {
-                Success = true
+                Success = true,
+                teachers
             });
-            return response;
+            return response; //Return the response, with username and token Jwt Authorization 
         }
     }
 }

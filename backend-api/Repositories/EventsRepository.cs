@@ -12,7 +12,8 @@ namespace backend_api.Repositories
         Task<List<EventListResponseDTO>?> getEventsByTopics(EventListByTopicsRequestDTO t); //Get the list of all events with a specific Topic
         Task<List<EventListStudentResponseDTO>?> getEventsStudentByEntityId(EventStudentByEntityIdRequestDTO t); //Get the list of all events with a specific EntityId
         Task<EventListResponseDTO?> getEventsByEventId(EventByEventIdRequestDTO t); //Get the list of all events with a specific EventId
-        Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t); //Create event
+        Task<(bool Success, string? Message)> createEvent_Teacher(EventCreateTeacherRequestDTO t);
+        Task<(bool Success, string? Message)> createEvent_Admin(EventCreateAdminRequestDTO t);
         Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t); //Update event with the status Close and set the DateClose
         Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t); //Update event with the status Ongoing
 
@@ -181,7 +182,7 @@ namespace backend_api.Repositories
             }
         }
 
-        public async Task<(bool Success, string? Message)> createEvent(EventCreateRequestDTO t)
+        public async Task<(bool Success, string? Message)> createEvent_Teacher(EventCreateTeacherRequestDTO t)
         {
             if (string.IsNullOrWhiteSpace(t.Name)) return (false, "Name field empty.");
             if (string.IsNullOrWhiteSpace(t.Description)) return (false, "Description field empty.");
@@ -203,10 +204,56 @@ namespace backend_api.Repositories
                     Name = t.Name.Trim(),
                     Description = t.Description.Trim(),
                     TopicsId = t.TopicsId,
-                    CreateById = t.CreateById.Value, 
+                    CreateById = t.CreateById.Value,
                     DateCreate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                     DateClose = null,
-                    StatusId = 1 
+                    StatusId = 1
+                };
+
+                dbContext.Events.Add(eventCreate);
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Event created successfully."); ;
+            }
+            catch
+            {
+                return (false, "Event created unsuccessfully."); ;
+            }
+        }
+
+        public async Task<(bool Success, string? Message)> createEvent_Admin(EventCreateAdminRequestDTO t)
+        {
+            if (string.IsNullOrWhiteSpace(t.Name)) return (false, "Name field empty.");
+            if (string.IsNullOrWhiteSpace(t.Description)) return (false, "Description field empty.");
+            if (t.TopicsId <= 0) return (false, "TopicId field empty."); ;
+            if (t.CreateById <= 0) return (false, "CreateById field empty.");
+            if (t.AdminId <= 0 || t.AdminId is null) return (false, "AdminId field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var isAdmin = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.AdminId && e.Roles.Type == "Admin");
+
+                if (!isAdmin)
+                    return (false, "User is not Admin.");
+
+                var topic = await dbContext.Topics
+                .AsNoTracking()
+                .AnyAsync(x => x.Id == t.TopicsId);
+
+                if (!topic)
+                    return (false, "Topic not found."); ;
+
+                var eventCreate = new Events
+                {
+                    Name = t.Name.Trim(),
+                    Description = t.Description.Trim(),
+                    TopicsId = t.TopicsId,
+                    CreateById = t.CreateById,
+                    DateCreate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                    DateClose = null,
+                    StatusId = 1
                 };
 
                 dbContext.Events.Add(eventCreate);

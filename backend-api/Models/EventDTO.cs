@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace backend_api.Models
 {   
-    //Responses
-    //Dto Request to create a Event
-    public sealed class EventCreateRequestDTO
+    //Dto Request for Teacher create a Event 
+    public sealed class EventCreateTeacherRequestDTO
     {
         [Required]
         public string Name { get; set; } = default!;
@@ -14,6 +13,20 @@ namespace backend_api.Models
         public int TopicsId { get; set; } = default!;
         [Required]
         public int? CreateById { get; set; } = default!;
+    }
+    //Dto Request for Admin create a Event
+    public sealed class EventCreateAdminRequestDTO
+    {
+        [Required]
+        public string Name { get; set; } = default!;
+        [Required]
+        public string Description { get; set; } = default!;
+        [Required]
+        public int TopicsId { get; set; } = default!;
+        [Required]
+        public int CreateById { get; set; } = default!;
+        [Required]
+        public int? AdminId { get; set; } = default!;
     }
 
     //Dto Response for all Event without any filter
@@ -43,7 +56,6 @@ namespace backend_api.Models
         public string Grade { get; init; } = default!;
         public string ParticipantDescription { get; init; } = default!;
     }
-    //Requests
     //DTO Request for all Event from a specific Topics
     public sealed class EventListByTopicsRequestDTO
     {
