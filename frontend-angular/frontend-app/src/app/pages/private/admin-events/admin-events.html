@@ -1,1 +1,138 @@
-<p>admin-events works!</p>
+<!-- Page Admin Edit Event -->
+<div class="min-h-screen bg-gray-50 flex justify-center py-10 px-4">
+    <div class="w-full max-w-4xl space-y-6">
+
+        <!-- Top bar -->
+        <div class="mb-6 flex items-center justify-between">
+            <a routerLink="/admin"
+                class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-700 hover:bg-blue-50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 5.5 9 12l6.5 6.5-1.5 1.5L6 12l8-8 1.5 1.5Z" />
+                </svg>
+                Back to list
+            </a>
+
+            <div class="flex items-center gap-2 text-blue-700/70 text-sm">
+                <span class="hidden sm:inline">Admin Center</span>
+                <span>•</span>
+                <span>Edit course</span>
+            </div>
+        </div>
+
+        <!-- Form course edit -->
+        <div *ngIf="eventData else notFoundEvent" class="bg-white rounded-2xl shadow-lg border border-blue-200 p-6">
+            <form [formGroup]="form" (ngSubmit)="btnSave()" class="space-y-4" novalidate>
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-blue-900">
+                        Name
+                    </label>
+                    <input id="name" type="text" formControlName="name" maxlength="100" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Course title" />
+                    <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="mt-1 text-xs text-red-600">
+                        Name is required and must have at most 100 characters.
+                    </p>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-blue-900">
+                        Description
+                    </label>
+                    <textarea id="description" formControlName="description" rows="5" maxlength="2000" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                   placeholder:text-blue-900/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Explain what students will learn..."></textarea>
+                    <p *ngIf="form.get('description')?.invalid && form.get('description')?.touched"
+                        class="mt-1 text-xs text-red-600">
+                        Description is required (max 2000 characters).
+                    </p>
+                </div>
+
+                <!-- Topic -->
+                <div>
+                    <label for="topicName" class="block text-sm font-medium text-blue-900">
+                        Topic
+                    </label>
+                    <select id="topicName" formControlName="topicName" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <!-- Default option -->
+                        <option [ngValue]="null" disabled>Choose a topic</option>
+                        <!-- Option list of topics -->
+                        <option *ngFor="let t of topics" [ngValue]="t.Type">
+                            {{ t.Type }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Teacher -->
+                <div>
+                    <label for="teacher" class="block text-sm font-medium text-blue-900">
+                        Teacher
+                    </label>
+
+                    <select id="teacher" formControlName="teacher" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                        focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <!-- Default option -->
+                        <option [ngValue]="null" disabled>Choose a teacher</option>
+
+                        <!-- Option if the teacher is not in the list -->
+                        <ng-container *ngIf="form.value.teacher && !isTeacherInList(form.value.teacher)">
+                            <option [ngValue]="form.value.teacher">
+                                {{ form.value.teacher }} (not in list)
+                            </option>
+                        </ng-container>
+
+                        <!-- Option list of teachers -->
+                        <option *ngFor="let t of teachers" [ngValue]="t.Name">
+                            {{ t.Name }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Start Date -->
+                <div>
+                    <label for="startDate" class="block text-sm font-medium text-blue-900">
+                        Start date
+                    </label>
+                    <input id="startDate" type="date" formControlName="startDate" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                   focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <!-- Info extra -->
+                <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800 space-y-1">
+                    <p>
+                        <strong>Current status:</strong>
+                        {{ eventData['Status'] ?? eventData['status'] ?? '—' }}
+                    </p>
+                    <p>
+                        <strong>Created at:</strong>
+                        {{
+                        (eventData['DateCreate'] ?? eventData['dateCreate'])
+                        | date: 'medium'
+                        }}
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" (click)="btnCancel()"
+                        class="mt-2 rounded-xl bg-red-600/90 px-4 py-2.5 font-semibold text-white shadow hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-200">
+                        Cancel
+                    </button>
+
+                    <button [disabled]="btnSaveDisabled" type="submit" class="mt-2 rounded-xl bg-blue-600/90 px-4 py-2 text-sm font-semibold text-white shadow
+                   hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:opacity-50">
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- Not found Event -->
+        <ng-template #notFoundEvent>
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+                Event not found.
+            </div>
+        </ng-template>
+    </div>
+</div>
