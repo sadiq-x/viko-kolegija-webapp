@@ -6,12 +6,13 @@ namespace backend_api.Repositories
 {
     public interface IUserRepository
     {
-        Task<UserLoginResponseDTO?> authUserLogin(UserLoginRequestDTO t); //Task to check if the login is valid
-        Task<(bool Success, string? Message)> authUserRegister(UserRegisterRequestDTO t); //Task to crete a new user
-        Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t); //Task to update user password
-        Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t); //Task to update user 
-        Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t); //Task to update user 
-        Task<List<UserGetAllResponseDTO>?> GetUsers(UserGetAllRequestDTO t); //Task to get all users
+        Task<UserLoginResponseDTO?> authUserLogin(UserLoginRequestDTO t);
+        Task<(bool Success, string? Message)> authUserRegister(UserRegisterRequestDTO t);
+        Task<(bool Success, string? Message)> authUpdateUserPassword(UserUpdatePasswordRequestDTO t);
+        Task<(bool Success, string? Message)> authUpdateUser(UserUpdateRequestDTO t);
+        Task<UserProfileResponseDTO?> authGetUser(UserProfileRequestDTO t);
+        Task<List<UserGetAllResponseDTO>?> GetUsers(UserGetAllRequestDTO t);
+        Task<List<TeachersListResponseDTO>?> GetTeachers(TeacherRequestDTO t);
     }
 
     public class UserRepository : IUserRepository
@@ -235,7 +236,7 @@ namespace backend_api.Repositories
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
 
@@ -279,6 +280,40 @@ namespace backend_api.Repositories
             catch (Exception)
             {
                 throw;
+            }
+        }
+
+        public async Task<List<TeachersListResponseDTO>?> GetTeachers(TeacherRequestDTO t)
+        {
+            if (t.EntityId <= 0) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+
+                var isAdmin = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.EntityId && e.Roles.Type == "Admin");
+
+                if (!isAdmin) return null;
+
+                var teachers = await dbContext.Entities
+                    .AsNoTracking()
+                    .Where(u => u.Roles.Type == "Teacher")
+                    .Select(u => new TeachersListResponseDTO
+                    {
+                        Id = u.Id,
+                        Name = u.Name,
+                    })
+                    .ToListAsync();
+
+                if (teachers == null || teachers.Count == 0)
+                    return null;
+
+                return teachers;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

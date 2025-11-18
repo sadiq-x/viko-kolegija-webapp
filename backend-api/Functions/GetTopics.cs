@@ -23,12 +23,12 @@ namespace backend_api.Functions
             var topics = await _topicsRepository.getTopics(); //Checking request body with database
             if (topics is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Topics not found."
-                }); //Reponse a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 

@@ -12,7 +12,9 @@ namespace backend_api.Models
     {
         [Required]
         public int? EntityId { get; set; } = default!; 
+        [Required]
         public string? Username { get; set; } = default!;
+        [Required]
         public string? Type { get; set; } = default!; 
     }
     public sealed class RolesUpdateUserRequestDTO

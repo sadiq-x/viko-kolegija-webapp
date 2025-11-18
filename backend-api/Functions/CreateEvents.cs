@@ -17,33 +17,33 @@ namespace backend_api.Functions
             _eventsRepository = eventsRepository;
         }
 
-        [Function("createEvents")]
+        [Function("createEventsTeacher")]
         [Produces("application/json")]
-        public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "create/events")] HttpRequestData req, FunctionContext executionContext)
+        public async Task<HttpResponseData> Run1(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "create/events/teacher")] HttpRequestData req, FunctionContext executionContext)
         {
-            var eventDTO = await req.ReadFromJsonAsync<EventCreateRequestDTO>();
+            var eventDTO = await req.ReadFromJsonAsync<EventCreateTeacherRequestDTO>();
 
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) 
+            if (string.IsNullOrEmpty(token))
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Message = "Token don't receive"
-                }); 
+                });
                 return BadResponse;
             }
 
-            var userId = JwtAuth.DecoderUserId(token); 
+            var userId = JwtAuth.DecoderUserId(token);
 
             eventDTO!.CreateById = userId;
 
             if (eventDTO is null || !eventDTO.IsValid())
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -53,7 +53,7 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var eventResponse = await _eventsRepository.createEvent(eventDTO); 
+            var eventResponse = await _eventsRepository.createEvent_Teacher(eventDTO);
             if (!eventResponse.Success)
             {
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
@@ -61,16 +61,84 @@ namespace backend_api.Functions
                 {
                     eventResponse.Success,
                     message = eventResponse.Message
-                }); 
+                });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); 
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
                 eventResponse.Success,
             });
-            return response; 
+            return response;
         }
+
+        [Function("createEventsAdmin")]
+        [Produces("application/json")]
+        public async Task<HttpResponseData> Run2(
+                [HttpTrigger(AuthorizationLevel.Function, "post", Route = "create/events/admin")] HttpRequestData req, FunctionContext executionContext)
+        {
+            var eventDTO = await req.ReadFromJsonAsync<EventCreateAdminRequestDTO>();
+
+            if (eventDTO is null)
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
+                return BadResponse;
+            }
+
+            executionContext.Items.TryGetValue("Token", out var userObj);
+            var token = userObj as string;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token);
+
+            if (userId <= 0 || userId is null)
+            {
+                var badResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await badResponse.WriteAsJsonAsync(new { message = "Invalid token." });
+                return badResponse;
+            }
+
+            eventDTO.AdminId = userId;
+
+            if (eventDTO == null || !eventDTO.IsValid() || eventDTO.AdminId is null)
+            {
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Fields incorrect.",
+                    Error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                });
+                return BadRequest;
+            }
+
+            var eventResponse = await _eventsRepository.createEvent_Admin(eventDTO);
+            if (!eventResponse.Success)
+            {
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    eventResponse.Success,
+                    message = eventResponse.Message
+                });
+                return notFoundResponse;
+            }
+
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(new
+            {
+                eventResponse.Success,
+            });
+            return response;
+        }
+
     }
 }
