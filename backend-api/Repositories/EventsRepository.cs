@@ -16,7 +16,7 @@ namespace backend_api.Repositories
         Task<(bool Success, string? Message)> createEvent_Admin(EventCreateAdminRequestDTO t);
         Task<(bool Success, string? Message)> updateEventStatusToClose(EventChangeStatusRequestDTO t); //Update event with the status Close and set the DateClose
         Task<(bool Success, string? Message)> updateEventStatusToOngoing(EventChangeStatusRequestDTO t); //Update event with the status Ongoing
-
+        Task<(bool Success, string? Message)> updateEvent_Admin(EventEditAdminRequestDTO t); 
     }
 
     public class EventsRepository : IEventsRepository
@@ -323,5 +323,57 @@ namespace backend_api.Repositories
             }
         }
 
+        public async Task<(bool Success, string? Message)> updateEvent_Admin(EventEditAdminRequestDTO t)
+        {
+            if (t.Id <= 0) return (false, "Id field empty.");
+            if (string.IsNullOrWhiteSpace(t.Name)) return (false, "Name field empty.");
+            if (string.IsNullOrWhiteSpace(t.Description)) return (false, "Description field empty.");
+            if (string.IsNullOrWhiteSpace(t.Type)) return (false, "Type field empty.");
+            if (t.AdminId is null || t.AdminId <= 0) return (false, "AdminId field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var isAdmin = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.AdminId && e.Roles.Type == "Admin");
+
+                if (!isAdmin)
+                    return (false, "User is not Admin.");
+
+                var eventEntity = await dbContext.Events
+                    .FirstOrDefaultAsync(e => e.Id == t.Id);
+
+                if (eventEntity is null)
+                    return (false, "Event not found.");
+
+                var topic = await dbContext.Topics
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(tp => tp.Type == t.Type);
+
+                if (topic is null)
+                    return (false, "Topic not found.");
+
+                var teacherEntity = await dbContext.Entities
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.Name == t.CreateBy);
+
+                if (teacherEntity is null)
+                    return (false, "Teacher not found.");
+
+                eventEntity.Name = t.Name;
+                eventEntity.Description = t.Description;
+                eventEntity.TopicsId = topic.Id;
+                eventEntity.CreateById = teacherEntity.Id;
+                eventEntity.DateCreate = t.DateCreate.ToString();
+
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Event updated successfully.");
+            }
+            catch (Exception)
+            {
+                return (false, "Error updating event.");
+            }
+        }
     }
 }
