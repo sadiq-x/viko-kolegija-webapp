@@ -1,7 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { ModelEventsRequest } from '../../../models/modelEvents';
 import { ModelTopicsResponse } from '../../../models/modelTopics';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { TeacherService } from '../../../services/teacher';
 import { EventService } from '../../../services/events';
 import { TopicsService } from '../../../services/topics';
@@ -17,12 +23,20 @@ import { ModelTeacherResponse } from '../../../models/modelTeacher';
 export class AdminCreateEvents {
   form!: FormGroup;
 
-  topics = signal<ModelTopicsResponse[]>([]);
-  teachers = signal<ModelTeacherResponse[]>([]);
+  topics = signal<ModelTopicsResponse[]>([]); //List of all topics
+  teachers = signal<ModelTeacherResponse[]>([]); //List of all teachers
 
-  selectedTeacherName: string | null = null;
+  submitting = signal<boolean>(false); //Variable boolean to help in the button to submit
 
-  submitting = signal<boolean>(false);
+  teacherQuery = signal<string>(''); //Search query Name 
+
+  //Function to filtered all teachers with or without filters
+  filteredTeachers = computed<ModelTeacherResponse[]>(() => {
+    const q = this.teacherQuery().trim().toLowerCase();
+    const list = this.teachers() ?? [];
+    if (!q) return list;
+    return list.filter((t) => t.Name.toLowerCase().includes(q));
+  });
 
   constructor(
     private fb: FormBuilder,
@@ -34,13 +48,15 @@ export class AdminCreateEvents {
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(2000)]],
       topicId: [null, [Validators.required]],
-      entityId: [null, [Validators.required]],
+      teacherId: [null, [Validators.required]],
     });
   }
 
   ngOnInit(): void {
     this.getTopics();
+    this.getTeachers();
   }
+
   //Get the all topics from backend
   private getTopics() {
     this.topicService.getTopics().subscribe({
@@ -53,15 +69,29 @@ export class AdminCreateEvents {
               Description: x.Description ?? x.description,
             }))
           );
-        } else {
-          this.topics.set([]);
+          return;
         }
+        this.topics.set([]);
       },
-      error: () => this.topics.set([]),
     });
   }
   //Get the all teachers from backend
-  private getTeachers() {}
+  private getTeachers() {
+    this.teacherService.getTeachers().subscribe({
+      next: (res) => {
+        if (Array.isArray(res) && res) {
+          this.teachers.set(
+            res.map((x: any) => ({
+              Id: x.Id ?? x.id,
+              Name: x.Name ?? x.name,
+            }))
+          );
+          return;
+        }
+        this.teachers.set([]);
+      },
+    });
+  }
   //Button to create a event
   onCreateCourse() {
     if (this.form.invalid) {
@@ -69,42 +99,39 @@ export class AdminCreateEvents {
       return;
     }
 
-    const payload: ModelEventsRequest = {
-      Name: this.form.value.name,
-      Description: this.form.value.description,
-      TopicsId: this.form.value.topicId,
-    };
+    const v = this.form.value;
 
+    const obj = {
+      Name: v.name,
+      Description: v.description,
+      TopicsId: v.topicId,
+      CreateById: v.teacherId,
+    };
+    
     this.submitting.set(true);
-    this.eventService.createEvent(payload).subscribe({
+    this.eventService.createEvent_admin(obj).subscribe({
       next: (res) => {
         if (!res) {
           alert('Could not create course.');
-          return;
-        } else {
-          alert('Course created successfully.');
-          this.form.reset();
-          this.form.markAsPristine();
-          this.form.markAsUntouched();
           this.submitting.set(false);
+          return;
         }
+
+        alert('Course created successfully.');
+        this.form.reset();
+        this.teacherQuery.set('')
+        this.form.markAsPristine();
+        this.form.markAsUntouched();
+        this.submitting.set(false);
       },
       error: () => {
         this.submitting.set(false);
         alert('Error creating course.');
-        return;
       },
     });
   }
   //Helper of button state
   get submitDisabled() {
     return this.form.invalid || this.submitting();
-  }
-
-  onTeacherSelect(name: string) {
-    const teacher = this.teachers().find((t) => t.Name === name);
-    if (teacher) {
-      this.form.patchValue({ topicId: teacher.Id });
-    }
   }
 }

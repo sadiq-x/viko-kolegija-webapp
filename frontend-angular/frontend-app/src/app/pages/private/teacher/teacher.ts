@@ -124,7 +124,7 @@ export class Teacher implements OnInit {
     };
     
     this.submitting.set(true);
-    this.eventService.createEvent(payload).subscribe({
+    this.eventService.createEvent_teacher(payload).subscribe({
       next: (res) => {
         if (!res) {
           alert('Could not create course.');

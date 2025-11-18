@@ -3,7 +3,6 @@ import { Component, computed, signal, TrackByFunction } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../../../services/users';
 import { ModelEntities } from '../../../models/modelEntity';
-import { TeacherService } from '../../../services/teacher';
 import { RolesTypes } from '../../../data/roles';
 import { EventService } from '../../../services/events';
 import { RouterLink } from '@angular/router';
@@ -82,6 +81,7 @@ export class Admin {
   courseDateFrom = signal<string>(''); // yyyy-MM-dd
   courseDateTo = signal<string>(''); // yyyy-MM-dd
 
+  //Variable to create new topic
   newTopic = {
     Type: '',
     Description: '',
@@ -181,6 +181,7 @@ export class Admin {
       },
     });
   }
+
   //Function to filtered all users with or without filters
   filteredUsers = computed<AdminUsers[]>(() => {
     const list = this.users() ?? [];
@@ -281,7 +282,7 @@ export class Admin {
     return Array.from(set).sort(); // opcional: ordena alfabeticamente
   });
   //List of all types of the list course
-  typesOptions = computed<string[]>(() => {
+  courseTypesOptions = computed<string[]>(() => {
     const list = this.allCourses() ?? [];
     const set = new Set<string>();
 
@@ -293,8 +294,7 @@ export class Admin {
 
     return Array.from(set).sort(); // opcional: ordena alfabeticamente
   });
-  trackByUserId: TrackByFunction<AdminUsers> = (_, item) => item.Id;
-  trackByCourseId: TrackByFunction<AdminCourse> = (_, item) => item.Id;
+
   //Function to normalize strings
   private normalize(str: string): string {
     return str
@@ -318,7 +318,7 @@ export class Admin {
 
     this.roleService.updateParticipantStatus(obj).subscribe({
       next: (res) => {
-        console.log(res)
+        console.log(res);
         if (!res) {
           alert('User role change successful.');
           return;
@@ -380,7 +380,8 @@ export class Admin {
       },
     });
   }
-  //Helper
-  //? Check this
+  //TrackBy to help and performance in list courses
   trackByTopicId = (_: number, topic: any) => topic.Id;
+  trackByUserId: TrackByFunction<AdminUsers> = (_, item) => item.Id;
+  trackByCourseId: TrackByFunction<AdminCourse> = (_, item) => item.Id;
 }

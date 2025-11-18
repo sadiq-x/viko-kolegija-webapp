@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
-import { EventListResponse, EventParticipantListResponse, ModelEventsRequest } from '../models/modelEvents';
+import {
+  EventListResponse,
+  EventParticipantListResponse,
+  ModelEventsRequest,
+} from '../models/modelEvents';
 import { map, Observable } from 'rxjs';
 
 @Injectable({
@@ -16,7 +20,8 @@ export class EventService {
   private apiUrlGetEventByEntityId = environment.apiUrl + 'get/events/byEntityId';
   private apiUrlGetEventByEventId = environment.apiUrl + 'get/events/byEventId/';
   //Create
-  private apiUrlCreateEvent = environment.apiUrl + 'create/events';
+  private apiUrlCreateEvent_teacher = environment.apiUrl + 'create/events/teacher';
+  private apiUrlCreateEvent_admin = environment.apiUrl + 'create/events/admin';
   //Update
   private apiUrlUpdateEventStatusClose = environment.apiUrl + 'update/event/close';
   private apiUrlUpdateEventStatusOngoing = environment.apiUrl + 'update/event/ongoing';
@@ -58,7 +63,7 @@ export class EventService {
   //Function getEventByEntityId will get a Event with a specific EntityId
   getEventByEntityId(): Observable<EventParticipantListResponse | false> {
     return this.http.get<any>(this.apiUrlGetEventByEntityId).pipe(
-      map((response) => { 
+      map((response) => {
         if (response?.success && response?.events) {
           return response.events;
         }
@@ -67,9 +72,9 @@ export class EventService {
     );
   }
   //Function getEventByEventId will get a Event with a specific EventId
-  getEventByEventId(eventId:number): Observable<EventListResponse | false> {
+  getEventByEventId(eventId: number): Observable<EventListResponse | false> {
     return this.http.get<any>(`${this.apiUrlGetEventByEventId}${eventId}`).pipe(
-      map((response) => { 
+      map((response) => {
         if (response?.success && response?.eventResponse) {
           return response.eventResponse;
         }
@@ -77,9 +82,25 @@ export class EventService {
       })
     );
   }
-  //Function getEventById will create new Event
-  createEvent(obj: ModelEventsRequest): Observable<boolean> {
-    return this.http.post<any>(this.apiUrlCreateEvent, obj).pipe(
+  //Function createEvent_teacher will create new Event from a specific teacher
+  createEvent_teacher(obj: ModelEventsRequest): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlCreateEvent_teacher, obj).pipe(
+      map((response) => {
+        if (!response?.success) {
+          return false as const;
+        }
+        return true;
+      })
+    );
+  }
+  //Function createEvent_admin will create new Event from a admin, the admin can select everything (Name + Description + Topic + Teacher)
+  createEvent_admin(obj: {
+    Name: string;
+    Description: string;
+    TopicsId: number;
+    CreateById: number;
+  }): Observable<boolean> {
+    return this.http.post<any>(this.apiUrlCreateEvent_admin, obj).pipe(
       map((response) => {
         if (!response?.success) {
           return false as const;
@@ -92,7 +113,7 @@ export class EventService {
   updateEventStatusClose(obj: { Id: number }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateEventStatusClose, obj).pipe(
       map((response) => {
-        console.log(response)
+        console.log(response);
         if (response?.success) {
           return true as const;
         }
@@ -104,7 +125,7 @@ export class EventService {
   updateEventStatusOngoing(obj: { Id: number }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateEventStatusOngoing, obj).pipe(
       map((response) => {
-        console.log(response)
+        console.log(response);
         if (response?.success) {
           return true as const;
         }
