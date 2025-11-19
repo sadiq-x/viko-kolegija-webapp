@@ -44,9 +44,9 @@ namespace backend_api.Models
     public sealed class ParticipantsEventUpdateStatusRequestDTO
     {
         [Required]
-        public int Id { get; init; } = default!;
+        public int Id { get; set; } = default!;
         [Required]
-        public int EventId { get; init; } = default!;
+        public int EventId { get; set; } = default!;
         [Required]
         public int EntityId { get; set; } = default!;
     }
@@ -67,5 +67,13 @@ namespace backend_api.Models
         public int? EntityId { get; set; } = default!;
         [Required]
         public string? ParticipantDescription { get; set; } = default!;
+    }
+    //Dto Request to update status of individual student
+    public sealed class ParticipantsEventCancelRequestDTO
+    {
+        [Required]
+        public int? EntityId { get; set; } = default!;
+        [Required]
+        public int EventId { get; set; } = default!;
     }
 }
