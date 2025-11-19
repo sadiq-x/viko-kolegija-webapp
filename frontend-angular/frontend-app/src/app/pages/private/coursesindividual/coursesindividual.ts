@@ -112,15 +112,15 @@ export class CoursesIndividual {
   }
   //Button to register on event
   btnRegisterEvent() {
-    const obj = {
-      eventId: this.eventId,
+    const payload = {
+      EventId: this.eventId,
     };
 
-    if (!obj.eventId && this.loginType != 'User') {
+    if (!payload.EventId && this.loginType != 'User') {
       return;
     }
 
-    this.participantsService.insertParticipantsInEvent(obj).subscribe({
+    this.participantsService.insertParticipantsInEvent(payload).subscribe({
       next: (res) => {
         if (!res) {
           this.participantEventStatus = false;
@@ -132,19 +132,44 @@ export class CoursesIndividual {
       },
     });
   }
+  //Button to cancel registration on event
+  btnCancelEvent() {
+    const payload = {
+      EventId: this.eventId,
+    };
+    const participantGrade = this.participant().filter(c => c.Grade === '' )
+    const participantStatus = this.participant().filter(c => c.Status === true )
+
+    if (!payload.EventId && this.loginType != 'User' && !participantGrade && !participantStatus) {
+      return;
+    }
+
+    this.participantsService.cancelParticipantStatus(payload).subscribe({
+      next: (res) => {
+        if (!res) {
+          this.participantEventStatus = false;
+          return;
+        }
+
+        this.participantEventStatus = true;
+        this.getParticipant();
+      },
+    });
+
+  }
   //Button to insert description of student on event
   btnInsertParticipantDescription() {
-    const obj = {
-      eventId: this.eventId,
-      participantDescription: this.formEvent.get('description')?.value,
+    const payload = {
+      EventId: this.eventId,
+      ParticipantDescription: this.formEvent.get('description')?.value,
     };
 
-    if (!obj.participantDescription || obj.participantDescription.trim().length === 0) {
+    if (!payload.ParticipantDescription || payload.ParticipantDescription.trim().length === 0) {
       alert('You need to write your appointments');
       return;
     }
 
-    this.participantsService.insertParticipantParticipantDescription(obj).subscribe({
+    this.participantsService.insertParticipantParticipantDescription(payload).subscribe({
       next: (res) => {
         console.log(res);
         if (!res) {
@@ -156,7 +181,7 @@ export class CoursesIndividual {
         this.participant.update((current) =>
           current.map((item) => ({
             ...item,
-            ParticipantDescription: obj.participantDescription,
+            ParticipantDescription: payload.ParticipantDescription,
           }))
         );
 
@@ -180,4 +205,13 @@ export class CoursesIndividual {
       this.router.navigate(['/course']);
     }
   }
+  get cancelButtonDisabled() {
+  const p = this.participant();
+
+  const missingDescription = p.some(c => !c.ParticipantDescription || c.ParticipantDescription.trim() === '');
+  const missingGrade = p.some(c => !c.Grade || c.Grade.trim() === '');
+  const hasActiveStatus = p.some(c => c.Status === true);
+
+  return missingDescription && missingGrade && hasActiveStatus;
+}
 }
