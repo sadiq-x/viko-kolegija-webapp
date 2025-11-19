@@ -12,6 +12,7 @@ namespace backend_api.Repositories
         Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t);
         Task<(bool Success, string? Message)> insertParticipantsEventInEvent(ParticipantsEventInsertInEventIdRequestDTO t);
         Task<(bool Success, string? Message)> insertParticipantsEventParticipantDescription(ParticipantsEventInsertParticipantDescriptionRequestDTO t);
+        Task<(bool Success, string? Message)> cancelParticipantsEvent(ParticipantsEventCancelRequestDTO t);
     }
 
     public class ParticipantsEventsRepository : IParticipantsEventsRepository
@@ -266,5 +267,33 @@ namespace backend_api.Repositories
                 return (false, "Error updating participant description.");
             }
         }
+
+        public async Task<(bool Success, string? Message)> cancelParticipantsEvent(ParticipantsEventCancelRequestDTO t)
+        {
+            if (t.EntityId <= 0) return (false, "Entity field empty.");
+            if (t.EventId <= 0) return (false, "EventId field empty.");
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var participantEvent = await dbContext.ParticipantsEvents
+                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId);
+
+                if (participantEvent is null)
+                {
+                    return (false, "Participant is not registered in this event.");
+                }
+
+                dbContext.ParticipantsEvents.Remove(participantEvent);
+                await dbContext.SaveChangesAsync();
+
+                return (true, "Participant removed from event successfully.");
+            }
+            catch (Exception)
+            {
+                return (false, "Participant removed from event unsuccessfully.");
+            }
+        }
+
+
     }
 }
