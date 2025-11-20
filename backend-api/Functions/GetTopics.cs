@@ -20,10 +20,10 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/topics")] HttpRequestData req)
         {
-            var topics = await _topicsRepository.getTopics(); //Checking request body with database
+            var topics = await _topicsRepository.getTopics(); 
             if (topics is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -32,13 +32,13 @@ namespace backend_api.Functions
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 topics
             });
-            return response; //Return
+            return response; 
         }
     }
 }

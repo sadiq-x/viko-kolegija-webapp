@@ -25,16 +25,16 @@ namespace backend_api.Functions
             var events = await _eventsRepository.getEvents();
             if (events is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     Message = "Events not found."
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
@@ -51,26 +51,26 @@ namespace backend_api.Functions
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token))
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Message = "Token don't receive"
-                }); //Response send with msg
+                }); 
                 return BadResponse;
             }
 
-            var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); //Information of decoded token
+            var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); 
 
             var eventById = new EventByCreateByIdRequestDTO
             {
                 CreateById = userId
             };
 
-            if (eventById is null || !eventById.IsValid() || eventById.CreateById <= 0 || eventById.CreateById is null) //Verify if email and password are null, and reject the login
+            if (eventById is null || !eventById.IsValid() || eventById.CreateById <= 0 || eventById.CreateById is null) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -80,25 +80,25 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var events = await _eventsRepository.getEventsByCreateById(eventById); //Checking request body with database
+            var events = await _eventsRepository.getEventsByCreateById(eventById); 
             if (events is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     Message = "Events not found."
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 events
             });
-            return response; //Return
+            return response; 
         }
 
         [Function("getEventsByTopic")]
@@ -115,30 +115,30 @@ namespace backend_api.Functions
                 {
                     Success = false,
                     Message = "Fields incorrect.",
-                    Error = eventsTopicDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                    Error = eventsTopicDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
                 });
                 return BadRequest;
             }
 
-            var events = await _eventsRepository.getEventsByTopics(eventsTopicDTO); //Checking request body with database
+            var events = await _eventsRepository.getEventsByTopics(eventsTopicDTO); 
             if (events is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Events not found."
-                }); //Response a message if the error exist
+                });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 events
             });
-            return response; //Return
+            return response; 
         }
 
         [Function("getEventsByEntityId")]
@@ -149,26 +149,26 @@ namespace backend_api.Functions
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token)) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Message = "Token don't receive"
-                }); //Response send with msg
+                });
                 return BadResponse;
             }
 
-            var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
+            var userId = JwtAuth.DecoderUserId(token); 
 
             var eventsEntityDTO = new EventStudentByEntityIdRequestDTO
             {
                 EntityId = userId
             };
 
-            if (eventsEntityDTO is null || !eventsEntityDTO.IsValid() || eventsEntityDTO.EntityId <= 0) //Verify if email and password are null, and reject the login
+            if (eventsEntityDTO is null || !eventsEntityDTO.IsValid() || eventsEntityDTO.EntityId <= 0) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -178,25 +178,25 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var events = await _eventsRepository.getEventsStudentByEntityId(eventsEntityDTO); //Checking request body with database
+            var events = await _eventsRepository.getEventsStudentByEntityId(eventsEntityDTO); 
             if (events is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Events not found."
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 events
             });
-            return response; //Return
+            return response; 
         }
 
         [Function("getEventsByEventId")]
@@ -208,7 +208,7 @@ namespace backend_api.Functions
 
             if (eventDTO is null || !eventDTO.IsValid() || eventDTO.Id <= 0)
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -218,25 +218,25 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var eventResponse = await _eventsRepository.getEventsByEventId(eventDTO); //Checking request body with database
+            var eventResponse = await _eventsRepository.getEventsByEventId(eventDTO); 
             if (eventResponse is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Events not found."
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 eventResponse
             });
-            return response; //Return
+            return response;
         }
 
     }

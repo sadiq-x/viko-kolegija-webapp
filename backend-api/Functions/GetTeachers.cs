@@ -54,15 +54,15 @@ namespace backend_api.Functions
                 {
                     Success = false,
                     Message = "Fields incorrect.",
-                    Error = teacherDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                    Error = teacherDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() 
                 });
                 return BadRequest;
             }
 
-            var teachers = await _userRepository.GetTeachers(teacherDTO); //Checking request body with database
+            var teachers = await _userRepository.GetTeachers(teacherDTO);
             if (teachers is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -71,13 +71,13 @@ namespace backend_api.Functions
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 teachers
             });
-            return response; //Return the response, with username and token Jwt Authorization 
+            return response; 
         }
     }
 }

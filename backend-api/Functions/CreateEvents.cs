@@ -24,6 +24,13 @@ namespace backend_api.Functions
         {
             var eventDTO = await req.ReadFromJsonAsync<EventCreateTeacherRequestDTO>();
 
+            if (eventDTO is null)
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
+                return BadResponse;
+            }
+
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
@@ -39,7 +46,7 @@ namespace backend_api.Functions
 
             var userId = JwtAuth.DecoderUserId(token);
 
-            eventDTO!.CreateById = userId;
+            eventDTO.CreateById = userId;
 
             if (eventDTO is null || !eventDTO.IsValid())
             {
@@ -59,7 +66,7 @@ namespace backend_api.Functions
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
-                    eventResponse.Success,
+                    Success = false,
                     message = eventResponse.Message
                 });
                 return notFoundResponse;
@@ -68,7 +75,7 @@ namespace backend_api.Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
-                eventResponse.Success,
+                Success = true
             });
             return response;
         }
@@ -126,7 +133,7 @@ namespace backend_api.Functions
                 var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
-                    eventResponse.Success,
+                    Success = false,
                     message = eventResponse.Message
                 });
                 return notFoundResponse;
@@ -135,7 +142,7 @@ namespace backend_api.Functions
             var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
-                eventResponse.Success,
+                Success = true
             });
             return response;
         }

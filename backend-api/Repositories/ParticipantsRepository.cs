@@ -69,10 +69,11 @@ namespace backend_api.Repositories
         public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Teacher(ParticipantsListFromEventIdTeacherRequestDTO t)
         {
             if (t.EventId <= 0) return null;
+            if (t.EntityId <= 0 || t.EntityId is null) return null;
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
-                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId);
+                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId && u.CreateById == t.EntityId);
 
                 if (!eventExist)
                 {
@@ -111,11 +112,12 @@ namespace backend_api.Repositories
         {
             if (t.Id <= 0) return (false, "Id field empty.");
             if (t.EventId <= 0) return (false, "EventId field empty.");
+            if (t.EntityId <= 0 || t.EntityId is null) return (false, "EntityId field empty.");
             if (string.IsNullOrEmpty(t.Grade)) return (false, "Grade field empty.");
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
-                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId);
+                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId && u.CreateById == t.EntityId);
 
                 if (!eventExist)
                     return (false, "Event not found.");
@@ -149,19 +151,34 @@ namespace backend_api.Repositories
         {
             if (t.Id <= 0) return (false, "Id field empty.");
             if (t.EventId <= 0) return (false, "EventId field empty.");
-            if (t.EntityId <= 0) return (false, "EntityId field empty.");
+            if (t.UserId <= 0) return (false, "UserId field empty.");
+            if (t.TeacherId <= 0 || t.TeacherId is null) return (false, "TeacherId field empty.");
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
+                var isTeacherOfEvent = await dbContext.Events
+                .AsNoTracking()
+                .AnyAsync(e => e.Id == t.EventId && e.CreateById == t.TeacherId);
+
+                if (!isTeacherOfEvent)
+                {
+                    return (false, "Teacher is not the owner of this event.");
+                }
+
                 var participantEvent = await dbContext.ParticipantsEvents
                     .SingleOrDefaultAsync(pe =>
                         pe.Id == t.Id &&
                         pe.EventId == t.EventId &&
-                        pe.EntityId == t.EntityId);
+                        pe.EntityId == t.UserId);
 
                 if (participantEvent is null)
                 {
                     return (false, "Participant for this event not found.");
+                }
+
+                if (string.IsNullOrWhiteSpace(participantEvent.Grade))
+                {
+                    return (false, "Participant does not have a grade yet.");
                 }
 
                 participantEvent.Status = false;
@@ -172,7 +189,7 @@ namespace backend_api.Repositories
             }
             catch (Exception)
             {
-                throw;
+                return (true, "Status updated unsuccessfully.");
             }
         }
 
@@ -251,7 +268,7 @@ namespace backend_api.Repositories
                     return (false, "Entity not found.");
 
                 var participant = await dbContext.ParticipantsEvents
-                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId);
+                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId && pe.Status == true && string.IsNullOrEmpty(pe.Grade));
 
                 if (participant is null)
                     return (false, "Participant not registered in this event.");
@@ -267,7 +284,6 @@ namespace backend_api.Repositories
                 return (false, "Error updating participant description.");
             }
         }
-
         public async Task<(bool Success, string? Message)> cancelParticipantsEvent(ParticipantsEventCancelRequestDTO t)
         {
             if (t.EntityId <= 0) return (false, "Entity field empty.");
@@ -276,7 +292,7 @@ namespace backend_api.Repositories
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
                 var participantEvent = await dbContext.ParticipantsEvents
-                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId);
+                    .FirstOrDefaultAsync(pe => pe.EventId == t.EventId && pe.EntityId == t.EntityId && pe.Status == true);
 
                 if (participantEvent is null)
                 {
@@ -293,7 +309,6 @@ namespace backend_api.Repositories
                 return (false, "Participant removed from event unsuccessfully.");
             }
         }
-
 
     }
 }

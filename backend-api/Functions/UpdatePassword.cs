@@ -16,36 +16,65 @@ namespace backend_api.Functions
             _userRepository = userRepository;
         }
 
-        [Function("authUpdatePassword")] //Function to update password
+        [Function("authUpdatePassword")] 
         [Produces("application/json")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/update/password")] HttpRequestData req) //Create the Http req and res
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/update/password")] HttpRequestData req, FunctionContext executionContext) //Create the Http req and res
         {
             var userUpdatePasswordDto = await req.ReadFromJsonAsync<UserUpdatePasswordRequestDTO>();
 
-            if (userUpdatePasswordDto is null || !userUpdatePasswordDto.IsValid()) //Verify if the properties are correctly fields
+            if (userUpdatePasswordDto is null)
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send with boolean and message
-                await BadResponse.WriteAsJsonAsync(new //Returns boolean and message
-                {
-                    Success = false,
-                    message = "Fields incorrect.",
-                    error = userUpdatePasswordDto?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
-                });
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
                 return BadResponse;
             }
 
-            var user = await _userRepository.authUpdateUserPassword(userUpdatePasswordDto); //Update password in database
+            executionContext.Items.TryGetValue("Token", out var userObj);
+
+            var token = userObj as string;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token);
+
+            if (userId <= 0 || userId is null)
+            {
+                var badResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await badResponse.WriteAsJsonAsync(new { message = "Invalid token: userId not found." });
+                return badResponse;
+            }
+
+            userUpdatePasswordDto.EntityId = userId;
+
+            if (userUpdatePasswordDto == null || !userUpdatePasswordDto.IsValid())
+            {
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Fields incorrect.",
+                    Error = userUpdatePasswordDto?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                });
+                return BadRequest;
+            }
+
+            var user = await _userRepository.authUpdateUserPassword(userUpdatePasswordDto);
             if (!user.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send with boolean and message
-                await notFoundResponse.WriteAsJsonAsync(new { user.Success, user.Message }); //Returns boolean and message
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
+                await notFoundResponse.WriteAsJsonAsync(new { user.Success, user.Message }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send with boolean and message
-            await response.WriteAsJsonAsync(new { user.Success, user.Message }); //Returns boolean and message
-            return response; 
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(new { user.Success, user.Message }); 
+            return response;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace backend_api.Functions
         {
             var eventDTO = await req.ReadFromJsonAsync<EventChangeStatusRequestDTO>();
 
-            if (eventDTO is null) //Verify the Dto
+            if (eventDTO is null) 
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
@@ -34,17 +34,17 @@ namespace backend_api.Functions
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token)) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Message = "Token don't receive"
-                }); //Response send with msg
+                });
                 return BadResponse;
             }
 
-            var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
+            var userId = JwtAuth.DecoderUserId(token); 
 
             if (userId <= 0 || userId is null)
             {
@@ -57,29 +57,29 @@ namespace backend_api.Functions
 
             if (!eventDTO.IsValid() || eventDTO.Id <= 0 || eventDTO.CreateById <= 0 || eventDTO.CreateById is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Fields incorrect.",
-                    error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
-                }); //Response a message if the error exist
+                    error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() 
+                }); 
                 return notFoundResponse;
             }
 
-            var eventStatus = await _eventsRepository.updateEventStatusToClose(eventDTO); //Checking request body with database
+            var eventStatus = await _eventsRepository.updateEventStatusToClose(eventDTO); 
             if (!eventStatus.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = eventStatus.Message
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
@@ -94,7 +94,7 @@ namespace backend_api.Functions
         {
             var eventDTO = await req.ReadFromJsonAsync<EventChangeStatusRequestDTO>();
 
-            if (eventDTO is null) //Verify the Dto
+            if (eventDTO is null) 
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
@@ -104,17 +104,17 @@ namespace backend_api.Functions
             executionContext.Items.TryGetValue("Token", out var userObj);
             var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token)) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); 
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     Message = "Token don't receive"
-                }); //Response send with msg
+                }); 
                 return BadResponse;
             }
 
-            var userId = JwtAuth.DecoderUserId(token); //Information of decoded token
+            var userId = JwtAuth.DecoderUserId(token); 
 
             if (userId <= 0 || userId is null)
             {
@@ -127,34 +127,34 @@ namespace backend_api.Functions
 
             if (!eventDTO.IsValid() || eventDTO.Id <= 0 || eventDTO.CreateById <= 0 || eventDTO.CreateById is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Fields incorrect.",
-                    error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
-                }); //Response a message if the error exist
+                    error = eventDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() 
+                }); 
                 return notFoundResponse;
             }
 
-            var eventStatus = await _eventsRepository.updateEventStatusToOngoing(eventDTO); //Checking request body with database
+            var eventStatus = await _eventsRepository.updateEventStatusToOngoing(eventDTO); 
             if (!eventStatus.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = eventStatus.Message
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
             });
-            return response; //Return
+            return response; 
         }
     
     }
