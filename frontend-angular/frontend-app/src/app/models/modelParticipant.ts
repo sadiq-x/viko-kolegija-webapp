@@ -6,6 +6,7 @@ export interface ModelListParticipants {
     Status: boolean,
     Grade: string,
     Comments: string,
+    ParticipantDescription: string
 }
 
 export interface ModelListParticipantInfo {

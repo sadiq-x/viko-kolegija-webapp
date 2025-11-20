@@ -101,10 +101,7 @@ export class Profile implements OnInit {
       return;
     }
 
-    const localStorageItem = localStorage.getItem('authUser');
-    const localStorageItemParsed = JSON.parse(localStorageItem!);
     const payload = {
-      EntityId: localStorageItemParsed.entityId,
       Username: this.profileForm.get('username')?.value,
       Email: this.profileForm.get('email')?.value,
       Image: this.profileForm.value.image,
@@ -193,11 +190,7 @@ export class Profile implements OnInit {
       return;
     }
 
-    //Get the localStorage to pick EntityId and Username
-    const localStorageItem = localStorage.getItem('authUser');
-    const EntityId = JSON.parse(localStorageItem!);
     var payload = {
-      EntityId: EntityId.entityId,
       Username: this.profileForm.get('username')?.value,
       PasswordHash: password,
     };

@@ -39,7 +39,6 @@ export class Dashboard {
   }
 
   private getCourses() {
-    //NEED TODO THIS
     this.eventService.getEventByEntityId().subscribe({
       next: (res) => {
         if (Array.isArray(res) && !!res) {
