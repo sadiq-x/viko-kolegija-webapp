@@ -20,40 +20,69 @@ namespace backend_api.Functions
         [Function("updateParticipantsEventStatus")]
         [Produces("application/json")]
         public async Task<HttpResponseData> Run1(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "update/participant/status")] HttpRequestData req)
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = "update/participant/status")] HttpRequestData req, FunctionContext executionContext)
         {
-            var insertGrade = await req.ReadFromJsonAsync<ParticipantsEventUpdateStatusRequestDTO>();
+            var updateStatusDTO = await req.ReadFromJsonAsync<ParticipantsEventUpdateStatusRequestDTO>();
 
-            if (insertGrade == null || !insertGrade.IsValid())
+            if (updateStatusDTO is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await notFoundResponse.WriteAsJsonAsync(new
-                {
-                    Success = false,
-                    message = "Fields incorrect.",
-                    error = insertGrade?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
-                }); //Response a message if the error exist
-                return notFoundResponse;
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
+                return BadResponse;
             }
 
-            var participantsStatus = await _participantsEventsRepository.updateStatusParticipantsEvent(insertGrade); //Checking request body with database
+            executionContext.Items.TryGetValue("Token", out var userObj);
+
+            var token = userObj as string;
+
+            if (string.IsNullOrEmpty(token))
+            {
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
+                return BadResponse;
+            }
+
+            var userId = JwtAuth.DecoderUserId(token);
+
+            if (userId <= 0 || userId is null)
+            {
+                var badResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await badResponse.WriteAsJsonAsync(new { message = "Invalid token: userId not found." });
+                return badResponse;
+            }
+
+            updateStatusDTO.TeacherId = userId;
+
+            if (updateStatusDTO == null || !updateStatusDTO.IsValid())
+            {
+                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                await BadRequest.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = "Fields incorrect.",
+                    Error = updateStatusDTO?.Validate().Select(e => e.ToString()) ?? new List<string>()
+                });
+                return BadRequest;
+            }
+
+            var participantsStatus = await _participantsEventsRepository.updateStatusParticipantsEvent(updateStatusDTO); 
             if (!participantsStatus.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = participantsStatus.Message
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true
             });
-            return response; //Return
+            return response;
         }
 
         [Function("updateParticipantsEventCancel")]
@@ -94,7 +123,7 @@ namespace backend_api.Functions
 
             if (cancelEventDTO == null || !cancelEventDTO.IsValid())
             {
-                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                var BadRequest = req.CreateResponse(HttpStatusCode.OK);
                 await BadRequest.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -104,24 +133,24 @@ namespace backend_api.Functions
                 return BadRequest;
             }
 
-            var participantsCanceled = await _participantsEventsRepository.cancelParticipantsEvent(cancelEventDTO); //Checking request body with database
+            var participantsCanceled = await _participantsEventsRepository.cancelParticipantsEvent(cancelEventDTO); 
             if (!participantsCanceled.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = participantsCanceled.Message
-                }); //Response a message if the error exist
+                }); 
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
                 Success = true
             });
-            return response; //Return
+            return response; 
         }
     }
 }

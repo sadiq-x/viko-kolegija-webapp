@@ -5,7 +5,7 @@ namespace backend_api.Models
     public sealed class UserUpdateRequestDTO
     {
         [Required]
-        public int EntityId { get; set; } = default!;
+        public int? EntityId { get; set; } = default!;
         [Required]
         public string Username { get; set; } = default!;
         [Required, EmailAddress, MaxLength(150)]

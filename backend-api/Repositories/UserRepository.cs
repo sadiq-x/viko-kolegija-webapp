@@ -75,9 +75,8 @@ namespace backend_api.Repositories
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
 
-                //Check if the Email or Username exist in database
-                if (await dbContext.Set<Users>().AsNoTracking().AnyAsync(u => u.Username == t.Username)) return (false, "Username already exist.");
-                if (await dbContext.Set<Entities>().AsNoTracking().AnyAsync(e => e.Email == t.Email)) return (false, "Email already exist.");
+                if (await dbContext.Users.AsNoTracking().AnyAsync(u => u.Username == t.Username)) return (false, "Username already exist.");
+                if (await dbContext.Entities.AsNoTracking().AnyAsync(e => e.Email == t.Email)) return (false, "Email already exist.");
 
                 var EntitiesDTO = new Entities
                 {
@@ -88,7 +87,7 @@ namespace backend_api.Repositories
                     Birthday = t.Birthday.Trim(),
                     Nationality = t.Nationality.Trim(),
                     Gender = t.Gender.Trim(),
-                    RoleId = 5 //Set the Unauthorized
+                    RoleId = 5 
                 };
 
                 if (!string.IsNullOrWhiteSpace(t.Image))

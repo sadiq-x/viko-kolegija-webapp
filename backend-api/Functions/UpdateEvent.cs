@@ -55,7 +55,7 @@ namespace backend_api.Functions
 
             if (updateEventDTO == null || !updateEventDTO.IsValid())
             {
-                var BadRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                var BadRequest = req.CreateResponse(HttpStatusCode.OK);
                 await BadRequest.WriteAsJsonAsync(new
                 {
                     Success = false,

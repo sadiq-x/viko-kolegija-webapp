@@ -23,18 +23,18 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run1(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/profile")] HttpRequestData req, FunctionContext executionContext)
         {
-            executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
-            var token = userObj as string; //Transform token object into string
+            executionContext.Items.TryGetValue("Token", out var userObj);
+            var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token))
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
-                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive" }); //Response send with msg
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
                 return BadResponse;
             }
 
-            var (userId, userName) = JwtAuth.DecoderUserIdUsername(token); //Information of decoded token
-            var userProfileDto = new UserProfileRequestDTO //use the userModel for fill the data from token
+            var (userId, userName) = JwtAuth.DecoderUserIdUsername(token);
+            var userProfileDto = new UserProfileRequestDTO
             {
                 EntityId = userId,
                 Username = userName
@@ -42,22 +42,30 @@ namespace backend_api.Functions
 
             if (userProfileDto == null || string.IsNullOrEmpty(userProfileDto.Username) || userProfileDto.EntityId == null || userProfileDto.EntityId <= 0) //Verify if entity model don't are false and token don't are empty
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await BadResponse.WriteAsJsonAsync(new { message = "Username and EntityId don't find in JWT token" }); //Response send with msg
-                return BadResponse;
+                var badResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await badResponse.WriteAsJsonAsync(new { message = "Invalid token: userId not found." });
+                return badResponse;
             }
 
-            var user = await _userRepository.authGetUser(userProfileDto); //Checking request body with database
+            var user = await _userRepository.authGetUser(userProfileDto);
             if (user is null)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound); //Create a response to send
-                await notFoundResponse.WriteAsJsonAsync(new { message = "User not found." }); //Response a message if the error exist
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    message = "Users not found."
+                });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
-            await response.WriteAsJsonAsync(new { user });
-            return response; //Return the response, with username and token Jwt Authorization 
+            var response = req.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                user
+            });
+            return response;
         }
 
         [Function("getUser")]
@@ -65,13 +73,13 @@ namespace backend_api.Functions
         public async Task<HttpResponseData> Run2(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = "get/users")] HttpRequestData req, FunctionContext executionContext)
         {
-            executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
-            var token = userObj as string; //Transform token object into string
+            executionContext.Items.TryGetValue("Token", out var userObj); 
+            var token = userObj as string; 
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token)) 
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized); //Create a response to send
-                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." }); //Response send with msg
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized);
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." });
                 return BadResponse;
             }
 
@@ -89,30 +97,30 @@ namespace backend_api.Functions
                 {
                     Success = false,
                     Message = "Invalid request body.",
-                    Error = requestDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                    Error = requestDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() 
                 });
                 return BadRequest;
             }
 
-            var usersResponse = await _userRepository.GetUsers(requestDTO); //Checking request body with database
+            var usersResponse = await _userRepository.GetUsers(requestDTO);
             if (usersResponse is null || usersResponse.Count == 0)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     message = "Users not found."
-                }); //Response a message if the error exist
+                });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 usersResponse
             });
-            return response; //Return
+            return response;
         }
 
     }

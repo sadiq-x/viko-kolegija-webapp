@@ -16,16 +16,16 @@ namespace backend_api.Functions
             _userRepository = userRepository;
         }
 
-        [Function("authLogin")] //Function to do login
+        [Function("authLogin")] 
         [Produces("application/json")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/login")] HttpRequestData req) //Create the Http req and res
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/login")] HttpRequestData req) 
         {
             var loginUserDto = await req.ReadFromJsonAsync<UserLoginRequestDTO>();
 
-            if (loginUserDto is null || !loginUserDto.IsValid()) //Verify if email and password are null, and reject the login
+            if (loginUserDto is null || !loginUserDto.IsValid())
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest); //Create a response to send
+                var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new
                 {
                     message = "Wrong Credentials.",
@@ -34,11 +34,10 @@ namespace backend_api.Functions
                 return BadResponse;
             }
 
-            var user = await _userRepository.authUserLogin(loginUserDto); //Checking request body with database
+            var user = await _userRepository.authUserLogin(loginUserDto); 
             if (user is null || string.IsNullOrEmpty(user.Username) || user.EntityId <= 0 || string.IsNullOrEmpty(user.RoleType))
             {
-                // Parse the request body to extract username and password
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
@@ -47,15 +46,15 @@ namespace backend_api.Functions
                 return notFoundResponse;
             }
 
-            string token = JwtAuth.GenerateToken(user.Username, user.EntityId, user.RoleType); //Create token with username and id
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            string token = JwtAuth.GenerateToken(user.Username, user.EntityId, user.RoleType);
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true,
                 user,
                 token
             });
-            return response; //Return the response, with username and token Jwt Authorization 
+            return response;
         }
     }
 }

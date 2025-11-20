@@ -17,7 +17,7 @@ namespace backend_api.Functions
             _userRepository = userRepository;
         }
 
-        [Function("authRegister")] //Function to do login
+        [Function("authRegister")]
         [Produces("application/json")]
         public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = "auth/register")] HttpRequestData req)
@@ -40,13 +40,22 @@ namespace backend_api.Functions
 
             if (!registerUser.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.NotFound);
-                await notFoundResponse.WriteAsJsonAsync(new { registerUser.Success, registerUser.Message });
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK);
+                await notFoundResponse.WriteAsJsonAsync(new
+                {
+                    Success = false,
+                    Message = registerUser.Message
+                });
                 return notFoundResponse;
             }
 
+
             var response = req.CreateResponse(HttpStatusCode.OK);
-            await response.WriteAsJsonAsync(new { registerUser.Success, registerUser.Message });
+            await response.WriteAsJsonAsync(new
+            {
+                Success = true,
+                Message = registerUser.Message
+            });
             return response;
         }
     }

@@ -191,6 +191,12 @@ namespace backend_api.Repositories
             try
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
+                var isTeacher = await dbContext.Entities
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Id == t.CreateById && e.Roles.Type == "Teacher");
+
+                if (!isTeacher)
+                    return (false, "Teacher is not Admin.");
 
                 var topic = await dbContext.Topics
                 .AsNoTracking()
@@ -236,7 +242,7 @@ namespace backend_api.Repositories
                     .AnyAsync(e => e.Id == t.AdminId && e.Roles.Type == "Admin");
 
                 if (!isAdmin)
-                    return (false, "User is not Admin.");
+                    return (false, "Admin is not Admin.");
 
                 var topic = await dbContext.Topics
                 .AsNoTracking()

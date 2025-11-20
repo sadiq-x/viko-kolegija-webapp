@@ -24,21 +24,21 @@ namespace backend_api.Functions
         {
             var createParticipantDTO = await req.ReadFromJsonAsync<ParticipantsEventInsertParticipantDescriptionRequestDTO>();
 
-            if (createParticipantDTO is null) //Verify the Dto
+            if (createParticipantDTO is null) 
             {
                 var BadResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                 await BadResponse.WriteAsJsonAsync(new { message = "Invalid request body." });
                 return BadResponse;
             }
 
-            executionContext.Items.TryGetValue("Token", out var userObj); //Get Item Token from Context Function
+            executionContext.Items.TryGetValue("Token", out var userObj); 
 
-            var token = userObj as string; //Transform token object into string
+            var token = userObj as string;
 
-            if (string.IsNullOrEmpty(token)) //Verify if entity model don't are false and token don't are empty
+            if (string.IsNullOrEmpty(token))
             {
-                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized); //Create a response to send
-                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." }); //Response send with msg
+                var BadResponse = req.CreateResponse(HttpStatusCode.Unauthorized); 
+                await BadResponse.WriteAsJsonAsync(new { message = "Token don't receive." }); 
                 return BadResponse;
             }
 
@@ -62,7 +62,7 @@ namespace backend_api.Functions
                 {
                     Success = false,
                     Message = "Fields incorrect.",
-                    Error = createParticipantDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() //Check all required annotations
+                    Error = createParticipantDTO?.Validate().Select(e => e.ToString()) ?? new List<string>() 
                 });
                 return BadRequest;
             }
@@ -70,21 +70,21 @@ namespace backend_api.Functions
             var participantCreated = await _participantsEventsRepository.insertParticipantsEventParticipantDescription(createParticipantDTO); //Checking request body with database
             if (!participantCreated.Success)
             {
-                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+                var notFoundResponse = req.CreateResponse(HttpStatusCode.OK); 
                 await notFoundResponse.WriteAsJsonAsync(new
                 {
                     Success = false,
                     Message = participantCreated.Message
-                }); //Response a message if the error exist
+                });
                 return notFoundResponse;
             }
 
-            var response = req.CreateResponse(HttpStatusCode.OK); //Create a response to send
+            var response = req.CreateResponse(HttpStatusCode.OK); 
             await response.WriteAsJsonAsync(new
             {
                 Success = true
             });
-            return response; //Return
+            return response; 
         }
 
     }
