@@ -19,16 +19,16 @@ export class ProfileService {
     //Http request get
     return this.http.get<any>(this.apiUrlGetProfile).pipe(
       map((response) => {
-        if (response?.user) {
+        console.log(response)
+        if (response?.user && response?.success) {
           return response.user;
         }
-        return false as const;
+        return false as const; 
       })
     );
   }
   //Function updateProfile will update all information of user
   updateProfile(obj: {
-    EntityId: number;
     Username: string;
     Email: string;
     Image: string;
@@ -40,6 +40,8 @@ export class ProfileService {
   }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlUpdateProfile, obj).pipe(
       map((response) => {
+        console.log(response)
+        //test this
         return response?.success === true;
       })
     );

@@ -107,7 +107,7 @@
                                 <p class="mt-1 font-medium">{{ item.Comments || "Not Attributed" }}</p>
                             </div>
                         </div>
-                        <form [formGroup]="formEvent" class="space-y-4" *ngIf="!item.ParticipantDescription">
+                        <form [formGroup]="formEvent" class="space-y-4" *ngIf="!item.Grade && item.Status == true && !item.ParticipantDescription">
                             <div class="mt-6">
                                 <label for="descriptionInput" class="text-sm font-semibold text-blue-800 mb-2">
                                     Your writing space
@@ -125,7 +125,7 @@
                             </button>
                         </form>
                         <div class="mt-6  sm:grid-cols-2 gap-4 text-sm text-blue-900 whitespace-pre-line break-words"
-                            *ngIf="!!item.ParticipantDescription">
+                            *ngIf="item.Status == false || !!item.Grade || item.ParticipantDescription">
                             <h2 class="text-sm font-semibold text-blue-800 mb-2">What did you write</h2>
                             <div class="rounded-xl border border-blue-200 bg-blue-50/40 p-4" id="descriptionOutput">
                                 <p class="mt-1 font-medium">{{ item.ParticipantDescription}}</p>

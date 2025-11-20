@@ -40,10 +40,11 @@ export class ParticipantsService {
   getParticipantsIndividualEvent_teacher(EventId: number): Observable<ModelListParticipants | false> {
     return this.http.get<any>(`${this.apiUrlGetParticipants_teacher}${EventId}`).pipe(
       map((response) => {
+        console.log(response)
         if (response?.success && response?.participantsEvent) {
           return response.participantsEvent;
         } else if (!response.success) {
-          return false as const;
+          return false as const; 
         }
       })
     );
@@ -67,6 +68,7 @@ export class ParticipantsService {
   }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlInsertParticipantParticipantDescription, obj).pipe(
       map((response) => {
+        //test this
         console.log(response);
         if (response?.success) {
           return true as const;
@@ -96,7 +98,7 @@ export class ParticipantsService {
   updateParticipantStatus(obj: {
     Id: number;
     EventId: number;
-    EntityId: number;
+    UserId: number;
   }): Observable<boolean> {
     return this.http.put<any>(this.apiUrlUpdateStatusParticipant, obj).pipe(
       map((response) => {

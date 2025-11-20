@@ -86,7 +86,6 @@ export class AuthService {
   }
   //Request the backend to update password
   updatePassword(obj: {
-    EntityId: string;
     Username: string;
     PasswordHash: string;
   }): Observable<boolean> {

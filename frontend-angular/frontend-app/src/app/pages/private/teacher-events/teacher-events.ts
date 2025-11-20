@@ -93,6 +93,7 @@ export class TeacherEvents {
     this.loadingParticipants.set(true);
     this.participantsService.getParticipantsIndividualEvent_teacher(this.eventId).subscribe({
       next: (res) => {
+        console.log(res)
         if (Array.isArray(res) && !!res) {
           this.loadingParticipants.set(false);
           this.errorLoadingParticipants = false;
@@ -105,6 +106,7 @@ export class TeacherEvents {
               Status: x.status ?? x.Status,
               Grade: x.grade ?? x.Grade,
               Comments: x.comments ?? x.Comments,
+              ParticipantDescription: x.participantDescription ?? x.ParticipantDescription
             }))
           );
           return;
@@ -161,7 +163,7 @@ export class TeacherEvents {
     const payload = {
       Id: p.Id,
       EventId: this.eventId,
-      EntityId: p.EntityId,
+      UserId: p.EntityId,
     };
 
     this.participantsService.updateParticipantStatus(payload).subscribe({

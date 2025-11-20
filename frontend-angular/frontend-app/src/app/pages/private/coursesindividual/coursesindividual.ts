@@ -207,11 +207,13 @@ export class CoursesIndividual {
   }
   get cancelButtonDisabled() {
   const p = this.participant();
+  const c = this.course();
 
   const missingDescription = p.some(c => !c.ParticipantDescription || c.ParticipantDescription.trim() === '');
   const missingGrade = p.some(c => !c.Grade || c.Grade.trim() === '');
   const hasActiveStatus = p.some(c => c.Status === true);
+  const hasEventActiveStatus = c.some(c => c.Status === "Open");
 
-  return missingDescription && missingGrade && hasActiveStatus;
+  return missingDescription && missingGrade && hasActiveStatus && hasEventActiveStatus;
 }
 }
