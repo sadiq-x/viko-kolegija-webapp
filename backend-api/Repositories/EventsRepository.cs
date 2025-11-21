@@ -347,7 +347,7 @@ namespace backend_api.Repositories
                     return (false, "User is not Admin.");
 
                 var eventEntity = await dbContext.Events
-                    .FirstOrDefaultAsync(e => e.Id == t.Id);
+                    .FirstOrDefaultAsync(e => e.Id == t.Id && e.StatusEvents.Type == "Open");
 
                 if (eventEntity is null)
                     return (false, "Event not found.");
