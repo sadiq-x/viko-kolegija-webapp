@@ -3,7 +3,8 @@
     <div class="w-full max-w-md">
         <!-- Logo  Tittle -->
         <div class="text-center mb-6">
-            <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain" />
+            <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain cursor-pointer"
+                [routerLink]="['/home']"/>
             <h1 class="mt-3 text-2xl font-bold text-blue-800">Sign in</h1>
             <p class="mt-1 text-sm text-blue-700/70">Fill in the data securely.</p>
         </div>
@@ -15,8 +16,8 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
-                    <input id="username" type="text" formControlName="username" autocomplete="username" (keydown.space)="$event.preventDefault()"
-                        placeholder="Username" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
+                    <input id="username" type="text" formControlName="username" autocomplete="username"
+                        (keydown.space)="$event.preventDefault()" placeholder="Username" class="mt-1 w-full rounded-xl border border-blue-200 bg-white px-3 py-2 text-blue-900
                    placeholder:text-blue-900/40 focus:outline-none focus:ring-4
                    focus:ring-blue-200 focus:border-blue-400" aria-describedby="username-help" required />
                     <p id="username-help" class="mt-1 text-xs text-blue-700/70">

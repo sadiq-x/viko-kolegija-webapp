@@ -212,8 +212,8 @@ export class CoursesIndividual {
   const missingDescription = p.some(c => !c.ParticipantDescription || c.ParticipantDescription.trim() === '');
   const missingGrade = p.some(c => !c.Grade || c.Grade.trim() === '');
   const hasActiveStatus = p.some(c => c.Status === true);
-  const hasEventActiveStatus = c.some(c => c.Status === "Open");
+  const hasEventOpenStatus = c.some(c => c.Status === "Open");
 
-  return missingDescription && missingGrade && hasActiveStatus && hasEventActiveStatus;
+  return missingDescription && missingGrade && hasActiveStatus && hasEventOpenStatus;
 }
 }

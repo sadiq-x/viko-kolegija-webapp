@@ -15,11 +15,10 @@ import { EventService } from '../../../services/events';
   styleUrl: './admin-events.scss',
 })
 export class AdminEvents {
-  private eventId: number = 0;
-  eventData: any | null = null;
+  private eventId: number = 0; //Variable with event Id
+  eventData: any | null = null; //Variable to receive event information
 
-  // formulário de edição
-  form: FormGroup;
+  form: FormGroup; //Form to edit open events
 
   topics: ModelTopicsResponse[] = []; //List of all topics
   teachers: ModelTeacherResponse[] = []; //List of all teachers
@@ -48,13 +47,14 @@ export class AdminEvents {
     if (!coursePassed || (coursePassed.Id ?? coursePassed.id) !== this.eventId) {
       return;
     }
-    console.log(coursePassed);
+
     this.getTopics();
     this.getTeachers();
 
     this.eventData = coursePassed;
 
     this.patchEventData();
+    this.formDisabled();
   }
 
   //Get the all topics from backend
@@ -113,6 +113,14 @@ export class AdminEvents {
     if (!teacher) return false;
     return this.teachers.some((t) => t.Name === teacher);
   }
+  //Function to verify status and attribute if the form can be enable or disable
+  private formDisabled() {
+    if (this.isEditable) {
+      this.form.enable();
+    } else {
+      this.form.disable();
+    }
+  }
   //Button to save edition of event
   btnSave() {
     if (this.form.invalid || !this.eventData) {
@@ -130,10 +138,9 @@ export class AdminEvents {
       CreateBy: v.teacher,
       DateCreate: new Date(v.startDate).toISOString(),
     };
-
+    console.log(this.form.dirty);
     this.eventService.updateEvent_admin(payload).subscribe({
       next: (res) => {
-        console.log(res);
         if (res) {
           alert('Event update successfully');
         }
@@ -144,8 +151,16 @@ export class AdminEvents {
   btnCancel() {
     this.router.navigate(['/admin']);
   }
+  //Property to get status
+  get status(): string {
+    return this.eventData?.Status ?? this.eventData?.status ?? '';
+  }
+  //Property to disable editable form
+  get isEditable(): boolean {
+    return this.status === 'Open';
+  }
   //Property to disable the button
-  get btnSaveDisabled() {
-    return this.form.invalid || !this.form.dirty;
+  get btnSaveDisabled(): boolean {
+    return !this.isEditable || this.form.invalid;
   }
 }
