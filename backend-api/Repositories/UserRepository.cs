@@ -104,7 +104,7 @@ namespace backend_api.Repositories
                 var UsersDTO = new Users
                 {
                     EntityId = EntitiesDTO.Id,
-                    Username = t.Username,
+                    Username = t.Username.Trim().ToLowerInvariant(),
                     PasswordHash = t.PasswordHash,
                 };
 
