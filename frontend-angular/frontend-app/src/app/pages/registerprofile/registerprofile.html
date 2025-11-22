@@ -2,6 +2,17 @@
 <div class="min-h-screen from-blue-50 to-white py-8 px-4 flex justify-center items-start bg-blue-50" *ngIf="user">
     <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-blue-100 p-6 transition hover:shadow-2xl">
 
+        <!-- Button Back to Home -->
+        <div class="w-full max-w-2xl mb-4">
+            <a routerLink="/home" class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-white px-3 py-2
+                  text-blue-700 hover:bg-blue-50 transition shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 5.5 9 12l6.5 6.5-1.5 1.5L6 12l8-8 1.5 1.5Z" />
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
         <!-- Welcome message -->
         <div class="mb-6 text-center">
             <h2 class="text-xl font-semibold text-blue-800">

@@ -24,6 +24,11 @@
                         Use the username associated with your account.
                     </p>
                 </div>
+                <!-- ERROR: Username -->
+                <p *ngIf="form.get('username')?.hasError('required') && form.get('username')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Username is required.
+                </p>
 
                 <!-- Password -->
                 <div>
@@ -51,6 +56,11 @@
                         Keep your password safe.
                     </p>
                 </div>
+                <!-- ERROR: Password -->
+                <p *ngIf="form.get('password')?.hasError('required') && form.get('password')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Password is required.
+                </p>
 
                 <!-- Option remember login  -->
                 <div class="flex items-center justify-between">
