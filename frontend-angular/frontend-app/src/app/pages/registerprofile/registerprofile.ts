@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ModelUserRegisterRequest } from '../../models/modelUser';
 
 @Component({
   selector: 'app-registerprofile',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './registerprofile.html',
   styleUrl: './registerprofile.scss',
 })

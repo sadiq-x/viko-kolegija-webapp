@@ -8,7 +8,7 @@ import {
   ValidatorFn,
   FormGroup,
 } from '@angular/forms';
-import { Route, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DIAL_CODES } from '../../data/dial-codes';
 import { ModelDialCode } from '../../models/model-dial-codes';
 import { CommonModule } from '@angular/common';
@@ -45,9 +45,17 @@ export class Register {
   constructor(private fb: FormBuilder, private auth: AuthService, private route: Router) {
     this.formRegister = this.fb.group(
       {
-        username: ['', [Validators.required]],
+        username: ['', [Validators.required, Validators.pattern(/^\S+$/)]],
         name: ['', [Validators.required, Validators.maxLength(100)]],
-        email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
+        email: [
+          '',
+          [
+            Validators.required,
+            Validators.email,
+            Validators.maxLength(150),
+            Validators.pattern(/^\S+$/),
+          ],
+        ],
         countryCode: ['+370', [Validators.required]],
         phone: [
           '',
@@ -99,11 +107,8 @@ export class Register {
 
     this.auth.register(payload).subscribe({
       next: (res: boolean) => {
-        console.log(res);
         if (res) {
-          this.route.navigate(['/register/profile'], { state: {user : payload} });
-          //Need to create a page to show the new user created.
-          //TODO: Todo this ->
+          this.route.navigate(['/register/profile'], { state: { user: payload } });
         }
       },
     });
@@ -143,6 +148,20 @@ export class Register {
 
     //Update the form with clean value
     this.formRegister.patchValue({ numberPhone: input.value });
+  }
+  removeSpaces() {
+    //For the username
+    const valueUsername = this.formRegister.get('username')?.value || '';
+    const cleanedUsername = valueUsername.replace(/\s/g, '').toLowerCase();
+    this.formRegister.get('username')?.setValue(cleanedUsername.replace(/\s/g, ''), {
+      emitEvent: false,
+    });
+    //For the email
+    const valueEmail = this.formRegister.get('email')?.value || '';
+    const cleanedEmail = valueEmail.replace(/\s/g, '').toLowerCase();
+    this.formRegister.get('email')?.setValue(cleanedEmail.replace(/\s/g, ''), {
+      emitEvent: false,
+    });
   }
   //Property to disable the buttons
   get submitDisabled() {

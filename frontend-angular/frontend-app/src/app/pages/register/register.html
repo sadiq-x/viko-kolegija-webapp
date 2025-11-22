@@ -5,7 +5,7 @@
         <div class="text-center mb-6">
             <!-- Logo -->
             <img src="/logo-viko.png" alt="Logo Viko" class="mx-auto w-24 h-24 object-contain cursor-pointer"
-                [routerLink]="['/home']"/>
+                [routerLink]="['/home']" />
         </div>
 
         <!-- Tittle -->
@@ -23,10 +23,15 @@
                 <!-- Username -->
                 <div>
                     <label for="username" class="block text-sm font-medium text-blue-900">Username</label>
-                    <input id="username" type="text" formControlName="username" required class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
+                    <input id="username" type="text" (input)="removeSpaces()" formControlName="username" required class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
          text-blue-900 placeholder:text-blue-900/40
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="Username" />
                 </div>
+                <!-- ERROR: Username -->
+                <p *ngIf="formRegister.get('username')?.hasError('required') && formRegister.get('username')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Username is required.
+                </p>
 
                 <!-- Name -->
                 <div>
@@ -35,14 +40,25 @@
          text-blue-900 placeholder:text-blue-900/40
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="Your name" />
                 </div>
+                <!-- ERROR: Name -->
+                <p *ngIf="formRegister.get('name')?.hasError('required') && formRegister.get('name')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Name is required.
+                </p>
 
                 <!-- Email -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-blue-900">Email</label>
-                    <input id="email" type="email" formControlName="email" required maxlength="150" class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
+                    <input id="email" type="email" (input)="removeSpaces()" formControlName="email" required
+                        maxlength="150" class="w-full rounded-xl border border-blue-300 bg-white px-3 py-2 
          text-blue-900 placeholder:text-blue-900/40
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" placeholder="exemplo@gmail.com" />
                 </div>
+                <!-- ERROR: Email -->
+                <p *ngIf="formRegister.get('email')?.hasError('required') && formRegister.get('email')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Email is required.
+                </p>
 
                 <!-- Phone (country code + number) -->
                 <div>
@@ -65,6 +81,11 @@
                         Choose the country code and enter your mobile phone number.
                     </p>
                 </div>
+                <!-- ERROR: Number Phone -->
+                <p *ngIf="formRegister.get('phone')?.hasError('required') && formRegister.get('phone')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Number Phone is required.
+                </p>
 
                 <!-- Address -->
                 <div>
@@ -74,6 +95,11 @@
          focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400"
                         placeholder="Location, street and number." />
                 </div>
+                <!-- ERROR: Address -->
+                <p *ngIf="formRegister.get('address')?.hasError('required') && formRegister.get('address')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Address is required.
+                </p>
 
                 <!-- Profile Image -->
                 <div>
@@ -98,6 +124,11 @@
                 text-blue-900 placeholder:text-blue-900/40
                 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-400" />
                 </div>
+                <!-- ERROR: Birthday -->
+                <p *ngIf="formRegister.get('birthday')?.hasError('required') && formRegister.get('birthday')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Birthday is required.
+                </p>
 
                 <!-- Nationality -->
                 <div>
@@ -108,6 +139,11 @@
                         placeholder="e.g., Portuguese" />
                     <p class="mt-1 text-xs text-blue-700/70">Maximum 20 characters.</p>
                 </div>
+                <!-- ERROR: Nationality -->
+                <p *ngIf="formRegister.get('nationality')?.hasError('required') && formRegister.get('nationality')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Nationality is required.
+                </p>
 
                 <!-- Gender -->
                 <div>
@@ -119,6 +155,11 @@
                         Maximum 20 characters.
                     </p>
                 </div>
+                <!-- ERROR: Gender -->
+                <p *ngIf="formRegister.get('gender')?.hasError('required') && formRegister.get('gender')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Gender is required.
+                </p>
 
                 <!-- Password -->
                 <div>
@@ -142,6 +183,11 @@
                         Minimum 8 characters, including lowercase, uppercase and digit.
                     </p>
                 </div>
+                <!-- ERROR: Password -->
+                <p *ngIf="formRegister.get('password')?.hasError('required') && formRegister.get('password')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Password is required.
+                </p>
 
                 <!-- Confirm Password -->
                 <div>
@@ -164,6 +210,11 @@
                         </button>
                     </div>
                 </div>
+                <!-- ERROR: Confirm Password -->
+                <p *ngIf="formRegister.get('confirmPassword')?.hasError('required') && formRegister.get('confirmPassword')?.touched"
+                    class="text-xs text-red-600 mt-1">
+                    Confirm Password is required.
+                </p>
 
                 <!-- Tip -->
                 <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
