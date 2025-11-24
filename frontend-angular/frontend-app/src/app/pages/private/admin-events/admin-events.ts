@@ -7,6 +7,8 @@ import { ModelTeacherResponse } from '../../../models/modelTeacher';
 import { TopicsService } from '../../../services/topics';
 import { TeacherService } from '../../../services/teacher';
 import { EventService } from '../../../services/events';
+import { ModelListParticipants } from '../../../models/modelParticipant';
+import { ParticipantsService } from '../../../services/participants';
 
 @Component({
   selector: 'app-admin-events',
@@ -17,6 +19,10 @@ import { EventService } from '../../../services/events';
 export class AdminEvents {
   private eventId: number = 0; //Variable with event Id
   eventData: any | null = null; //Variable to receive event information
+
+  loadingParticipants = signal<boolean>(false); //Loading view UI of participants
+  participants = signal<ModelListParticipants[]>([]); //List of participants
+  errorLoadingParticipants: boolean = true; //Variable if the participant don't exist, will set false, remove every UI of participant
 
   form: FormGroup; //Form to edit open events
 
@@ -29,7 +35,8 @@ export class AdminEvents {
     private fb: FormBuilder,
     private topicService: TopicsService,
     private teacherService: TeacherService,
-    private eventService: EventService
+    private eventService: EventService,
+    private participantsService: ParticipantsService
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -55,6 +62,7 @@ export class AdminEvents {
 
     this.patchEventData();
     this.formDisabled();
+    this.getParticipants();
   }
 
   //Get the all topics from backend
@@ -85,6 +93,44 @@ export class AdminEvents {
           return;
         }
         this.teachers = [];
+      },
+    });
+  }
+  //Get the participants from backend, from specific eventId
+  private getParticipants() {
+    const payload = {
+      EventId: this.eventId,
+      EntityName: this.eventData.CreateBy,
+    };
+
+    if (!payload.EventId || !payload.EntityName) {
+      return;
+    }
+
+    this.loadingParticipants.set(true);
+    this.participantsService.getParticipantsIndividualEvent_admin(payload).subscribe({
+      next: (res) => {
+
+        if (Array.isArray(res) && !!res) {
+          this.loadingParticipants.set(false);
+          this.errorLoadingParticipants = false;
+          this.participants.set(
+            res.map((x: any) => ({
+              Id: x.id ?? x.Id,
+              EntityId: x.entityId ?? x.EntityId,
+              Name: x.name ?? x.Name,
+              Email: x.email ?? x.Email,
+              Status: x.status ?? x.Status,
+              Grade: x.grade ?? x.Grade,
+              Comments: x.comments ?? x.Comments,
+              ParticipantDescription: x.participantDescription ?? x.ParticipantDescription,
+            }))
+          );
+          return;
+        }
+        this.participants.set([]);
+        this.loadingParticipants.set(false);
+        this.errorLoadingParticipants = false;
       },
     });
   }
@@ -159,8 +205,12 @@ export class AdminEvents {
   get isEditable(): boolean {
     return this.status === 'Open';
   }
-  //Property to disable the button
+  //Property to disable the button Save
   get btnSaveDisabled(): boolean {
-    return !this.isEditable || this.form.invalid;
+    return !this.form.dirty;
+  }
+  //Property to disable the all buttons
+  get buttonsDisabled(): boolean {
+    return this.isEditable;
   }
 }

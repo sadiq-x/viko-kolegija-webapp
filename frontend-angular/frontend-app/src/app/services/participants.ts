@@ -13,14 +13,15 @@ export class ParticipantsService {
   //Get
   private apiUrlGetParticipants_user = environment.apiUrl + 'get/participants/';
   private apiUrlGetParticipants_teacher = environment.apiUrl + 'get/participants/teacher/';
+  private apiUrlGetParticipants_admin = environment.apiUrl + 'get/participants/admin';
   //Insert
   private apiUrlInsertParticipantInEvent = environment.apiUrl + 'insert/participant/event';
-  private apiUrlInsertParticipantParticipantDescription = environment.apiUrl + 'insert/participant/description';
+  private apiUrlInsertParticipantParticipantDescription =
+    environment.apiUrl + 'insert/participant/description';
   private apiUrlInsertGradeParticipant = environment.apiUrl + 'insert/participant/grade';
   //Update
   private apiUrlUpdateStatusParticipant = environment.apiUrl + 'update/participant/status';
   private apiUrlUpdateCancelParticipant = environment.apiUrl + 'update/participant/cancelEvent';
-  
 
   constructor(private http: HttpClient) {}
 
@@ -37,14 +38,30 @@ export class ParticipantsService {
     );
   }
   //Function getParticipantsIndividualEvent_teacher will get participants of a specific event
-  getParticipantsIndividualEvent_teacher(EventId: number): Observable<ModelListParticipants | false> {
+  getParticipantsIndividualEvent_teacher(
+    EventId: number
+  ): Observable<ModelListParticipants | false> {
     return this.http.get<any>(`${this.apiUrlGetParticipants_teacher}${EventId}`).pipe(
       map((response) => {
-        console.log(response)
         if (response?.success && response?.participantsEvent) {
           return response.participantsEvent;
         } else if (!response.success) {
-          return false as const; 
+          return false as const;
+        }
+      })
+    );
+  }
+  //Function getParticipantsIndividualEvent_admin will get participants of a specific event
+  getParticipantsIndividualEvent_admin(obj: {
+    EventId: number;
+    EntityName: string;
+  }): Observable<ModelListParticipants | false> {
+    return this.http.post<any>(this.apiUrlGetParticipants_admin, obj).pipe(
+      map((response) => {
+        if (response?.success && response?.participantsEvent) {
+          return response.participantsEvent;
+        } else if (!response.success) {
+          return false as const;
         }
       })
     );
@@ -53,6 +70,7 @@ export class ParticipantsService {
   insertParticipantsInEvent(obj: { EventId: number }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlInsertParticipantInEvent, obj).pipe(
       map((response) => {
+        console.log(response);
         if (response?.success) {
           return true as const;
         } else {
@@ -68,7 +86,6 @@ export class ParticipantsService {
   }): Observable<boolean> {
     return this.http.post<any>(this.apiUrlInsertParticipantParticipantDescription, obj).pipe(
       map((response) => {
-        //test this
         console.log(response);
         if (response?.success) {
           return true as const;
@@ -110,9 +127,7 @@ export class ParticipantsService {
     );
   }
   //Function cancelParticipantStatus will cancel a participant of a event
-  cancelParticipantStatus(obj: {
-    EventId: number;
-  }): Observable<boolean> {
+  cancelParticipantStatus(obj: { EventId: number }): Observable<boolean> {
     return this.http.put<any>(this.apiUrlUpdateCancelParticipant, obj).pipe(
       map((response) => {
         if (response?.success) {
