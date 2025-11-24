@@ -18,6 +18,16 @@ namespace backend_api.Models
         [Required]
         public int? EntityId { get; set; } = default!;
     }
+    //Dto Request for a specific eventId - Admin
+    public sealed class ParticipantsListFromEventIdAdminRequestDTO
+    {
+        [Required]
+        public int EventId { get; set; } = default!;
+        [Required]
+        public string EntityName { get; set; } = default!;
+        [Required]
+        public int? AdminId { get; set; } = default!;
+    }
     //Dto Response for a specific eventId
     public sealed class ParticipantsListFromEventIdResponseDTO
     {
@@ -66,7 +76,7 @@ namespace backend_api.Models
         public int? EntityId { get; set; } = default!;
     }
     //Dto Request insert participant description in specific event
-    public sealed class ParticipantsEventInsertParticipantDescriptionRequestDTO        
+    public sealed class ParticipantsEventInsertParticipantDescriptionRequestDTO
     {
         [Required]
         public int EventId { get; set; } = default!;

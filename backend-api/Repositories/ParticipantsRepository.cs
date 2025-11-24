@@ -8,6 +8,7 @@ namespace backend_api.Repositories
     {
         Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_User(ParticipantsListFromEventIdUserRequestDTO t);
         Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Teacher(ParticipantsListFromEventIdTeacherRequestDTO t);
+        Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Admin(ParticipantsListFromEventIdAdminRequestDTO t); 
         Task<(bool Success, string? Message)> insertGradeParticipantsEvent(ParticipantsEventGradeRequestDTO t);
         Task<(bool Success, string? Message)> updateStatusParticipantsEvent(ParticipantsEventUpdateStatusRequestDTO t);
         Task<(bool Success, string? Message)> insertParticipantsEventInEvent(ParticipantsEventInsertInEventIdRequestDTO t);
@@ -74,6 +75,56 @@ namespace backend_api.Repositories
             {
                 using var dbContext = _readContextFactory.CreateDbContext();
                 var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId && u.CreateById == t.EntityId);
+
+                if (!eventExist)
+                {
+                    return null;
+                }
+
+                var result = await dbContext.ParticipantsEvents
+                    .AsNoTracking()
+                    .Where(pe => pe.EventId == t.EventId)
+                    .Select(u => new ParticipantsListFromEventIdResponseDTO
+                    {
+                        Id = u.Id,
+                        EntityId = u.EntityId,
+                        Name = u.Entity.Name,
+                        Email = u.Entity.Email,
+                        Status = u.Status,
+                        Grade = u.Grade,
+                        Comments = u.Comments,
+                        ParticipantDescription = u.ParticipantDescription
+                    })
+                    .ToListAsync();
+
+
+                if (result.Count == 0)
+                    return null;
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<ParticipantsListFromEventIdResponseDTO>?> getParticipantsFromEventId_Admin(ParticipantsListFromEventIdAdminRequestDTO t)
+        {
+            if (t.EventId <= 0) return null;
+            if (string.IsNullOrEmpty(t.EntityName)) return null;
+            if (t.AdminId <= 0 || t.AdminId is null) return null;
+            try
+            {
+                using var dbContext = _readContextFactory.CreateDbContext();
+                var isAdmin = await dbContext.Entities
+                   .AsNoTracking()
+                   .AnyAsync(e => e.Id == t.AdminId && e.Roles.Type == "Admin");
+
+                if (!isAdmin)
+                    return null;
+
+                var eventExist = await dbContext.Events.AsNoTracking().AnyAsync(u => u.Id == t.EventId && u.Entities.Name == t.EntityName);
 
                 if (!eventExist)
                 {
