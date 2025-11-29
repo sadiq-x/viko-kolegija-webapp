@@ -64,6 +64,7 @@ Admins can create new courses, manage users and progress
 >Participants
 * get/participants/{eventId:int}
 * get/participants/teacher/{eventId:int}
+* get/participants/admin
 * insert/participant/description
 * insert/participant/event
 * insert/participant/grade
