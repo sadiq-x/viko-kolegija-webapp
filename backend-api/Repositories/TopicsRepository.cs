@@ -100,6 +100,13 @@ namespace backend_api.Repositories
                 if (!isAdmin)
                     return (false, "User is not Admin.");
 
+                var eventsExist = await dbContext.Events
+                    .AsNoTracking()
+                    .AnyAsync(e => e.Topics.Type == t.Type);
+
+                if (eventsExist)
+                    return (false, "Events with topic exist.");
+
                 var topicExists = await dbContext.Topics
                     .AsNoTracking()
                     .FirstOrDefaultAsync(tp => tp.Type == t.Type && tp.Id == t.Id);
