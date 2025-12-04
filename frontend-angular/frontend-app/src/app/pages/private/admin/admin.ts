@@ -353,7 +353,9 @@ export class Admin {
     this.topicService.deleteTopics(topic).subscribe({
       next: (res) => {
         if (!res) {
+          console.log(res)
           alert('Topic impossible to delete.');
+          return;
         }
         this.allTopics.update((list) => list.filter((t) => t.Id !== topic.Id));
         alert('Topic deleted successful.');
